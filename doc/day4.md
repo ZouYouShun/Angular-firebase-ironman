@@ -108,6 +108,8 @@ CollectionHandler、DocumentHandler的實作方法與昨天的List、Object也�
 # 本日小結
 今天我們初步了解了firestore的基礎新刪修，了解到firestore它的強大的地方，特別是他那神秘的傳輸過程，今天是平安夜，祝大家平安喜樂，明天會針對firestore做query與相關用法作介紹。
 
+本日範例：https://github.com/ZouYouShun/Angular-firebase-ironman/tree/day4_cloudfiretore_base_use
+
 # 參考文章
 [https://github.com/angular/angularfire2/blob/master/docs/firestore/documents.md](https://github.com/angular/angularfire2/blob/master/docs/firestore/documents.md)
 

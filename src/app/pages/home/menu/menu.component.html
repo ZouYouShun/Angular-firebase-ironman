@@ -1,0 +1,17 @@
+<!-- <input type="text" #addInput>
+<button (click)="add(addInput.value)">add</button>
+<div *ngFor="let menu of menus$ | async" style="border: 2px solid black">
+  <ng-container *ngIf="!menu.update; else update">
+    <p>Title: {{menu.title}},
+      Value: {{menu.value}},
+      Created at: ({{menu.createdAt | date:'yyyy-MM-dd hh:mm:ss'}}),
+      updated at: ({{menu.updatedAt | date:'yyyy-MM-dd hh:mm:ss'}})
+      <button *ngIf="!menu.update" (click)="menu.update = true">update</button>
+      <button (click)="delete(menu)">delete</button>
+    </p>
+  </ng-container>
+  <ng-template #update>
+    <input type="text" [value]="menu.title" #updateInput>
+    <button (click)="updateItem(menu, updateInput.value)">ok</button>
+  </ng-template>
+</div> -->

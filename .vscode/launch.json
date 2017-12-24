@@ -1,0 +1,27 @@
+{
+  "version": "0.2.0",
+  "compounds": [{
+    "name": "Server+Browser",
+    "configurations": ["Server", "Browser"]
+  }],
+  "configurations": [{
+      "type": "chrome",
+      "request": "attach",
+      "name": "Browser",
+      "url": "http://localhost:4200*",
+      "port": 9222,
+      "sourceMaps": true,
+      "webRoot": "${workspaceRoot}",
+      "sourceMapPathOverrides": {
+        "webpack://{{workspaceRoot}}/src/*": "{{workspaceRoot}}/src/*"
+      }
+    },
+    {
+      "type": "node",
+      "request": "attach",
+      "name": "Server",
+      "port": 9229,
+      "restart": true
+    }
+  ]
+}

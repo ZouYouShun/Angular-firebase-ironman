@@ -1,0 +1,19 @@
+<ul>
+  <li *ngFor="let message of messages$ | async">
+    <ng-container *ngIf="!message.update; else update">
+      <span>{{message.content}}</span><span>({{message.updatedAt | date:'yyyy-MM-dd hh:mm:ss'}})</span>
+    </ng-container>
+    <ng-template #update>
+      <input type="text" [value]="message.content" #updateInput>
+      <button (click)="updateItem(message, updateInput.value)">ok</button>
+    </ng-template>
+
+    <button (click)="delete(message)">delete</button>
+    <button (click)="updateItem(message)">update</button>
+  </li>
+</ul>
+
+<input type="text" #input (keyup.enter)="send(input.value)">
+<button (click)="send(input.value)">送出</button>
+
+<!-- <prettyjson [obj]="messages$ | async"></prettyjson> -->

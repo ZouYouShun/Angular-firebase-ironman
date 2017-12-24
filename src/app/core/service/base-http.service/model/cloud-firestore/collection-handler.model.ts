@@ -30,6 +30,16 @@ export class CollectionHandler {
       req.valueChanges();
   }
 
+  getById(key, isKey = true): Observable<any> {
+    return isKey ?
+      this._fireAction.doc(key).snapshotChanges().map(a => {
+        const data = a.payload.data();
+        const id = a.payload.id;
+        return { id, ...data };
+      }) :
+      this._fireAction.valueChanges();
+  }
+
   // state(events?: ('added' | 'removed' | 'modified')[]) {
   //   return this._fireAction.auditTrail();
   // }
@@ -37,7 +47,7 @@ export class CollectionHandler {
   add<T>(data: object): Observable<any> {
     return Observable.fromPromise(
       this._fireAction
-        .add(storeTimeObject(data)));
+        .add(storeTimeObject(data))).map(d => d.id);
   }
 
   delete(key: string): Observable<any> {

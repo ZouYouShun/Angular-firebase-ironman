@@ -219,7 +219,7 @@ ref.orderBy('content', 'asc').orderBy('updatedAt', 'desc')
 # 聖誕快樂~
 ![](https://ithelp.ithome.com.tw/images/emoticon/emoticon54.gif)![](https://ithelp.ithome.com.tw/images/emoticon/emoticon54.gif)![](https://ithelp.ithome.com.tw/images/emoticon/emoticon54.gif)![](https://ithelp.ithome.com.tw/images/emoticon/emoticon54.gif)![](https://ithelp.ithome.com.tw/images/emoticon/emoticon54.gif)![](https://ithelp.ithome.com.tw/images/emoticon/emoticon54.gif)![](https://ithelp.ithome.com.tw/images/emoticon/emoticon54.gif)![](https://ithelp.ithome.com.tw/images/emoticon/emoticon54.gif)![](https://ithelp.ithome.com.tw/images/emoticon/emoticon54.gif)![](https://ithelp.ithome.com.tw/images/emoticon/emoticon54.gif)![](https://ithelp.ithome.com.tw/images/emoticon/emoticon54.gif)![](https://ithelp.ithome.com.tw/images/emoticon/emoticon54.gif)![](https://ithelp.ithome.com.tw/images/emoticon/emoticon54.gif)![](https://ithelp.ithome.com.tw/images/emoticon/emoticon54.gif)![](https://ithelp.ithome.com.tw/images/emoticon/emoticon54.gif)![](https://ithelp.ithome.com.tw/images/emoticon/emoticon54.gif)![](https://ithelp.ithome.com.tw/images/emoticon/emoticon54.gif)![](https://ithelp.ithome.com.tw/images/emoticon/emoticon54.gif)![](https://ithelp.ithome.com.tw/images/emoticon/emoticon54.gif)![](https://ithelp.ithome.com.tw/images/emoticon/emoticon54.gif)
 
-本日範例：https://github.com/ZouYouShun/Angular-firebase-ironman/tree/day4_cloudfiretore_base_use
+本日範例：https://github.com/ZouYouShun/Angular-firebase-ironman/tree/day5_query_collection
 
 # 參考文章
 [https://github.com/angular/angularfire2/blob/master/docs/firestore/querying-collections.md](https://github.com/angular/angularfire2/blob/master/docs/firestore/querying-collections.md)

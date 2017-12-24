@@ -1,29 +1,68 @@
-import { Component, OnInit } from '@angular/core';
-import { RxViewer } from '@shared/ts/rx.viewer';
-import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/operator/take';
+
+import { Component } from '@angular/core';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { BaseHttpService, CollectionHandler } from '@core/service/base-http.service';
+import { RxViewer } from '@shared/ts/rx.viewer';
+import { QueryFn } from 'angularfire2/firestore';
+import * as firebase from 'firebase';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { Observable } from 'rxjs/Observable';
+
 
 @Component({
   selector: 'app-message-list',
   templateUrl: './message-list.component.html',
   styleUrls: ['./message-list.component.scss']
 })
-export class MessageListComponent implements OnInit {
+export class MessageListComponent {
   messages$: Observable<any>;
   messagesHandler: CollectionHandler;
+  query = new BehaviorSubject<QueryFn>(ref => ref.orderBy('updatedAt'));
+  myForm: FormGroup;
 
-  constructor(private _http: BaseHttpService) { }
+  constructor(private _http: BaseHttpService, private fb: FormBuilder) {
 
-  ngOnInit() {
+    this.myForm = this.fb.group({
+      content: ''
+    });
+
     this.messagesHandler = this._http.collection('messages');
-    this.messages$ = this.messagesHandler.get({
-      queryFn: ref => ref.orderBy('createdAt'),
-      isKey: true
+
+    this.messages$ = this.query.switchMap(queryFn => {
+      return this.messagesHandler.get({
+        queryFn: queryFn,
+        isKey: true
+      });
     });
   }
 
-  send(value: string) {
-    this.messagesHandler.add({ content: value }).subscribe(RxViewer);
+  getAll(number) {
+    if (number) {
+      return this.query.next(ref => ref.orderBy('updatedAt', 'asc').limit(number));
+    }
+    this.query.next(ref => ref.orderBy('updatedAt', 'asc'));
+  }
+
+  multiOrder() {
+    this.query.next(ref => ref.orderBy('content', 'asc').orderBy('updatedAt', 'desc'));
+  }
+
+  last(state: 'asc' | 'desc') {
+    this.query.next(ref => ref.orderBy('updatedAt', state).limit(2));
+  }
+
+  select(id) {
+    this.query.next(ref => ref.where(firebase.firestore.FieldPath.documentId(), '==', id));
+  }
+
+  handler(doc, type) {
+    this.query.next(ref => ref.orderBy('updatedAt', 'asc')[type](doc.updatedAt));
+  }
+
+  add() {
+    this.messagesHandler.add({ content: this.myForm.value.content }).subscribe(RxViewer);
+    this.myForm.reset();
   }
 
   delete(message: any) {
@@ -36,9 +75,5 @@ export class MessageListComponent implements OnInit {
       message.update = false;
     }
     message.update = true;
-  }
-
-  deleteEverything() {
-    // this.numbersHandler.drop().subscribe(rxHandler);
   }
 }

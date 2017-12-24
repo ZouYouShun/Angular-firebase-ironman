@@ -16,7 +16,9 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
   ],
   exports: [
     PrettyJsonModule,
-    ViewContainerDirective
+    ViewContainerDirective,
+    FormsModule,
+    ReactiveFormsModule
   ]
 })
 export class SharedModule {

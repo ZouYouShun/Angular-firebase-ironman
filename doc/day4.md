@@ -1,4 +1,4 @@
-# [Angular Firebase 入門與實做] Cloud Firestore - 新增(Create)、讀取(Read)、更新(Update)、刪除(Delete)
+# [Angular Firebase 入門與實做] Day-04 Cloud Firestore - 新增(Create)、讀取(Read)、更新(Update)、刪除(Delete)
 
 > Cloud Firestore is a NoSQL, document-oriented database. Unlike a SQL database, there are no tables or rows. Instead, you store data in documents, which are organized into collections. Each document contains a set of key-value pairs. Cloud Firestore is optimized for storing large collections of small documents.
 

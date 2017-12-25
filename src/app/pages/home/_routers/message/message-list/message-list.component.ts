@@ -1,10 +1,11 @@
 import 'rxjs/add/operator/take';
+import 'rxjs/add/operator/do';
 
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { BaseHttpService, CollectionHandler } from '@core/service/base-http.service';
 import { RxViewer } from '@shared/ts/rx.viewer';
-import { QueryFn } from 'angularfire2/firestore';
+import { QueryFn, DocumentChangeAction } from 'angularfire2/firestore';
 import * as firebase from 'firebase';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Observable } from 'rxjs/Observable';
@@ -20,6 +21,7 @@ export class MessageListComponent {
   messagesHandler: CollectionHandler;
   query = new BehaviorSubject<QueryFn>(ref => ref.orderBy('updatedAt'));
   myForm: FormGroup;
+  lastMessages;
 
   constructor(private _http: BaseHttpService, private fb: FormBuilder) {
 
@@ -34,10 +36,12 @@ export class MessageListComponent {
         queryFn: queryFn,
         isKey: true
       });
+    }).do((d: any[]) => {
+      console.log(d);
     });
   }
 
-  getAll(number) {
+  getAll(number?) {
     if (number) {
       return this.query.next(ref => ref.orderBy('updatedAt', 'asc').limit(number));
     }
@@ -57,7 +61,7 @@ export class MessageListComponent {
   }
 
   handler(doc, type) {
-    this.query.next(ref => ref.orderBy('updatedAt', 'asc')[type](doc.updatedAt));
+    this.query.next(ref => ref.orderBy('updatedAt', 'asc')[type](doc));
   }
 
   add() {

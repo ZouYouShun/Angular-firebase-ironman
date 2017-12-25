@@ -22,22 +22,18 @@ export class CollectionHandler {
     return config.isKey ?
       req.snapshotChanges().map(actions => {
         return actions.map(a => {
+          const metadata = a.payload.doc.metadata;
           const data = a.payload.doc.data();
+          const doc = a.payload.doc;
           const id = a.payload.doc.id;
-          return { id, ...data };
+          return { id, doc, metadata, ...data };
         });
       }) :
       req.valueChanges();
   }
 
-  getById(key, isKey = true): Observable<any> {
-    return isKey ?
-      this._fireAction.doc(key).snapshotChanges().map(a => {
-        const data = a.payload.data();
-        const id = a.payload.id;
-        return { id, ...data };
-      }) :
-      this._fireAction.valueChanges();
+  getById(key) {
+    return this._fireAction.doc(key);
   }
 
   // state(events?: ('added' | 'removed' | 'modified')[]) {

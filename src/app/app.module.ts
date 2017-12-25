@@ -16,7 +16,7 @@ import { SharedModule } from '@shared/shared.module';
     BrowserModule,
     AngularFireModule.initializeApp(environment.firebase), // init
     AngularFireDatabaseModule, // add realtime DB module
-    AngularFirestoreModule, // add cloudstore DB module
+    AngularFirestoreModule.enablePersistence(), // add cloudstore DB module
     AngularFireAuthModule, // add auth module
     AppRoutingModule,
     CoreModule,

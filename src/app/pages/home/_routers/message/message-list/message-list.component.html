@@ -23,11 +23,11 @@
 
     <button (click)="delete(message)">delete</button>
     <button (click)="updateItem(message)">update</button>
-    <button (click)="handler(message, 'endAt')"> <= </button>
-    <button (click)="handler(message, 'endBefore')"> < </button>
+    <button (click)="handler(message.doc, 'endAt')"> <= </button>
+    <button (click)="handler(message.doc, 'endBefore')"> < </button>
     <button (click)="select(message.id)"> == </button>
-    <button (click)="handler(message, 'startAt')"> >= </button>
-    <button (click)="handler(message, 'startAfter')"> > </button>
+    <button (click)="handler(message.doc, 'startAt')"> >= </button>
+    <button (click)="handler(message.doc, 'startAfter')"> > </button>
   </li>
 </ul>
 

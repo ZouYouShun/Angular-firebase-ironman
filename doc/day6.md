@@ -122,7 +122,7 @@ metadata:{hasPendingWrites: false, fromCache: true}
 # 本日小節
 今天我們再次體會到firebase的強大，只能說科技一直在進化，真的非常的厲害，有機會大家可以去看firebase的sourcecode藉此時做自己的http方法，真的能給使用者煥然一新的使用體驗！
 
-本日範例：https://github.com/ZouYouShun/Angular-firebase-ironman/tree/day6_offline-data
+本日範例：https://github.com/ZouYouShun/Angular-firebase-ironman/tree/day6_offline_data
 
 
 # 參考文章

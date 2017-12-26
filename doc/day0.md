@@ -30,6 +30,7 @@ AngularFire2 是 angular團隊針對Firebase推出的官方library，他使用Rx
 * **Cloud Firestore - querying list**
 * **Cloud Firestore - 更新(Update)、刪除(Delete)**
 * **Cloud Firestore - offline-data**
+* **Cloud Firestore - Hosting**
 * **Authentication -  E-mail登入認證**
 * **Authentication - google登入**
 * **Authentication - facebook登入**

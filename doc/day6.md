@@ -1,4 +1,4 @@
-# [Angular Firebase 入門與實做] Day-05 Cloud Firestore - Querying Collections-2 offline-data
+# [Angular Firebase 入門與實做] Day-06 Cloud Firestore - Querying Collections-2 offline-data
 
 > To improve is to change, to be perfect is to change often.
 
@@ -18,7 +18,7 @@ req.snapshotChanges().map(actions => {
   });
 }) 
 ```
-在昨天的handler就能直接用
+在昨天的handler就能直接用doc來做操作，不須特別指定欄位，firebase會依據該doc的那個欄位做比較
 * ts
 ```js
 handler(doc, type) {
@@ -40,7 +40,7 @@ AngularFirestoreModule.enablePersistence(),
 ```
 > 這麼簡單!?!?!?沒錯!就是這麼簡單，你現有的所有的code都不需要改！
 
-## 查看資料是否為離線資料並取是來自cache
+## 運作剖析
 
 為了方便觀看，我們將CollectionHandler的get做一下修改
 ```js
@@ -97,7 +97,7 @@ constructor(private _http: BaseHttpService,....){
 第二次為false，已經從伺服器回來了，所以是false
 我們可以透過這個屬性做到LINE等通訊軟體的*已送出*、*送出中*的功能
 ### fromCache
-兩次都為false，因為這筆資料是我們開啟瀏覽器後才新增的。
+兩次都為false，因為這筆資料是我們進入頁面之後才新增的，若是再進入前就已經新增的話會是true。
 
 我們把網路斷線，並且新增一筆資料
 ![](https://res.cloudinary.com/dw7ecdxlp/image/upload/fromca0_jd5xzf.jpg)
@@ -107,12 +107,12 @@ constructor(private _http: BaseHttpService,....){
 ```js
 metadata:{hasPendingWrites: true, fromCache: true}
 ```
-我們重新連線，稍後一下，大概30秒~1分鐘(或是直接重新整理)，他會自動重新連線，並回應資料
+我們重新連線網路，稍後一下，大概30秒~1分鐘(或是直接重新整理)，他會自動重新連線，並回應資料
 ```js
 metadata:{hasPendingWrites: false, fromCache: true}
 ```
 統整一下我們看到的現象與邏輯，
-1. fromCache只的是*當下*資料的來源，如果資料是當下新增的狀態必定為`false`
+1. fromCache指的是*當下*資料的來源，如果資料是進入頁面後才做的新增、修改，那們他的狀態必定為`false`
 2. 所以資料都會被存入cache，而離線發送的資料因為不會得到回應，hasPendingWrites狀態為true
 4. 再次進入APP時，所有fromCache狀態必定都是true
 3. 任意一資料的hasPendingWrites為true時，firebase會發送請求給server，並回傳一次next

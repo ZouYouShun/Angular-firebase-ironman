@@ -4,7 +4,7 @@ import { Observable } from 'rxjs/Observable';
 import { storeTimeObject } from './store.time.function';
 
 
-export class DocumentHandler {
+export class DocumentHandler<T> {
   url: string;
   _fireAction: AngularFirestoreDocument<{}>;
   constructor(private _afs: AngularFirestore, private _url) {
@@ -15,9 +15,10 @@ export class DocumentHandler {
   get(isKey = true): Observable<any> {
     return isKey ?
       this._fireAction.snapshotChanges().map(a => {
+        const metadata = a.payload.metadata;
         const data = a.payload.data();
         const id = a.payload.id;
-        return { id, ...data };
+        return { id, metadata, ...data };
       }) :
       this._fireAction.valueChanges();
   }
@@ -26,13 +27,13 @@ export class DocumentHandler {
     return Observable.fromPromise(this._fireAction.delete());
   }
   // 修改
-  update<T>(data: T) {
+  update(data: T) {
     return Observable.fromPromise(
       this._fireAction
         .update(storeTimeObject(data, false)));
   }
   // 設定
-  set<T>(data: T) {
+  set(data: T) {
     return Observable.fromPromise(
       this._fireAction
         .set(storeTimeObject(data, false)));

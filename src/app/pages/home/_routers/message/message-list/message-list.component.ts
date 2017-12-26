@@ -18,7 +18,7 @@ import { Observable } from 'rxjs/Observable';
 })
 export class MessageListComponent {
   messages$: Observable<any>;
-  messagesHandler: CollectionHandler;
+  messagesHandler: CollectionHandler<any>;
   query = new BehaviorSubject<QueryFn>(ref => ref.orderBy('updatedAt'));
   myForm: FormGroup;
   lastMessages;

@@ -7,6 +7,10 @@ const routes: Routes = [
     loadChildren: './pages/pages.module#PagesModule',
   },
   {
+    path: 'auth',
+    loadChildren: './auth/auth.module#AuthModule'
+  },
+  {
     path: '**',
     redirectTo: ''
   }

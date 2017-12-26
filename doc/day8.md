@@ -31,3 +31,88 @@ firebase 的authentication功能，為我們的系統加入了登入的功能，
 })
 export class AppModule { }
 ```
+
+* 先在app.component注入AngularFireAuth然後實做google登入做測試
+ts
+```js
+import { Component } from '@angular/core';
+import { AngularFireAuth } from 'angularfire2/auth';
+import * as firebase from 'firebase/app';
+
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.scss']
+})
+export class AppComponent {
+
+  constructor(public afAuth: AngularFireAuth) {
+  }
+  login() {
+    this.afAuth.auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
+  }
+  logout() {
+    this.afAuth.auth.signOut();
+  }
+}
+```
+html
+```html
+<div *ngIf="afAuth.authState | async; let user; else showLogin">
+  <h1>Hello {{ user.displayName }}!</h1>
+  <button (click)="logout()">Logout</button>
+</div>
+<ng-template #showLogin>
+  <p>Please login.</p>
+  <button (click)="login()">Login with Google</button>
+</ng-template>
+```
+* AngularFireAuth的定義檔
+```js
+// auth.d.ts
+export declare class AngularFireAuth {
+    app: FirebaseApp;
+    readonly auth: firebase.auth.Auth;
+    readonly authState: Observable<firebase.User | null>;
+    readonly idToken: Observable<string | null>;
+    constructor(app: FirebaseApp);
+}
+```
+> 到這邊我們就可以透過firebase登入了！是不是很簡單
+
+# 取得登入資訊
+我們可以由定義檔得知authState會回傳一個firebase.User的物件，我們可以透過他來得到使用者的資料
+```js
+constructor(public afAuth: AngularFireAuth) {
+  this.afAuth.authState.subscribe((data) => {
+    console.log(data);
+  });
+}
+```
+當我們登入後，他會回傳一個物件，其中有些屬性是對我們比較有用的，以下舉例
+```js
+{
+  displayName:"",
+  email:"",
+  metadata:{
+    a: "1514272725000", 
+    b: "1514273935000", 
+    lastSignInTime: "Tue, 26 Dec 2017 07:38:55 GMT", 
+    creationTime: "Tue, 26 Dec 2017 07:18:45 GMT",
+    photoURL:""
+  },
+  providerData:[
+    {
+      displayName:"",
+      email:"",
+      phoneNumber:,
+      photoURL:"",
+      providerId:"",
+      uid:"",
+    }
+  ]
+}
+```
+並且會在localstorage加入一筆資料，資料的內容與我們由state取出來的內容差不多，firebase內部運作就是透過這裡取得資料的。
+
+有興趣他存了什麼的朋友，可以把資料複製出來到 https://jsoneditoronline.org/ 看看有哪些

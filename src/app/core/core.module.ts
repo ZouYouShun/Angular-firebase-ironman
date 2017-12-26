@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { NgModule, Optional, SkipSelf } from '@angular/core';
-import { BaseHttpService } from '@core/service/base-http.service';
+import { AuthService } from './service/auth.service';
+import { BaseHttpService } from './service/base-http.service';
 
 import { throwIfAlreadyLoaded } from './module-import-guard';
 
@@ -10,7 +11,8 @@ import { throwIfAlreadyLoaded } from './module-import-guard';
   ],
   declarations: [],
   providers: [
-    BaseHttpService
+    BaseHttpService,
+    AuthService
   ]
 })
 export class CoreModule {

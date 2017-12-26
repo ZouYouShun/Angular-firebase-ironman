@@ -8,8 +8,8 @@ import { RxViewer } from '@shared/ts/rx.viewer';
   styleUrls: ['./menu.component.scss']
 })
 export class MenuComponent {
-  menusHandler: ListHandler;
-  menuHandler: DocumentHandler;
+  menusHandler: ListHandler<any>;
+  menuHandler: DocumentHandler<any>;
   menus$;
   menu$;
   constructor(private _http: BaseHttpService) {
@@ -31,14 +31,6 @@ export class MenuComponent {
   updateItem(message: any, value?: string) {
     this.menusHandler.update(message.key, { title: value }).subscribe(RxViewer);
     message.update = false;
-  }
-
-  deleteEverything() {
-    // this.numbersHandler.drop().subscribe(rxHandler);
-  }
-
-  choice(key) {
-    this.menuHandler = this._http.document(`menus/${key}`);
   }
 
 }

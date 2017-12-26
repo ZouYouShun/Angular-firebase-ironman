@@ -3,7 +3,7 @@ import { Observable } from 'rxjs/Observable';
 
 import { dbTimeObject } from './db.time.function';
 
-export class ObjectHandler {
+export class ObjectHandler<T> {
   url: string;
   _fireObject: AngularFireObject<{}>;
   constructor(private _db: AngularFireDatabase, private _url) {
@@ -21,11 +21,11 @@ export class ObjectHandler {
     return Observable.fromPromise(this._fireObject.remove());
   }
   // 修改
-  update<T>(data: T) {
+  update(data: T) {
     return Observable.fromPromise(this._fireObject.update(dbTimeObject(data, false)));
   }
   // 設定
-  set<T>(data: T) {
+  set(data: T) {
     return Observable.fromPromise(this._fireObject.set(dbTimeObject(data, false)));
   }
 }

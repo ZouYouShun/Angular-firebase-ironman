@@ -60,17 +60,17 @@ export class CollectionHandler<T> {
       Observable.throw(new Error('no key!'));
   }
 
-  update(key, data: T) {
+  update(key, data: T): Observable<string> {
     return Observable.fromPromise(
       this._fireAction
         .doc(key)
-        .update(storeTimeObject(data, false)));
+        .update(storeTimeObject(data, false))).map(() => key);
   }
 
   set(key, data: T) {
     return Observable.fromPromise(
       this._fireAction
         .doc(key)
-        .set(storeTimeObject(data, false)));
+        .set(storeTimeObject(data)));
   }
 }

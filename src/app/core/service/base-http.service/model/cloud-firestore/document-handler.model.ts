@@ -36,6 +36,6 @@ export class DocumentHandler<T> {
   set(data: T) {
     return Observable.fromPromise(
       this._fireAction
-        .set(storeTimeObject(data, false)));
+        .set(storeTimeObject(data)));
   }
 }

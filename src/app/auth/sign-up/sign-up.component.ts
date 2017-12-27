@@ -33,11 +33,25 @@ export class SignUpComponent implements OnInit {
   get catchPhrase() { return this.detialForm.get('catchPhrase'); }
 
   signup() {
-    return this._auth.signUpEmail(this.email.value, this.password.value);
+    return this._auth.signUpByEmail(this.email.value, this.password.value);
   }
 
-  setCatchPhrase(user) {
-    return this._auth.editUser(user, { catchPhrase: this.catchPhrase.value });
+  // setCatchPhrase(user) {
+  //   return this._auth.editUser(user, { catchPhrase: this.catchPhrase.value });
+  // }
+
+  signIn() {
+    this._auth.signInByEmail(this.email.value, this.password.value);
+  }
+  signInGoogle() {
+    this._auth.signInUpByGoogle();
   }
 
+  signOut() {
+    this._auth.signOut();
+  }
+
+  resetPassword() {
+    this._auth.resetPassword(this.password.value);
+  }
 }

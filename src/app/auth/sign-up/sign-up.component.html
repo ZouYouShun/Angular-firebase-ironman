@@ -1,49 +1,32 @@
-<ng-container *ngIf="(_auth.user$ | async) || {} as user">
+<prettyjson [obj]="_auth.user$ | async"></prettyjson>
+<form [formGroup]="signupForm" (ngSubmit)="signup()">
 
-  <form [formGroup]="signupForm" *ngIf="!user.uid" (ngSubmit)="signup()">
+  <ul>
+    <li>
+      <label for="email">信箱：</label>
+      <input type="email" class="input" [class.is-danger]="email.invalid && email.dirty" formControlName="email" required autocomplete="off">
 
-    <h3>New User Signup</h3>
+      <div *ngIf="email.invalid && email.dirty" class="notification is-danger">
+        信箱格式不正確
+      </div>
 
-    <label for="email">Email</label>
-    <input type="email" class="input" [class.is-danger]="email.invalid && email.dirty" formControlName="email" required autocomplete="off">
+    </li>
+    <li>
+      <label for="password">密碼：</label>
+      <input type="password" class="input" [class.is-danger]="password.invalid && password.touched" formControlName="password"
+        required>
+      <div *ngIf="password.invalid && password.dirty" class="notification is-danger">
+        密碼必須大於六碼，並且最少有一個數字
+      </div>
+    </li>
+  </ul>
 
+  <div *ngIf="signupForm.valid" class="notification is-success">看起來很不錯喔！可以送出了！</div>
 
-    <div *ngIf="email.invalid && email.dirty" class="notification is-danger">
-      Your email doesn't look quite right...
-    </div>
+  <button (click)="signIn()" [disabled]="!signupForm.valid">信箱登入</button>
+  <button [disabled]="!signupForm.valid">註冊</button>
+</form>
 
-    <label for="password">Password</label>
-    <input type="password" class="input" [class.is-danger]="password.invalid && password.touched" formControlName="password"
-      required>
-
-    <div *ngIf="password.invalid && password.touched" class="notification is-danger">
-      Password must be between 6 and 24 chars and have at least one number
-    </div>
-
-    <div *ngIf="signupForm.valid" class="notification is-success">Form looks good! Let's do this.</div>
-
-    <button type="submit" class="button is-primary" [disabled]="!signupForm.valid">Submit</button>
-
-
-  </form>
-
-
-<!--
-  <form [formGroup]="detailForm" *ngIf="user.uid && !user.catchPhrase" (ngSubmit)="setCatchPhrase(user)">
-
-    <h3>Set your Catch Phrase</h3>
-
-    <label for="catchPhrase">CatchPhrase</label>
-    <input type="test" class="input" formControlName="catchPhrase" required autocomplete="off">
-
-
-    <button type="submit" class="button is-success" [disabled]="!detailForm.valid">Submit</button>
-
-
-  </form>
-
-  <p *ngIf="user.catchPhrase" class="text-success">
-    You have completed the form!
-  </p> -->
-
-</ng-container>
+<button (click)="signInGoogle()">Google登入</button>
+<button (click)="signOut()">登出</button>
+<button (click)="resetPassword()">重新設置密碼</button>

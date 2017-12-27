@@ -1,5 +1,8 @@
 export interface User {
-  uid: string;
+  uid?: string;
   email: string;
+  type?: string;
   catchPhrase?: string;
+  photoURL?: string;
+  lastSignInTime?: string;
 }

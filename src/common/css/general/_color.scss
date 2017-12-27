@@ -1,0 +1,15 @@
+@import '~common/css/_my-theme.variable.scss';
+@mixin type-color($type) {
+  @each $property,
+  $value in $app-color {
+    .#{$type}-#{$property} {
+      #{$type}: mat-color($value)
+    }
+  }
+  .color-white {
+    color: white;
+  }
+  .color-black {
+    color: white;
+  }
+}

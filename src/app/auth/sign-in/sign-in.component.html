@@ -1,4 +1,41 @@
-<p>
-  sign-in works!
-</p>
-<!-- https://hahow.in/auth/login -->
+<ul>
+  <li>
+    <button mat-button class="width-full fb-button" (click)="onClick">
+      <i class="icon-facebook color-white md-size-2"></i>
+      <span class="color-white">使用Facebook登入</span>
+    </button>
+  </li>
+  <li class="margin-top">
+    <button mat-button class="width-full google-button" (click)="onClick">
+      <i class="icon-google color-white md-size-2"></i>
+      <span class="color-white" (click)="signInGoogle()">使用Google登入</span>
+    </button>
+  </li>
+  <li class="margin-top">
+    <form [formGroup]="signupForm" (ngSubmit)="signup()">
+      <mat-form-field class="width-full" required>
+        <mat-label>
+          信箱
+          <i class="color-red">*</i>
+        </mat-label>
+        <input matInput type="email" placeholder="輸入信箱地址" formControlName="email">
+        <mat-error *ngIf="email.invalid && email.touched">信箱格式不正確</mat-error>
+      </mat-form-field>
+      <mat-form-field class="width-full" required>
+        <mat-label>
+          密碼
+          <i class="color-red">*</i>
+        </mat-label>
+        <input matInput type="password" placeholder="密碼必須大於六碼，並且最少有一個數字" formControlName="password">
+        <mat-error *ngIf="password.invalid && password.touched">
+          密碼必須大於六碼，並且最少有一個數字
+        </mat-error>
+      </mat-form-field>
+
+      <div *ngIf="signupForm.valid" class="notification is-success">看起來很不錯喔！可以送出了！</div>
+
+      <button mat-raised-button color="primary" class="width-full">登入</button>
+      <!-- <button [disabled]="!signupForm.valid">註冊</button> -->
+    </form>
+  </li>
+</ul>

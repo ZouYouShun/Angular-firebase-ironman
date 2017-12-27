@@ -1,32 +1,50 @@
-<prettyjson [obj]="_auth.user$ | async"></prettyjson>
-<form [formGroup]="signupForm" (ngSubmit)="signup()">
+<ul>
+  <li>
+    <button mat-button class="width-full fb-button" (click)="onClick">
+      <i class="icon-facebook color-white md-size-2"></i>
+      <span class="color-white">使用Facebook註冊</span>
+    </button>
+  </li>
+  <li class="margin-top">
+    <button mat-button class="width-full google-button" (click)="onClick">
+      <i class="icon-google color-white md-size-2"></i>
+      <span class="color-white" (click)="signUpGoogle()">使用Google註冊</span>
+    </button>
+  </li>
+  <li class="margin-top">
+    <form [formGroup]="signupForm" (ngSubmit)="signup()">
+      <mat-form-field class="width-full" required>
+        <mat-label>
+          信箱
+          <i class="color-red">*</i>
+        </mat-label>
+        <input matInput type="email" placeholder="輸入信箱地址" formControlName="email">
+        <mat-error *ngIf="email.invalid && email.touched">信箱格式不正確</mat-error>
+      </mat-form-field>
+      <mat-form-field class="width-full" required>
+        <mat-label>
+          密碼
+          <i class="color-red">*</i>
+        </mat-label>
+        <input matInput type="password" placeholder="密碼必須大於六碼，並且最少有一個數字" formControlName="password">
+        <mat-error *ngIf="password.invalid && password.touched">
+          密碼必須大於六碼，並且最少有一個數字
+        </mat-error>
+      </mat-form-field>
+      <mat-form-field class="width-full" required>
+        <mat-label>
+          姓名
+          <i class="color-red">*</i>
+        </mat-label>
+        <input matInput type="text" placeholder="打一個喜歡的名子" formControlName="name">
+        <mat-error *ngIf="name.invalid && name.touched">
+          打一個名子好嗎QQ
+        </mat-error>
+      </mat-form-field>
 
-  <ul>
-    <li>
-      <label for="email">信箱：</label>
-      <input type="email" class="input" [class.is-danger]="email.invalid && email.dirty" formControlName="email" required autocomplete="off">
+      <div *ngIf="signupForm.valid" class="notification is-success">看起來很不錯喔！可以送出了！</div>
 
-      <div *ngIf="email.invalid && email.dirty" class="notification is-danger">
-        信箱格式不正確
-      </div>
-
-    </li>
-    <li>
-      <label for="password">密碼：</label>
-      <input type="password" class="input" [class.is-danger]="password.invalid && password.touched" formControlName="password"
-        required>
-      <div *ngIf="password.invalid && password.dirty" class="notification is-danger">
-        密碼必須大於六碼，並且最少有一個數字
-      </div>
-    </li>
-  </ul>
-
-  <div *ngIf="signupForm.valid" class="notification is-success">看起來很不錯喔！可以送出了！</div>
-
-  <button (click)="signIn()" [disabled]="!signupForm.valid">信箱登入</button>
-  <button [disabled]="!signupForm.valid">註冊</button>
-</form>
-
-<button (click)="signInGoogle()">Google登入</button>
-<button (click)="signOut()">登出</button>
-<button (click)="resetPassword()">重新設置密碼</button>
+      <button mat-raised-button color="primary" class="width-full">註冊</button>
+    </form>
+  </li>
+</ul>

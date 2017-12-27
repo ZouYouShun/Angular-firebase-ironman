@@ -1,8 +1,11 @@
-import { CommonModule, JsonPipe } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { ModuleWithProviders, NgModule } from '@angular/core';
-import { PrettyJsonModule, SafeJsonPipe } from 'angular2-prettyjson';
-import { ViewContainerDirective } from './directive/view-container.directive';
+import { FlexLayoutModule } from '@angular/flex-layout';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { PrettyJsonModule } from 'angular2-prettyjson';
+
+import { ViewContainerDirective } from './directive/view-container.directive';
+import { MyMaterialModuleModule } from './my-material-module.module';
 
 
 @NgModule({
@@ -18,7 +21,9 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
     PrettyJsonModule,
     ViewContainerDirective,
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    MyMaterialModuleModule,
+    FlexLayoutModule,
   ]
 })
 export class SharedModule {

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { AuthService } from '@core/service/auth.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AuthService } from '@core/service/auth.service';
 
 @Component({
   selector: 'app-sign-up',
@@ -10,48 +10,35 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 export class SignUpComponent implements OnInit {
 
   signupForm: FormGroup;
-  detialForm: FormGroup;
 
-  constructor(public _auth: AuthService, private _fb: FormBuilder) { }
+  constructor(private _auth: AuthService, private _fb: FormBuilder) {
+    // 不管是誰進來這一頁直接登出。
+    this._auth.signOut();
+  }
 
   ngOnInit() {
     this.signupForm = this._fb.group({
       'email': ['', [Validators.email, Validators.required]],
       'password': ['', [
+        Validators.required,
         Validators.pattern('^(?=.*[0-9])(?=.*[a-zA-Z])([a-zA-Z0-9]+)$'),
         Validators.minLength(6),
         Validators.maxLength(25)
-      ]]
-    });
-    this.detialForm = this._fb.group({
-      'catchPhrase': ['', [Validators.required]]
+      ]],
+      'name': ['', [Validators.required]]
     });
   }
 
+  get name() { return this.signupForm.get('name'); }
   get email() { return this.signupForm.get('email'); }
   get password() { return this.signupForm.get('password'); }
-  get catchPhrase() { return this.detialForm.get('catchPhrase'); }
 
   signup() {
-    return this._auth.signUpByEmail(this.email.value, this.password.value);
+    return this._auth.signUpByEmail(this.email.value, this.password.value, this.name.value);
   }
 
-  // setCatchPhrase(user) {
-  //   return this._auth.editUser(user, { catchPhrase: this.catchPhrase.value });
-  // }
-
-  signIn() {
-    this._auth.signInByEmail(this.email.value, this.password.value);
-  }
-  signInGoogle() {
+  signUpGoogle() {
     this._auth.signInUpByGoogle();
   }
 
-  signOut() {
-    this._auth.signOut();
-  }
-
-  resetPassword() {
-    this._auth.resetPassword(this.password.value);
-  }
 }

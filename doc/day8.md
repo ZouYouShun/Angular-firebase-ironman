@@ -14,7 +14,7 @@ firebase 的authentication功能，為我們的系統加入了登入的功能，
 將電子郵件/密碼啟用
 ![](https://res.cloudinary.com/dw7ecdxlp/image/upload/authentication3_kt1gsv.jpg)
 
-* 加入email Auth
+## Auth 測試與基本邏輯
 回到Angular專案，確認我們的`app.module.ts`有把`AngularFireAuthModule`加入了，
 ```js
 @NgModule({
@@ -67,17 +67,6 @@ html
   <button (click)="login()">Login with Google</button>
 </ng-template>
 ```
-* AngularFireAuth的定義檔
-```js
-// auth.d.ts
-export declare class AngularFireAuth {
-    app: FirebaseApp;
-    readonly auth: firebase.auth.Auth;
-    readonly authState: Observable<firebase.User | null>;
-    readonly idToken: Observable<string | null>;
-    constructor(app: FirebaseApp);
-}
-```
 > 到這邊我們就可以透過firebase登入了！是不是很簡單
 
 # 取得登入資訊
@@ -115,4 +104,37 @@ constructor(public afAuth: AngularFireAuth) {
 ```
 並且會在localstorage加入一筆資料，資料的內容與我們由state取出來的內容差不多，firebase內部運作就是透過這裡取得資料的。
 
-有興趣他存了什麼的朋友，可以把資料複製出來到 https://jsoneditoronline.org/ 看看有哪些
+有興趣他存了什麼的朋友，可以把資料複製出來到 https://jsoneditoronline.org/ 看看有哪些。
+
+> 到這邊我們統整一下基本邏輯，firebase登入認證基本就是透過API登入認證後，訂閱`authState`取得登入者的資料，得知使用者登入
+
+有了基本的概念後，我們一樣將資料使用service封裝
+
+# Email新增使用者
+
+我們在core.module建立auth.service
+
+將AngularFireAuth注入
+```js
+constructor(
+  private _afAuth: AngularFireAuth,
+  private _http: BaseHttpService,
+  private _router: Router,
+  private _route: ActivatedRoute,
+)
+```
+為了把使用者的相關資訊存在資料庫，我們也把baseHttpService加入
+
+
+
+* AngularFireAuth的定義檔
+```js
+// auth.d.ts
+export declare class AngularFireAuth {
+    app: FirebaseApp;
+    readonly auth: firebase.auth.Auth;
+    readonly authState: Observable<firebase.User | null>;
+    readonly idToken: Observable<string | null>;
+    constructor(app: FirebaseApp);
+}
+```

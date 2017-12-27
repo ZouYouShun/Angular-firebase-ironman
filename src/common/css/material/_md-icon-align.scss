@@ -1,0 +1,10 @@
+@mixin md-icon-align($num:3) {
+  @for $i from 1 through $num {
+    .md-size-#{$i} {
+      font-size: #{$i}rem;
+      width: inherit;
+      height: #{$i + .2}rem;
+      vertical-align: middle;
+    }
+  }
+}

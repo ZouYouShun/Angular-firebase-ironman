@@ -1,0 +1,29 @@
+@mixin add-padding($num:3, $space:20, $type:'all') {
+  @for $i from 1 through $num {
+    .pad-#{$type}-#{$i * $space} {
+      @if $type=='all' {
+        padding: #{$i * $space}px;
+      }
+      @if $type=='t-b' {
+        padding-top: #{$i * $space}px;
+        padding-bottom: #{$i * $space}px;
+      }
+      @else if $type=='l-r' {
+        padding-right: #{$i * $space}px;
+        padding-left: #{$i * $space}px;
+      }
+      @else if $type=='l' {
+        padding-left: #{$i * $space}px;
+      }
+      @else if $type=='r' {
+        padding-right: #{$i * $space}px;
+      }
+      @else if $type=='t' {
+        padding-top: #{$i * $space}px;
+      }
+      @else if $type=='b' {
+        padding-bottom: #{$i * $space}px;
+      }
+    }
+  }
+}

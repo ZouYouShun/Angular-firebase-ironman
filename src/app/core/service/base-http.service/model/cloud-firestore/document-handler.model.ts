@@ -6,19 +6,19 @@ import { storeTimeObject } from './store.time.function';
 
 export class DocumentHandler<T> {
   url: string;
-  _fireAction: AngularFirestoreDocument<{}>;
+  _fireAction: AngularFirestoreDocument<T>;
   constructor(private _afs: AngularFirestore, private _url) {
     this.url = _url;
-    this._fireAction = this._afs.doc(_url);
+    this._fireAction = this._afs.doc<T>(_url);
   }
   // 取得資料
-  get(isKey = true): Observable<any> {
+  get(isKey = true): Observable<T> {
     return isKey ?
       this._fireAction.snapshotChanges().map(a => {
         const metadata = a.payload.metadata;
         const data = a.payload.data();
         const id = a.payload.id;
-        return { id, metadata, ...data };
+        return ({ id, metadata, ...data }) as any;
       }) :
       this._fireAction.valueChanges();
   }

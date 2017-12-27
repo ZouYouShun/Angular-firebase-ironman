@@ -1,0 +1,8 @@
+@import '~common/css/component/_loading.scss';
+@import '~common/css/component/_carousel.scss';
+@import '~common/css/component/_hover-card.scss';
+@import '~common/css/component/_course-card.scss';
+@include hover-card();
+@include course-card();
+@include loading-overlay();
+@include carousel-overlay();

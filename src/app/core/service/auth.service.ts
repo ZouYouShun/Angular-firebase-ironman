@@ -10,10 +10,11 @@ import { Observable } from 'rxjs/Observable';
 import { User } from '../model/user.model';
 import { AngularFirestore } from 'angularfire2/firestore';
 import { BaseHttpService, CollectionHandler } from './base-http.service';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 @Injectable()
 export class AuthService {
-  user$: Observable<User>;
+  currentUser = new BehaviorSubject<User>(null);
   userHandler: CollectionHandler<User>;
 
   constructor(
@@ -24,7 +25,7 @@ export class AuthService {
   ) {
     this.userHandler = this._http.collection<User>(`users`);
 
-    this.user$ = this._afAuth.authState
+    this._afAuth.authState
       .switchMap(user => {
         if (user) {
           return this.updateUser(user);
@@ -33,16 +34,21 @@ export class AuthService {
       })
       .switchMap(key => {
         if (key) {
+          this._router.navigateByUrl('/');
           return this._http.document<User>(`users/${key}`).get();
         }
         return Observable.of(null);
+      }).subscribe((user) => {
+        this.currentUser.next(user);
       });
   }
 
   // 注意！當註冊後也會更改當前authState，也會接到user，視同於登入
-  signUpByEmail(email: string, password: string) {
+  signUpByEmail(email: string, password: string, name: string) {
     return this._afAuth.auth.createUserWithEmailAndPassword(email, password)
-      .then(user => {
+      .then(result => {
+        const user = Object.assign({}, result, { displayName: name });
+        this.signOut();
         return this.addUser(user, 'email');
       })
       .catch(err => this.ErrorHandler(err));
@@ -50,8 +56,9 @@ export class AuthService {
 
   signInUpByGoogle() {
     this._afAuth.auth.signInWithPopup(new firebase.auth.GoogleAuthProvider())
-      .then(user => {
-        return this.addUser(user.user, 'google');
+      .then(result => {
+        const user = result.user;
+        return this.addUser(user, 'google');
       })
       .catch(err => this.ErrorHandler(err));
   }
@@ -84,6 +91,7 @@ export class AuthService {
     const data: User = {
       uid: user.uid,
       email: user.email,
+      displayName: user.displayName,
       photoURL: user.photoURL,
       lastSignInTime: user.metadata.lastSignInTime,
       type: types

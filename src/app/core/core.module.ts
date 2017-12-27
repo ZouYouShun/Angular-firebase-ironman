@@ -5,13 +5,20 @@ import { MatIconRegistry } from '@angular/material';
 import { throwIfAlreadyLoaded } from './module-import-guard';
 import { AuthService } from './service/auth.service';
 import { BaseHttpService } from './service/base-http.service';
+import { BaseService } from './service/base.service';
+import { PopUpModule } from '@shared/component/pop-up/pop-up.module';
+import { SharedModule } from '@shared/shared.module';
+import { AlertConfirmModule } from '@shared/component/alert-confirm/alert-confirm.module';
 
 @NgModule({
   imports: [
-    CommonModule
+    SharedModule,
+    PopUpModule.forRoot(),
+    AlertConfirmModule.forRoot()
   ],
   declarations: [],
   providers: [
+    BaseService,
     BaseHttpService,
     AuthService
   ]

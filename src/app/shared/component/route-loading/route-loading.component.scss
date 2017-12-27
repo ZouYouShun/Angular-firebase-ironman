@@ -1,0 +1,4 @@
+@import '~common/css/component/_modal.scss';
+:host {
+  @include modalView();
+}

@@ -1,0 +1,25 @@
+@import '~common/css/_my-theme.variable.scss';
+.align-center {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.content {
+  margin: 0.5em;
+}
+
+.button-area {
+  text-align: right; // justify-content: flex-end;
+  button {
+    margin: 0 2px;
+  }
+}
+
+.btn-ok {
+  background: app-color(green)
+}
+
+article {
+  padding-left: 0.3em;
+}

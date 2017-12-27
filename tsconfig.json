@@ -21,5 +21,8 @@
       "@shared/*": ["app/shared/*"],
       "@core/*": ["app/core/*"]
     }
+  },
+  "angularCompilerOptions": {
+    "preserveWhitespaces": false
   }
 }

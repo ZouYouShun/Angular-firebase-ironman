@@ -16,7 +16,7 @@ export class CollectionHandler<T> {
     this._fireAction = this._afs.collection(_url);
   }
 
-  get(config: CloudFirestoreConfig = { isKey: true }): Observable<any> {
+  get(config: CloudFirestoreConfig = { isKey: true }): Observable<T> {
     const req = config.queryFn ?
       this._afs.collection(this.url, config.queryFn) : this._fireAction;
     return config.isKey ?
@@ -27,21 +27,21 @@ export class CollectionHandler<T> {
           const doc = a.payload.doc;
           const id = a.payload.doc.id;
           return { id, doc, metadata, ...data };
-        });
+        }) as any;
       }) :
       req.valueChanges();
   }
 
-  getById(key, isKey = true) {
-    return isKey ?
-      this._fireAction.doc(key).snapshotChanges()
+  getById(key, isKey = true): Observable<T> {
+    return key ?
+      (isKey ? this._fireAction.doc(key).snapshotChanges()
         .map(a => {
           const metadata = a.payload.metadata;
           const data = a.payload.data();
           const id = a.payload.id;
-          return { id, metadata, ...data };
-        }) :
-      this._fireAction.valueChanges();
+          return { id, metadata, ...data } as any;
+        }) : this._fireAction.valueChanges())
+      : Observable.of(null);
   }
 
   // state(events?: ('added' | 'removed' | 'modified')[]) {

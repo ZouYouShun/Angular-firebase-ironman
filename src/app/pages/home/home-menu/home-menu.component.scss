@@ -1,0 +1,40 @@
+@import '~common/css/_my-theme.variable.scss';
+@import '~common/css/animation/_underline.scss';
+:host {
+  z-index: 2;
+  position: fixed;
+  width: 100%;
+}
+
+.menu-container {
+  display: flex;
+  width: 100%;
+  height: $app-menu-height;
+  @include mat-elevation(1);
+  .logo {
+    height: $app-menu-height - 5px;
+  }
+  &.small {
+    height: $app-menu-height / 2;
+    .logo {
+      height: ($app-menu-height - 5px) / 2;
+    }
+  }
+  .choice-menu {
+    display: block;
+    a {
+      position: relative;
+      color: mat-color($app-main-color);
+      @include underline-animation( mat-color($app-accent), mat-color($app-main-color, 900));
+    }
+  }
+}
+
+.touch-area {
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 15px;
+  z-index: $popup-zIndex + 1
+}

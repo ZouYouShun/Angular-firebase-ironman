@@ -1,0 +1,10 @@
+<div
+  *ngIf="isShow"
+  [@animate]="'fadeInUpLeaveDown'">
+  <div class="inline" (click)="goPrev()">
+    <ng-content select="[back-content]"></ng-content>
+  </div>
+  <div class="inline" (click)="goTop()">
+    <ng-content select="[top-content]"></ng-content>
+  </div>
+</div>

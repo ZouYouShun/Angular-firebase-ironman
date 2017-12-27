@@ -1,0 +1,70 @@
+@import '~common/css/_my-theme.variable.scss';
+:host {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+  overflow: auto;
+  padding: 1em;
+  z-index: $popup-zIndex;
+  &.backdrop {
+    background: rgba(0, 0, 0, 0.6);
+  }
+  &.center {
+    align-items: center;
+  }
+  .window {
+    z-index: $popup-zIndex + 1;
+    margin: 1em;
+    background: #fff;
+    position: relative; // box-shadow: 0 11px 15px -7px rgba(0, 0, 0, .2), 0 24px 38px 3px rgba(0, 0, 0, .14), 0 9px 46px 8px rgba(0, 0, 0, .12);
+    @include mat-elevation(5);
+    border-radius: app-border-radius(square);
+    .topHeader {
+      background: mat-color($app-primary);
+      color:  mat-color($app-main-color);
+      border-radius: app-border-radius(square) app-border-radius(square) 0 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      @include mat-elevation(1);
+      .popTitle {
+        @include mat-typography-level-to-styles($app-typgography, title);
+      }
+    }
+    .content {
+      padding: 1em;
+    }
+  } // right top area
+  .RightTop {
+    color: #2b7b82;
+    position: fixed;
+    right: 0;
+    top: 0;
+    padding: 12px 12px 16px 16px;
+    z-index: $popup-zIndex + 1;
+  }
+  .background {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+  }
+}
+
+@include app-breakpoint('lt-md'){
+  :host {
+    align-items: baseline;
+    &.center {
+      align-items: center;
+    }
+    .window {
+      width: 100% !important;
+    }
+  }
+}

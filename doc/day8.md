@@ -1,5 +1,9 @@
 # [Angular Firebase 入門與實做] Day-08 Authentication
 
+> Never let the demands of tomorrow interfere with the pleasures and excitement of today.
+
+今日成果：https://onfirechat.ga/auth/signin
+
 # Authentication
 firebase 的authentication功能，為我們的系統加入了登入的功能，並且透過他我們可以簡易的使用第三方登入，甚至他能使用電信用者登入、匿名登入、google、facebook、twitter、GitHub、Email等等，今天我們就針對最簡易的Email、google登入來實做登入功能。
 
@@ -138,8 +142,56 @@ constructor(public afAuth: AngularFireAuth) {
 
 > 到這邊我們統整一下基本邏輯，firebase登入認證基本就是透過API登入認證後，訂閱`authState`取得登入者的資料，得知使用者登入，有了基本的概念後，我們一樣可以將所有方法用一個service封裝，一來可以避免當firebase API修改時我們要改很多地方，二來可以把邏輯彙整在一個service裡面。
 
+實做比較比較繁瑣，步驟大同小異，只是我們會使用Rx做一次包裝，讓我們在處理資料順序上更加便利。
 
+這邊舉出一些比較值得講得部分，想知道詳細的朋友可以去看原始碼，有問題再做詢問
 
+* 
+```js
+@Injectable()
+export class AuthService {
+  currentUser = new BehaviorSubject<User>(null);
+  userHandler: CollectionHandler<User>;
+
+  constructor(
+    private _afAuth: AngularFireAuth,
+    private _http: BaseHttpService,
+    private _router: Router,
+  ) {
+    // 建立一個users得handler
+    this.userHandler = this._http.collection<User>(`users`);
+
+    // 由於這個Service會永遠存活，我們不需對她做unsubscribe
+    // 訂閱authState，當有人登入時會改變，
+    this._afAuth.authState
+      .switchMap(user => this.updateUser(user)) // 每次登入後我們都去修改一次使用者的資料，並更新登入的時間
+      .switchMap(key => this.userHandler.getById(key)) // 再去資料庫把這個使用者得一些基本資料找出來
+      .subscribe(user => { 
+        // 用一個BehaviorSubject存起來，外部只要訂閱就能取得當前得使用者內容(用於判斷登入與否)
+        this.currentUser.next(user); 
+      });
+  }
+
+  // Sends email allowing user to reset password
+  resetPassword(oldPassword: string, newPassword: string) {
+    // 修改前要再次登入一次
+    this.signInByEmail(this._afAuth.auth.currentUser.email, oldPassword)
+      .switchMap(() => Observable.fromPromise(this._afAuth.auth.currentUser.updatePassword(newPassword)));
+  }
+  ....
+}
+```
+1. 這個狀態得訂閱，我們不要讓他跑出去外面，會造成多個地方都有訂閱狀態得狀況，所以我們就在這裡直接訂閱即可
+2. 這個Observable永遠不會結束，不需要去unsubscribe。
+3. 記得要用switchMap，透過switchMap去取消之前訂閱的內容!!!
+4. resetPassword，這裡要注意的是，如果要重新設定密碼，必須要重新登入一次(如果原本是localstorage來登入的)，我們要用輸入原本密碼的方式再次登入藉此實做修改密碼的功能。
+
+其他相關實作可以看今日的原始碼：
+
+本日範例：https://github.com/ZouYouShun/Angular-firebase-ironman/tree/day8_authentication
+
+# 本日小節
+今天我們真正的了解到了firebase搭配Auth的強大之處，我們可以很輕易的串接幾個流行的大平台，並且透過Rx將其包裝起來，讓我們能更便利的操作，相當power也相當的便利！
 
 # 參考文章
 https://github.com/angular/angularfire2/blob/master/docs/auth/getting-started.md

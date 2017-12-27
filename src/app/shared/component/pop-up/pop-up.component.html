@@ -1,0 +1,32 @@
+<div [@animate]="config.windowAnimate"
+  [ngClass]="config.panelClass || 'window'"
+  [ngStyle]="config.panelStyle">
+  <!-- header -->
+  <header *ngIf="!config.disableTitle && !!title" class="topHeader">
+    <p class="popTitle" [innerHTML]="title"></p>
+  </header>
+  <!-- content -->
+  <article class="content">
+    <ng-container *ngIf="isTemplate; else dCom">
+      <ng-container *ngTemplateOutlet="component, context: {
+        $implicit: config.data,
+        complete: completeEmitter
+      }"></ng-container>
+    </ng-container>
+
+    <ng-template #dCom view-container></ng-template>
+  </article>
+</div>
+
+<!--background-->
+<ng-container *ngIf="!config.disableClose">
+  <div class="background" (click)="close()"></div>
+</ng-container>
+
+<!--close button-->
+<div [@animate]="'slideInRtoL'"
+  *ngIf="!config.disableCloseButton" class="RightTop" (click)="close()">
+  <button mat-mini-fab>
+    <mat-icon>close</mat-icon>
+  </button>
+</div>

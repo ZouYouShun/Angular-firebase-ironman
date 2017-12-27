@@ -1,46 +1,38 @@
-import 'rxjs/add/operator/switchMap';
-import 'rxjs/add/operator/concatMap';
 import 'rxjs/add/operator/catch';
+import 'rxjs/add/operator/concatMap';
+import 'rxjs/add/operator/switchMap';
 
 import { Injectable } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { AngularFireAuth } from 'angularfire2/auth';
 import * as firebase from 'firebase';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Observable } from 'rxjs/Observable';
 
 import { User } from '../model/user.model';
-import { AngularFirestore } from 'angularfire2/firestore';
 import { BaseHttpService, CollectionHandler } from './base-http.service';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 @Injectable()
 export class AuthService {
-  currentUser = new BehaviorSubject<User>(null);
+  currentUser$ = new BehaviorSubject<User>(null);
   userHandler: CollectionHandler<User>;
 
   constructor(
     private _afAuth: AngularFireAuth,
     private _http: BaseHttpService,
     private _router: Router,
-    private _route: ActivatedRoute,
   ) {
     this.userHandler = this._http.collection<User>(`users`);
 
+    // 由於這個Service會永遠存活，我們不需對她做unsubscribe
     this._afAuth.authState
-      .switchMap(user => {
+      .switchMap(user => this.updateUser(user))
+      .switchMap(key => this.userHandler.getById(key))
+      .subscribe(user => {
         if (user) {
-          return this.updateUser(user);
-        }
-        return Observable.of(null);
-      })
-      .switchMap(key => {
-        if (key) {
           this._router.navigateByUrl('/');
-          return this._http.document<User>(`users/${key}`).get();
         }
-        return Observable.of(null);
-      }).subscribe((user) => {
-        this.currentUser.next(user);
+        this.currentUser$.next(user);
       });
   }
 
@@ -82,22 +74,26 @@ export class AuthService {
   }
 
   // Sends email allowing user to reset password
-  resetPassword(password: string) {
+  resetPassword(oldPassword: string, newPassword: string) {
     // 修改前要再次登入一次
-    return this._afAuth.auth.currentUser.updatePassword(password);
+    this.signInByEmail(this._afAuth.auth.currentUser.email, oldPassword)
+      .switchMap(() => Observable.fromPromise(this._afAuth.auth.currentUser.updatePassword(newPassword)));
   }
 
   signOut() {
-    this._afAuth.auth.signOut();
+    return Observable.fromPromise(this._afAuth.auth.signOut());
   }
 
   private updateUser(user: firebase.User) {
-    const data: User = {
-      email: user.email,
-      photoURL: user.photoURL,
-      lastSignInTime: user.metadata.lastSignInTime
-    };
-    return this.userHandler.update(user.uid, data);
+    if (user) {
+      const data: User = {
+        email: user.email,
+        photoURL: user.photoURL,
+        lastSignInTime: user.metadata.lastSignInTime
+      };
+      return this.userHandler.update(user.uid, data);
+    }
+    return Observable.of(null);
   }
 
   private addUser(user: firebase.User, types: 'google' | 'email' | 'facebook') {

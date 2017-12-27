@@ -1,0 +1,19 @@
+// main bar container
+::-webkit-scrollbar {
+  width: 12px;
+  background-color: #555;
+}
+
+// custom scroll-bar
+// bar background
+// ::-webkit-scrollbar-track
+// {
+// 	border-radius: 10px;
+// 	background-color: #F5F5F5;
+// }
+// bar item
+::-webkit-scrollbar-thumb {
+  border-radius: app-border-radius(square);
+  -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, .3);
+  background-color: mat-color($app-primary);
+}

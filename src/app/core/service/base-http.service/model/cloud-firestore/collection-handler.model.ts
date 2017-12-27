@@ -8,7 +8,7 @@ export interface CloudFirestoreConfig {
   queryFn?: QueryFn;
 }
 
-export class CollectionHandler {
+export class CollectionHandler<T> {
   url: string;
   _fireAction: AngularFirestoreCollection<{}>;
   constructor(private _afs: AngularFirestore, private _url) {
@@ -16,7 +16,7 @@ export class CollectionHandler {
     this._fireAction = this._afs.collection(_url);
   }
 
-  get(config: CloudFirestoreConfig = { isKey: true }): Observable<any> {
+  get(config: CloudFirestoreConfig = { isKey: true }): Observable<T> {
     const req = config.queryFn ?
       this._afs.collection(this.url, config.queryFn) : this._fireAction;
     return config.isKey ?
@@ -27,20 +27,28 @@ export class CollectionHandler {
           const doc = a.payload.doc;
           const id = a.payload.doc.id;
           return { id, doc, metadata, ...data };
-        });
+        }) as any;
       }) :
       req.valueChanges();
   }
 
-  getById(key) {
-    return this._fireAction.doc(key);
+  getById(key, isKey = true): Observable<T> {
+    return key ?
+      (isKey ? this._fireAction.doc(key).snapshotChanges()
+        .map(a => {
+          const metadata = a.payload.metadata;
+          const data = a.payload.data();
+          const id = a.payload.id;
+          return { id, metadata, ...data } as any;
+        }) : this._fireAction.valueChanges())
+      : Observable.of(null);
   }
 
   // state(events?: ('added' | 'removed' | 'modified')[]) {
   //   return this._fireAction.auditTrail();
   // }
 
-  add<T>(data: object): Observable<any> {
+  add(data: object): Observable<any> {
     return Observable.fromPromise(
       this._fireAction
         .add(storeTimeObject(data))).map(d => d.id);
@@ -48,21 +56,21 @@ export class CollectionHandler {
 
   delete(key: string): Observable<any> {
     return key ?
-      Observable.fromPromise(this._fireAction.doc(key).delete()) :
+      Observable.fromPromise(this._fireAction.doc(key).delete()).map(() => key) :
       Observable.throw(new Error('no key!'));
   }
 
-  update<T>(key, data: T) {
+  update(key, data: T): Observable<string> {
     return Observable.fromPromise(
       this._fireAction
         .doc(key)
-        .update(storeTimeObject(data, false)));
+        .update(storeTimeObject(data, false))).map(() => key);
   }
 
-  set<T>(key, data: T) {
+  set(key, data: T) {
     return Observable.fromPromise(
       this._fireAction
         .doc(key)
-        .set(storeTimeObject(data, false)));
+        .set(storeTimeObject(data))).map(() => key);
   }
 }

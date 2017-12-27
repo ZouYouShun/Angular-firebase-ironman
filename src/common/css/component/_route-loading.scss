@@ -1,0 +1,96 @@
+@import '~common/css/_my-theme.variable.scss';
+@mixin route-loading-overlay() {
+  .loader-wrap {
+    display: flex;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: $popup-zIndex + 1;
+    background: rgba(0, 0, 0, 0.8);
+    .loader {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: space-around;
+      align-items: center;
+      margin: auto;
+      width: 10em;
+      height: 10em;
+      .loading-text {
+        font-family: 'Oswald', sans-serif;
+        font-weight: 200;
+        font-size: 38px;
+        text-align: center;
+        color: #eee;
+        margin-top: 150px;
+      }
+      .load-9 {
+        .spinner {
+          animation: loadingI 3s linear infinite;
+        }
+        .bubble-1,
+        .bubble-2,
+        .bubble-3,
+        .bubble-4 {
+          animation: bounce 2s ease-in-out infinite;
+        }
+        .bubble-2 {
+          animation-delay: -1.0s;
+        }
+        .bubble-3 {
+          animation-delay: -2.0s;
+        }
+        .bubble-4 {
+          animation-delay: -3.0s;
+        }
+      }
+    }
+  }
+  .spinner {
+    position: relative;
+    width: 50px;
+    height: 50px;
+    margin: 0 auto;
+  }
+  .bubble-1,
+  .bubble-2,
+  .bubble-3,
+  .bubble-4 {
+    position: absolute;
+    top: 0;
+    width: 25px;
+    height: 25px;
+    border-radius: app-border-radius(cycle);
+    background-color: #fa9404;
+  }
+  .bubble-2 {
+    top: auto;
+    bottom: 0;
+  }
+  .bubble-3 {
+    top: auto;
+    bottom: 0;
+    right: 0;
+  }
+  .bubble-4 {
+    top: 0;
+    bottom: auto;
+    right: 0;
+  }
+  @keyframes loadingI {
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+  @keyframes bounce {
+    0%,
+    100% {
+      transform: scale(0.0);
+    }
+    50% {
+      transform: scale(1.0);
+    }
+  }
+}

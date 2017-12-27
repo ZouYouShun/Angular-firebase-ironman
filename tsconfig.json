@@ -19,8 +19,10 @@
     "paths": {
       "@env": ["environments/environment"],
       "@shared/*": ["app/shared/*"],
-      "@core/*": ["app/core/*"],
-      "@common/*": ["app/common/*"]
+      "@core/*": ["app/core/*"]
     }
+  },
+  "angularCompilerOptions": {
+    "preserveWhitespaces": false
   }
 }

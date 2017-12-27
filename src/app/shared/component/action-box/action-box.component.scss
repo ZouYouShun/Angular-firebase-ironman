@@ -1,0 +1,8 @@
+@import '~common/css/_my-theme.variable.scss';
+:host {
+  position: fixed;
+  left: 10px;
+  bottom: 10px;
+  z-index: $popup-zIndex - 1;
+  opacity: 0.8;
+}

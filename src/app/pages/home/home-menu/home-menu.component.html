@@ -1,0 +1,39 @@
+<mat-toolbar color="primary"
+  fxLayoutGap="10px"
+  fxLayoutAlign="start center"
+  class="menu-container transition">
+
+  <!-- [ngClass]="{'small': isSmall}"
+  [ngClass.lt-md]="{'small': true}" -->
+  <div fxFlex="1 1 100%"
+    fxHide.gt-sm>
+    <button mat-icon-button
+      (click)="menu.toggle()">
+      <mat-icon>menu</mat-icon>
+    </button>
+    <div #openOverlay class="touch-area"></div>
+  </div>
+
+  <div fxFlex="1 1">
+    <img [routerLink]="['/']" class="flex logo cursor-pointer" src="assets/img/firebase.png" draggable="false">
+  </div>
+
+  <div class="fill-remaining-space"></div>
+  <!-- menus -->
+  <div class="choice-menu"
+    fxFlex="1 1 100%"
+    fxHide.lt-md
+    fxLayout="row"
+    fxLayoutGap="1.5em">
+    <a class="t-al-c cursor-pointer"
+      fxFlex
+      mat-ripple
+      *ngFor="let menu of menus"
+      [routerLink]="menu.url"
+      routerLinkActive="active">
+      {{menu.title}}
+    </a>
+  </div>
+  <app-setting-menu></app-setting-menu>
+
+</mat-toolbar>

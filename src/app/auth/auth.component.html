@@ -1,0 +1,31 @@
+<div fxLayout="column" fxFlexFill fxLayoutAlign="center center">
+  <div class="container">
+    <header class="pad-t-16 t-al-c">
+      <img src="/assets/img/firebase.png">
+      <ul class="width-full tab-group t-al-c cursor-pointer pad-t-16" fxLayout="row nowrap">
+        <li fxFlex="1 1 50%" class="background-color-primary"
+          mat-ripple
+          routerLinkActive="background-color-accent"
+          routerLink="/auth/signin">
+          <p>登入</p>
+        </li>
+        <li fxFlex="1 1 50%" class="background-color-primary"
+          mat-ripple
+          routerLinkActive="background-color-accent"
+          routerLink="/auth/signup">
+          <p>註冊</p>
+        </li>
+      </ul>
+    </header>
+    <section class="pad-l-r-40 pad-t-16">
+      <router-outlet></router-outlet>
+    </section>
+    <footer class="pad-t-16">
+      <!-- <div fxLayout="row nowrap">
+        <button mat-button>忘記密碼</button>
+        <span class="fill-remaining-space"></span>
+        <button mat-button></button>
+      </div> -->
+    </footer>
+  </div>
+</div>

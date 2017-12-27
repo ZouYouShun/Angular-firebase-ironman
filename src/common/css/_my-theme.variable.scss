@@ -1,0 +1,95 @@
+// Define theme
+@import '~@angular/material/theming';
+
+// @import url('https://fonts.googleapis.com/css?family=Open+Sans');
+// @import url('https://fonts.googleapis.com/css?family=Sedgwick+Ave');
+$popup-zIndex:1000;
+
+// @import './font/iconfont/material-icons.css';
+$app-menu-height:50px;
+$app-main-background: #fffce4;
+$app-main-color: mat-palette($mat-grey, 800);
+
+
+$app-typgography: mat-typography-config(
+  $font-family:'"Microsoft JhengHei", sans-serif',
+  $display-4:     mat-typography-level(112px, 112px, 300),
+  $display-3:     mat-typography-level(56px, 56px, 400),
+  $display-2:     mat-typography-level(45px, 48px, 400),
+  $display-1:     mat-typography-level(34px, 40px, 400),
+  $headline:      mat-typography-level(24px, 32px, 800),
+  $title:         mat-typography-level(16px, 32px, 700),
+  $subheading-2:  mat-typography-level(16px, 28px, 400),
+  $subheading-1:  mat-typography-level(12px, 24px, 400),
+  $body-2:        mat-typography-level(20px, 24px, 500),
+  $body-1:        mat-typography-level(14px, 20px, 400),
+  $caption:       mat-typography-level(16px, 25px, 400),
+  $button:        mat-typography-level(18px, 18px, 500),
+  // Line-height must be unit-less fraction of the font-size.
+  $input:         mat-typography-level(20px, 1.125, 400));
+
+$app-primary: mat-palette($mat-yellow, 200);
+$app-accent:mat-palette($mat-deep-orange, 300);
+$app-warn:mat-palette($mat-red, 500);
+$app-theme:mat-light-theme($app-primary, $app-accent, $app-warn);
+
+$app-reverse-primary: mat-palette($mat-brown, 300);
+$app-reverse-primary-color: #ffffff;
+
+$app-color: (
+  primary: mat-palette($mat-yellow, 200),
+  accent:mat-palette($mat-deep-orange, 300),
+  warn:mat-palette($mat-red, 500),
+  grey: mat-palette($mat-grey, 500),
+  red: mat-palette($mat-red, 500),
+  grey-dark: mat-palette($mat-grey, 800),
+  green: mat-palette($mat-lime, A400),
+);
+
+@function  app-color($color, $opacity: null){
+  @return mat-color(map-get($app-color, $color),default,$opacity);
+}
+
+$app-breakpoint: (
+  xs: 'screen and (max-width: 599px)',
+  sm: 'screen and (min-width: 600px) and (max-width: 959px)',
+  md: 'screen and (min-width: 960px) and (max-width: 1279px)',
+  lg: 'screen and (min-width: 1280px) and (max-width: 1919px)',
+  xl: 'screen and (min-width: 1920px) and (max-width: 5000px)',
+  lt-sm: 'screen and (max-width: 599px)',
+  lt-md: 'screen and (max-width: 959px)',
+  lt-lg: 'screen and (max-width: 1279px)',
+  lt-xl: 'screen and (max-width: 1919px)',
+  gt-xs: 'screen and (min-width: 600px)',
+  gt-sm: 'screen and (min-width: 960px)',
+  gt-md: 'screen and (min-width: 1280px)',
+  gt-lg: 'screen and (min-width: 1920px)'
+);
+
+@mixin app-breakpoint($type){
+  $value: map-get($app-breakpoint, $type);
+  @media #{$value}{
+    @content;
+  };
+}
+
+$app-border-radius: (
+  cycle: 50%,
+  square: 3px,
+  square-more: 5px,
+);
+
+@function  app-border-radius($type){
+  @return map-get($app-border-radius, $type);
+}
+
+$app-font-size:(
+  small: 12px,
+  nomal: 16px,
+  bigger: 24px,
+  large: 36px
+);
+
+@function  app-font-size($type){
+  @return map-get($app-font-size, $type);
+}

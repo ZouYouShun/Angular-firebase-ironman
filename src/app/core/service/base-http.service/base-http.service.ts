@@ -12,19 +12,19 @@ export class BaseHttpService {
 
   constructor(private _afs: AngularFirestore, private _db: AngularFireDatabase) { }
 
-  collection(url: string) {
-    return new CollectionHandler(this._afs, url);
+  collection<T>(url: string) {
+    return new CollectionHandler<T>(this._afs, url);
   }
 
-  document(url: string) {
-    return new DocumentHandler(this._afs, url);
+  document<T>(url: string) {
+    return new DocumentHandler<T>(this._afs, url);
   }
 
-  list(url: string) {
-    return new ListHandler(this._db, url);
+  list<T>(url: string) {
+    return new ListHandler<T>(this._db, url);
   }
 
-  object(url: string) {
-    return new ObjectHandler(this._db, url);
+  object<T>(url: string) {
+    return new ObjectHandler<T>(this._db, url);
   }
 }

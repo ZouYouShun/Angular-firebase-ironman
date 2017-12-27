@@ -10,10 +10,7 @@ const routes: Routes = [
     children: [
       {
         path: '',
-        component: MessageListComponent,
-        data: {
-          title: '最新消息'
-        },
+        component: MessageListComponent
       },
     ]
   }

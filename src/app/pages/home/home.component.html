@@ -1,8 +1,23 @@
-<!-- <p>
-  home works!
-</p> -->
-<app-menu></app-menu>
+<div fxLayout="column" fxFlexFill>
+  <!-- container -->
+  <mat-sidenav-container fxFlex class="main-background" fxFlexFill>
+    <!-- sidenav -->
+    <mat-sidenav #sidenav mode="over" class="sidenav">
+      沒東西!
+    </mat-sidenav>
 
+    <!-- main page -->
+    <mat-sidenav-content #containerElm fxLayout="column">
+      <!-- top menu -->
+      <app-home-menu [menu]="sidenav" [isScrollShrink]="false" [menus-data]="menus"></app-home-menu>
+      <div style="padding-top:50px">
+        <router-outlet></router-outlet>
+      </div>
+      <!-- fill remain area -->
+      <span class="fill-remaining-space"></span>
+      <!-- footer -->
+      <!-- <app-footer></app-footer> -->
+    </mat-sidenav-content>
 
-
-<router-outlet></router-outlet>
+  </mat-sidenav-container>
+</div>

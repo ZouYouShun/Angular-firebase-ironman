@@ -5,6 +5,10 @@
 
 export const environment = {
   production: false,
+  websiteTitle: {
+    zhTw: 'onfirechat',
+    enUS: 'onfirechat',
+  },
   firebase: {
     apiKey: 'AIzaSyAg7zgatP_9WpjR1b1_3UzEiJU7LmE-EXw',
     authDomain: 'my-firebase-first-app.firebaseapp.com',

@@ -5,6 +5,8 @@ import { HomeRoutingModule } from './home-routing.module';
 import { HomeComponent } from './home.component';
 import { MenuComponent } from './menu/menu.component';
 import { SharedModule } from '@shared/shared.module';
+import { HomeMenuComponent } from './home-menu/home-menu.component';
+import { SettingMenuComponent } from './home-menu/setting-menu/setting-menu.component';
 
 @NgModule({
   imports: [
@@ -14,6 +16,8 @@ import { SharedModule } from '@shared/shared.module';
   ],
   declarations: [
     HomeComponent,
+    HomeMenuComponent,
+    SettingMenuComponent,
     MenuComponent
   ]
 })

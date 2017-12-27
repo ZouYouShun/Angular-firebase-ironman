@@ -1,0 +1,25 @@
+<ng-container *ngIf="islogin$ | async as user; else login">
+
+  <button
+    mat-icon-button
+    [matMenuTriggerFor]="appMenu">
+    <div class="personal-img" *ngIf="user.photoURL; else default" [style.background-image]="user.photoURL | safe: 'background-image'"></div>
+    <ng-template #default>
+      <div class="personal-img" [style.background-image]="'assets/img/avatar.jpg' | safe: 'background-image'"></div>
+    </ng-template>
+  </button>
+
+
+  <mat-menu #appMenu="matMenu">
+    <button mat-menu-item (click)="logOut()">
+      <mat-icon>exit_to_app</mat-icon>
+      <span>登出</span>
+    </button>
+  </mat-menu>
+</ng-container>
+
+<ng-template #login>
+  <button mat-icon-button routerLink="/auth/signin">
+    <mat-icon>perm_identity</mat-icon>
+  </button>
+</ng-template>

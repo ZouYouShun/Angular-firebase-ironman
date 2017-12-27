@@ -1,0 +1,23 @@
+@import '~common/css/_my-theme.variable.scss';
+@mixin course-card() {
+  .course-card {
+    padding: .9rem;
+    .card-item {
+      background-color: white;
+      border-radius: app-border-radius(square-more);
+      @include mat-elevation(2);
+      .img {
+        padding-bottom: 50%
+      }
+      .title {
+        margin-top: 0;
+        margin-bottom: 20px;
+      }
+      .submit {}
+      &:hover {
+        @include mat-elevation(8);
+        transform: translateY(-5px);
+      }
+    }
+  }
+}

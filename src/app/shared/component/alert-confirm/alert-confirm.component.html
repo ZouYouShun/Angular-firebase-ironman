@@ -1,0 +1,21 @@
+<div class="content">
+  <h2 class="align-center">
+    <mat-icon color="accent">{{classList[popupInputData.data.type].icon}}</mat-icon>
+    <span *ngIf="popupInputData.data.title">{{popupInputData.data.title}}</span>
+    <!-- use for center the title  -->
+    <span></span>
+  </h2>
+  <article>
+    {{popupInputData.data.message}}
+  </article>
+</div>
+
+<div class="button-area">
+  <button mat-raised-button
+          *ngIf="popupInputData.type === 'confirm'"
+          color="warn"
+          (click)="cancel()" >Cancel</button>
+  <button mat-raised-button class="btn-ok"
+          (click)="ok()">OK</button>
+</div>
+<!-- {{popupInputData | json}} -->

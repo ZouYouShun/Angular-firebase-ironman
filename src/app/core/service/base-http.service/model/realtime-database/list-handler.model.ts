@@ -8,7 +8,7 @@ export interface RealTimeDbConfig {
   queryFn?: QueryFn;
 }
 
-export class ListHandler {
+export class ListHandler<T> {
   url: string;
   _fireList: AngularFireList<{}>;
   constructor(private _db: AngularFireDatabase, private _url) {
@@ -25,12 +25,12 @@ export class ListHandler {
       req.valueChanges();
   }
 
-  // state(events?: ('added' | 'removed' | 'modified')[]) {
+  // getById(events?: ('added' | 'removed' | 'modified')[]) {
   //   return this._fireList.auditTrail();
   // }
 
   // 新增
-  add<T>(data: T) {
+  add(data: T) {
     return Observable.fromPromise(this._fireList.push(dbTimeObject(data)));
   }
   // 刪除
@@ -40,11 +40,11 @@ export class ListHandler {
       Observable.throw(new Error('no key!'));
   }
   // 修改
-  update<T>(key, data: T) {
+  update(key, data: T) {
     return Observable.fromPromise(this._fireList.update(key, dbTimeObject(data, false)));
   }
   // 設定
-  set<T>(key, data: T) {
+  set(key, data: T) {
     return Observable.fromPromise(this._fireList.set(key, dbTimeObject(data, false)));
   }
   // 抹除

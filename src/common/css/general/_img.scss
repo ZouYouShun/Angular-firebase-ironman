@@ -1,0 +1,9 @@
+// @import '~common/css/_my-theme.variable.scss';
+@mixin background-img-rate($rate:0.5, $display:block) {
+  width: 100%;
+  display: $display;
+  background-size: cover;
+  background-position: center;
+  height: 0;
+  padding-bottom: $rate *100%;
+}

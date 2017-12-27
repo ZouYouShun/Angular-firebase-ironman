@@ -1,0 +1,16 @@
+@import '~common/css/_my-theme.variable.scss';
+@import './_addStyle.scss';
+@import './_align.scss';
+@import './_color.scss';
+@import './_display.scss';
+@import './_padding.scss';
+@include add-padding(3, 20, 't-b');
+@include add-padding(3, 20, 'l-r');
+@include add-padding(3, 16, 'l');
+@include add-padding(1, 16, 'r');
+@include add-padding(1, 16, 't');
+@include add-padding(1, 16, 'b');
+@include add-padding(3, 20);
+@include type-color('color');
+@include type-color('background-color');
+@include add-style(font-size, $app-font-size);

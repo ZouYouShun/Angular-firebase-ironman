@@ -1,0 +1,17 @@
+@import '~common/css/material/_my-material.theme.scss';
+.container {
+  width: 400px;
+  background-color: white;
+  border-radius: app-border-radius(square);
+  @include mat-elevation(2);
+  @include app-breakpoint('lt-md') {
+    width: 60%;
+  }
+  @include app-breakpoint('lt-sm') {
+    width: 95%;
+  }
+}
+
+.tab-group li {
+  position: relative;
+}

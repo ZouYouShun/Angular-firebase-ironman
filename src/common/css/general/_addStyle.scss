@@ -1,0 +1,9 @@
+@import '~common/css/_my-theme.variable.scss';
+@mixin add-style($type, $array) {
+  @each $property,
+  $value in $array {
+    .#{$type}-#{$property} {
+      #{$type}: $value
+    }
+  }
+}

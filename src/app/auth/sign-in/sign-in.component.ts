@@ -11,7 +11,7 @@ export class SignInComponent implements OnInit {
 
   signupForm: FormGroup;
 
-  constructor(private _auth: AuthService, private _fb: FormBuilder) {
+  constructor(public _auth: AuthService, private _fb: FormBuilder) {
     // 不管是誰進來這一頁直接登出。
     this._auth.signOut();
   }
@@ -35,11 +35,11 @@ export class SignInComponent implements OnInit {
     this._auth.signInByEmail(this.email.value, this.password.value);
   }
 
-  signInGoogle() {
-    this._auth.signInUpByGoogle();
+  signInUpByGoogle() {
+    this._auth.signInUpByGoogle().subscribe();
   }
 
-  resetPassword() {
-    this._auth.resetPassword(this.password.value);
+  signInUpByFacebook() {
+    this._auth.signInUpByFacebook().subscribe();
   }
 }

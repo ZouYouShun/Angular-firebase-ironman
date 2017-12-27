@@ -1,18 +1,18 @@
 <ul>
   <li>
-    <button mat-button class="width-full fb-button" (click)="onClick">
+    <button mat-button class="width-full fb-button" (click)="signInUpByFacebook()">
       <i class="icon-facebook color-white md-size-2"></i>
       <span class="color-white">使用Facebook登入</span>
     </button>
   </li>
   <li class="margin-top">
-    <button mat-button class="width-full google-button" (click)="onClick">
+    <button mat-button class="width-full google-button" (click)="signInUpByGoogle()">
       <i class="icon-google color-white md-size-2"></i>
-      <span class="color-white" (click)="signInGoogle()">使用Google登入</span>
+      <span class="color-white">使用Google登入</span>
     </button>
   </li>
   <li class="margin-top">
-    <form [formGroup]="signupForm" (ngSubmit)="signup()">
+    <form [formGroup]="signupForm" (ngSubmit)="signIn()">
       <mat-form-field class="width-full" required>
         <mat-label>
           信箱

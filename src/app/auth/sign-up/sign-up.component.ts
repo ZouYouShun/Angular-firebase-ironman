@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '@core/service/auth.service';
+import { RxViewer } from '@shared/ts/rx.viewer';
 
 @Component({
   selector: 'app-sign-up',
@@ -11,7 +12,7 @@ export class SignUpComponent implements OnInit {
 
   signupForm: FormGroup;
 
-  constructor(private _auth: AuthService, private _fb: FormBuilder) {
+  constructor(public _auth: AuthService, private _fb: FormBuilder) {
     // 不管是誰進來這一頁直接登出。
     this._auth.signOut();
   }
@@ -34,11 +35,15 @@ export class SignUpComponent implements OnInit {
   get password() { return this.signupForm.get('password'); }
 
   signup() {
-    return this._auth.signUpByEmail(this.email.value, this.password.value, this.name.value);
+    this._auth.signUpByEmail(this.email.value, this.password.value, this.name.value).subscribe(RxViewer);
   }
 
-  signUpGoogle() {
-    this._auth.signInUpByGoogle();
+  signInUpByGoogle() {
+    this._auth.signInUpByGoogle().subscribe();
+  }
+
+  signInUpByFacebook() {
+    this._auth.signInUpByFacebook().subscribe();
   }
 
 }

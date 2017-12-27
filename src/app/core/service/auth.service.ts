@@ -1,5 +1,6 @@
 import 'rxjs/add/operator/switchMap';
 import 'rxjs/add/operator/concatMap';
+import 'rxjs/add/operator/catch';
 
 import { Injectable } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -45,26 +46,38 @@ export class AuthService {
 
   // 注意！當註冊後也會更改當前authState，也會接到user，視同於登入
   signUpByEmail(email: string, password: string, name: string) {
-    return this._afAuth.auth.createUserWithEmailAndPassword(email, password)
-      .then(result => {
+    return Observable.fromPromise(this._afAuth.auth.createUserWithEmailAndPassword(email, password))
+      .switchMap(result => {
         const user = Object.assign({}, result, { displayName: name });
-        this.signOut();
         return this.addUser(user, 'email');
+      })
+      .do(() => {
+        this.signOut();
+        this._router.navigateByUrl('/auth/signin');
       })
       .catch(err => this.ErrorHandler(err));
   }
 
   signInUpByGoogle() {
-    this._afAuth.auth.signInWithPopup(new firebase.auth.GoogleAuthProvider())
-      .then(result => {
+    return Observable.fromPromise(this._afAuth.auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()))
+      .switchMap(result => {
         const user = result.user;
         return this.addUser(user, 'google');
       })
       .catch(err => this.ErrorHandler(err));
   }
 
+  signInUpByFacebook() {
+    return Observable.fromPromise(this._afAuth.auth.signInWithPopup(new firebase.auth.FacebookAuthProvider()))
+      .switchMap(result => {
+        const user = result.user;
+        return this.addUser(user, 'facebook');
+      })
+      .catch(err => this.ErrorHandler(err));
+  }
+
   signInByEmail(email: string, password: string) {
-    this._afAuth.auth.signInWithEmailAndPassword(email, password)
+    return Observable.fromPromise(this._afAuth.auth.signInWithEmailAndPassword(email, password))
       .catch(err => this.ErrorHandler(err));
   }
 
@@ -87,7 +100,7 @@ export class AuthService {
     return this.userHandler.update(user.uid, data);
   }
 
-  private addUser(user: firebase.User, types: 'google' | 'email') {
+  private addUser(user: firebase.User, types: 'google' | 'email' | 'facebook') {
     const data: User = {
       uid: user.uid,
       email: user.email,
@@ -101,5 +114,6 @@ export class AuthService {
 
   private ErrorHandler(err) {
     console.log(err);
+    return Observable.of(`Error: ${err}`);
   }
 }

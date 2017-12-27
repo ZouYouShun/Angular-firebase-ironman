@@ -56,7 +56,7 @@ export class CollectionHandler<T> {
 
   delete(key: string): Observable<any> {
     return key ?
-      Observable.fromPromise(this._fireAction.doc(key).delete()) :
+      Observable.fromPromise(this._fireAction.doc(key).delete()).map(() => key) :
       Observable.throw(new Error('no key!'));
   }
 
@@ -71,6 +71,6 @@ export class CollectionHandler<T> {
     return Observable.fromPromise(
       this._fireAction
         .doc(key)
-        .set(storeTimeObject(data)));
+        .set(storeTimeObject(data))).map(() => key);
   }
 }

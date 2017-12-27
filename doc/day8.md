@@ -32,6 +32,7 @@ firebase 的authentication功能，為我們的系統加入了登入的功能，
 export class AppModule { }
 ```
 
+# Google 登入
 * 先在app.component注入AngularFireAuth然後實做google登入做測試
 ts
 ```js
@@ -69,8 +70,37 @@ html
 ```
 > 到這邊我們就可以透過firebase登入了！是不是很簡單
 
+
+# Facebook 登入
+
+* 在firebase上啟用FB得登入，最下面那一組OAuth重新導向網址複製起來
+
+![](https://res.cloudinary.com/dw7ecdxlp/image/upload/facebook_suxuv7.jpg)
+
+* facebook建立APP
+
+https://developers.facebook.com
+
+我們要先在facebook建立一個APP，建立好後，再到Facebook Login得設定頁面，將剛剛得到得OAuth網址貼上
+
+![](https://res.cloudinary.com/dw7ecdxlp/image/upload/facebook3_xdzczv.jpg)
+
+在dashboard取得IP、KEY
+
+![](https://res.cloudinary.com/dw7ecdxlp/image/upload/facebook2_sly0kn.jpg)
+
+最後把IP、KEY貼回Firebase，設定就算完成了！
+
+# 測試Facebook登入
+
+實作方法語Google一樣，只是這次變成`FacebookAuthProvide`
+```js
+this._afAuth.auth.signInWithPopup(new firebase.auth.FacebookAuthProvider())
+```
+到這邊我們就能做到Facebook登入了，登入後我們可以回firebase管理中心查看，你會發現你的帳號已經被存進來了。
+
 # 取得登入資訊
-我們可以由定義檔得知authState會回傳一個firebase.User的物件，我們可以透過他來得到使用者的資料
+我們可以透過authState回傳讀firebase.User物件來得到使用者的資料
 ```js
 constructor(public afAuth: AngularFireAuth) {
   this.afAuth.authState.subscribe((data) => {
@@ -106,35 +136,12 @@ constructor(public afAuth: AngularFireAuth) {
 
 有興趣他存了什麼的朋友，可以把資料複製出來到 https://jsoneditoronline.org/ 看看有哪些。
 
-> 到這邊我們統整一下基本邏輯，firebase登入認證基本就是透過API登入認證後，訂閱`authState`取得登入者的資料，得知使用者登入
-
-有了基本的概念後，我們一樣將資料使用service封裝
-
-# Email新增使用者
-
-我們在core.module建立auth.service
-
-將AngularFireAuth注入
-```js
-constructor(
-  private _afAuth: AngularFireAuth,
-  private _http: BaseHttpService,
-  private _router: Router,
-  private _route: ActivatedRoute,
-)
-```
-為了把使用者的相關資訊存在資料庫，我們也把baseHttpService加入
+> 到這邊我們統整一下基本邏輯，firebase登入認證基本就是透過API登入認證後，訂閱`authState`取得登入者的資料，得知使用者登入，有了基本的概念後，我們一樣可以將所有方法用一個service封裝，一來可以避免當firebase API修改時我們要改很多地方，二來可以把邏輯彙整在一個service裡面。
 
 
 
-* AngularFireAuth的定義檔
-```js
-// auth.d.ts
-export declare class AngularFireAuth {
-    app: FirebaseApp;
-    readonly auth: firebase.auth.Auth;
-    readonly authState: Observable<firebase.User | null>;
-    readonly idToken: Observable<string | null>;
-    constructor(app: FirebaseApp);
-}
-```
+
+# 參考文章
+https://github.com/angular/angularfire2/blob/master/docs/auth/getting-started.md
+https://www.appcoda.com.tw/firebase-facebook-login/
+https://github.com/AngularFirebase/68-multistep-firebase-signup

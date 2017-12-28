@@ -1,5 +1,7 @@
 # [Angular Firebase 入門與實做] Day-02 Realtime Database - 讀取(Read)-1
 
+每日一句來源：[Daily English](https://play.google.com/store/apps/details?id=net.eocbox.dailysentence)
+
 > Be strong, believe in who you are; be strong, believe in what you fele.
 
 ## 讀取(Read)

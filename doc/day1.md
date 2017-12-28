@@ -1,4 +1,7 @@
 # [Angular Firebase 入門與實做] Day-01 開發環境建立與初始化
+
+每日一句來源：[Daily English](https://play.google.com/store/apps/details?id=net.eocbox.dailysentence)
+
 > Progress is impossible without change, and those who cannot chanage their minds connot change anything.
 
 ### 本日目標

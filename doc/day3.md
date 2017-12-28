@@ -1,5 +1,7 @@
 # [Angular Firebase 入門與實做] Day-03 Realtime Database - 讀取(Read)-2、新增、修改、刪除
 
+每日一句來源：[Daily English](https://play.google.com/store/apps/details?id=net.eocbox.dailysentence)
+
 > Every day may not be good, but there's something good in every day.
 
 昨天我們知道如何讀取到資料了，這邊統整介紹firebase提供的AngularFireAction API，方便我們在對資料操作。

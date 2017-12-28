@@ -1,3 +1,5 @@
+每日一句來源：[Daily English](https://play.google.com/store/apps/details?id=net.eocbox.dailysentence)
+
 > Smile and let everyone know that today you're a lot stronger than you were yesterday.![/images/emoticon/emoticon69.gif](/images/emoticon/emoticon69.gif)
 
 2017是一個技術爆炸的一年，特別對Angular來說更是如此，今年真的讓我們又愛又恨，充滿驚奇，有許多新東西不斷進入了我們的世界中，筆者是一名使用Angular在前端世界裡游泳的開發人員![/images/emoticon/emoticon31.gif](/images/emoticon/emoticon31.gif)，筆者喜歡並享受在撰寫Typescript、Angular時的優雅與穩定，透過這次鐵人賽，筆者想給自己一個機會究並實做Angular Firebase，也分享自己這一年寫Angular的一些小經驗給大家。

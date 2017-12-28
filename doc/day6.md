@@ -1,5 +1,7 @@
 # [Angular Firebase 入門與實做] Day-06 Cloud Firestore - Querying Collections-2 offline-data
 
+每日一句來源：[Daily English](https://play.google.com/store/apps/details?id=net.eocbox.dailysentence)
+
 > To improve is to change, to be perfect is to change often.
 
 * 今日demo： https://my-firebase-first-app.firebaseapp.com/

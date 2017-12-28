@@ -1,5 +1,7 @@
 # [Angular Firebase 入門與實做] Day-05 Cloud Firestore - Querying Collections
 
+每日一句來源：[Daily English](https://play.google.com/store/apps/details?id=net.eocbox.dailysentence)
+
 > The past can hurt. But from the way I see it, you can either run from it, or learn from it.
 
 # Querying Collections in AngularFirestore

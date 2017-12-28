@@ -1,5 +1,7 @@
 # [Angular Firebase 入門與實做] Day-07 Cloud Firestore - Hosting
 
+每日一句來源：[Daily English](https://play.google.com/store/apps/details?id=net.eocbox.dailysentence)
+
 > Life is a journey, not a destination.
 
 # Hosting

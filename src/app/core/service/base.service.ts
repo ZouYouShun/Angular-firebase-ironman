@@ -3,11 +3,12 @@ import 'rxjs/add/operator/filter';
 import 'rxjs/add/operator/takeUntil';
 
 import { Inject, Injectable, PLATFORM_ID } from '@angular/core';
+import { Title } from '@angular/platform-browser';
 import { onlyOnBrowser } from '@shared/decorator/only-on.browser';
 import { runAfterTimeout } from '@shared/decorator/timeout.decorator';
-import { RouteLoadingService } from '@shared/service/route-loading.service';
 import { Observable } from 'rxjs/Observable';
-import { Title } from '@angular/platform-browser';
+
+import { RouteLoadingService } from './route-loading.service';
 
 @Injectable()
 export class BaseService {
@@ -28,8 +29,8 @@ export class BaseService {
   }
 
   constructor(
-    private _pageChange: RouteLoadingService,
     @Inject(PLATFORM_ID) private platformId: Object,
+    private _pageChange: RouteLoadingService,
     private _title: Title
   ) { }
 

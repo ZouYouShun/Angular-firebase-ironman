@@ -16,9 +16,9 @@ import { environment } from '@env';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 import { RouteLoadingComponent } from '../component/route-loading/route-loading.component';
-import { onlyOnBrowser } from '../decorator/only-on.browser';
-import { runAfterTimeout } from '../decorator/timeout.decorator';
-import { CdkService } from '../service/cdk.service';
+import { CdkService } from '@shared/service/cdk.service';
+import { onlyOnBrowser } from '@shared/decorator/only-on.browser';
+import { runAfterTimeout } from '@shared/decorator/timeout.decorator';
 
 @Injectable()
 export class RouteLoadingService {

@@ -1,6 +1,6 @@
-import { Component, OnInit, HostBinding, HostListener } from '@angular/core';
+import { Component, HostBinding } from '@angular/core';
 import { animateFactory } from '@shared/animation';
-import { CUBIC_BEZIER, DURATIONS } from '../../animation/animate.constant';
+import { CUBIC_BEZIER, DURATIONS } from '@shared/animation/animate.constant';
 
 @Component({
   selector: 'block-view',

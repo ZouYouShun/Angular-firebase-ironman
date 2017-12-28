@@ -4,22 +4,22 @@ import 'rxjs/add/operator/takeUntil';
 
 import { DomPortalOutlet } from '@angular/cdk/portal';
 import {
-  AfterContentInit,
-  Component,
-  ComponentFactory,
-  ComponentFactoryResolver,
-  EventEmitter,
-  HostBinding,
-  HostListener,
-  ReflectiveInjector,
-  TemplateRef,
-  ViewChild,
+    AfterContentInit,
+    Component,
+    ComponentFactory,
+    ComponentFactoryResolver,
+    EventEmitter,
+    HostBinding,
+    HostListener,
+    ReflectiveInjector,
+    TemplateRef,
+    ViewChild,
 } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { animateFactory } from '@shared/animation';
+import { CUBIC_BEZIER, DURATIONS } from '@shared/animation/animate.constant';
+import { AutoDestroy } from '@shared/ts/auto.destroy';
 
-import { animateFactory } from '../../animation';
-import { CUBIC_BEZIER, DURATIONS } from '../../animation/animate.constant';
-import { AutoDestroy } from '../../ts/auto.destroy';
 import { PopUpCallback, PopUpConfig, PopUpRef } from './pop-up.model';
 import { ViewContainerDirective } from './view-container.directive';
 

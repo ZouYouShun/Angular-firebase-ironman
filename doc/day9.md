@@ -3,6 +3,9 @@
 每日一句來源：[Daily English](https://play.google.com/store/apps/details?id=net.eocbox.dailysentence)
 
 > You can't reach for anything new, if your hands are still full of yesterdays junk.
+	
+今日範例：https://onfirechat.ga/message
+進去後會要求登入，登入後才能進入訊息介面(訊息頁面尚未實做完成，直接點左上回首頁即可，只是為了測試Guard)。
 
 今天我們來實做route的守衛，也就是Guard，這是Angular讓我們對route提供路由時的保護，防止未認證的使用者進到不該進去的頁面。
 

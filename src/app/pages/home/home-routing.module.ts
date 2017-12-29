@@ -6,6 +6,10 @@ const routes: Routes = [{
   path: '',
   component: HomeComponent,
   children: [
+    {
+      path: '',
+      loadChildren: './_routers/message/message.module#MessageModule'
+    },
   ]
 }];
 

@@ -28,7 +28,7 @@ export class MessageDetialComponent {
   user: User;
   currentUser$;
 
-  messagesHandler: CollectionHandler<any>;
+  roomsHandler: CollectionHandler<any>;
   query = new BehaviorSubject<QueryFn>(ref => ref.orderBy('updatedAt'));
   myForm: FormGroup;
   lastMessages;
@@ -46,7 +46,7 @@ export class MessageDetialComponent {
     this.myForm = this.fb.group({
       content: ''
     });
-    this.messagesHandler = this._http.collection('messages');
+    this.roomsHandler = this._http.collection('rooms');
 
     // this.messages$ = this.messagesHandler.get()
     //   .switchMap(list => Observable.forkJoin(
@@ -62,10 +62,10 @@ export class MessageDetialComponent {
     // this.messagesHandler.document<Message>(params.id).get()
     this.messages$ =
       this._route.params
-        .switchMap((params) => this.messagesHandler.document<Message>(params.id).get())
+        .switchMap((params) => this.roomsHandler.document<Message>(params.id).get())
         .switchMap(item => {
           if (item) {
-            return this.messagesHandler.document(item.id).collection('messages').get({
+            return this.roomsHandler.document(item.id).collection('messages').get({
               isKey: false,
               queryFn: ref => ref.orderBy('createdAt')
             });
@@ -75,7 +75,7 @@ export class MessageDetialComponent {
   }
 
   add() {
-    this.messagesHandler.set(this.user.uid, <any>{})
+    this.roomsHandler.set(this.user.uid, <any>{})
       .switchMap(doc => Observable.forkJoin([
         doc.collection('users').set(this.user.uid, {}),
         doc.collection('messages').add({
@@ -89,7 +89,7 @@ export class MessageDetialComponent {
   }
 
   delete(message: any) {
-    this.messagesHandler.delete(message.id).subscribe(RxViewer);
+    this.roomsHandler.delete(message.id).subscribe(RxViewer);
   }
 
   updateItem(message: any, value?: string) {

@@ -6,7 +6,7 @@ import { AlertConfirmModule } from './component/alert-confirm/alert-confirm.modu
 import { BlockViewComponent } from './component/block-view/block-view.component';
 import { PopUpModule } from './component/pop-up/pop-up.module';
 import { RouteLoadingComponent } from './component/route-loading/route-loading.component';
-import { AuthGuard } from './guards/auth.guard';
+import { AuthGuard } from './guard/auth.guard';
 import { throwIfAlreadyLoaded } from './module-import-guard';
 import { AuthService } from './service/auth.service';
 import { BaseHttpService } from './service/base-http.service';

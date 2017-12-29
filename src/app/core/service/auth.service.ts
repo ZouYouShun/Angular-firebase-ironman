@@ -1,6 +1,8 @@
 import 'rxjs/add/operator/catch';
 import 'rxjs/add/operator/concatMap';
 import 'rxjs/add/operator/switchMap';
+import 'rxjs/add/observable/fromPromise';
+import 'rxjs/add/observable/throw';
 
 import { Inject, Injectable, PLATFORM_ID } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -36,18 +38,13 @@ export class AuthService {
     // 由於這個Service會永遠存活，我們不需對他做unsubscribe
     this._afAuth.authState
       .switchMap(user => this.updateUser(user))
-      .switchMap(key => this.userHandler.getById(key))
+      .switchMap(key => this.userHandler.document<User>(key).get())
       .subscribe(user => {
-        if (user) {
-          const returnUrl = localStorage.getItem('returnUrl');
-          if (returnUrl) {
-            this._router.navigateByUrl(returnUrl);
-            localStorage.removeItem('returnUrl');
-          }
-        }
+        this.returnUrl(user);
         this.currentUser$.next(user);
       });
   }
+
 
   // 注意！當註冊後也會更改當前authState，也會接到user，視同於登入
   signUpByEmail(email: string, password: string, name: string) {
@@ -80,7 +77,7 @@ export class AuthService {
   private signInBySocialMedia(provider, type) {
     this.storeUrl();
 
-    return Observable.fromPromise(this._afAuth.auth.signInWithRedirect(provider))
+    return Observable.fromPromise(this._afAuth.auth.signInWithPopup(provider))
       .switchMap(result => {
         const user = result.user;
         return this.addUser(user, type);
@@ -94,6 +91,16 @@ export class AuthService {
     localStorage.setItem('returnUrl', returnUrl);
   }
 
+  @onlyOnBrowser('platformId')
+  private returnUrl(user: User) {
+    if (user) {
+      const returnUrl = this._route.snapshot.queryParamMap.get('returnUrl') || localStorage.getItem('returnUrl');
+      if (returnUrl) {
+        this._router.navigateByUrl(returnUrl);
+        localStorage.removeItem('returnUrl');
+      }
+    }
+  }
   // Sends email allowing user to reset password
   resetPassword(oldPassword: string, newPassword: string) {
     // 修改前要再次登入一次

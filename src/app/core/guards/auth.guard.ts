@@ -16,7 +16,7 @@ export class AuthGuard implements CanActivate, CanLoad {
     private _router: Router) { }
 
   canLoad(route: Route): Observable<boolean> | Promise<boolean> | boolean {
-    console.log('AuthGuard canLoad');
+    // console.log('AuthGuard canLoad');
     const url = `/${route.path}`;
     return this.isLogin(url);
   }
@@ -24,8 +24,7 @@ export class AuthGuard implements CanActivate, CanLoad {
   canActivate(
     next: ActivatedRouteSnapshot,
     state: RouterStateSnapshot): Observable<boolean> | Promise<boolean> | boolean {
-
-    console.log('AuthGuard canActivate');
+    // console.log('AuthGuard canActivate');
     return this.isLogin(state.url);
   }
 

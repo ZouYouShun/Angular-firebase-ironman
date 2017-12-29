@@ -68,7 +68,7 @@ export class MessageDetialComponent {
             return this.messagesHandler.document(item.id).collection('messages').get({
               isKey: false,
               queryFn: ref => ref.orderBy('createdAt')
-            }).take(1);
+            });
           }
           return Observable.of(null);
         });

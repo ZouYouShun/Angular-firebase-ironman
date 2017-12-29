@@ -19,13 +19,18 @@ const routes: Routes = [
       {
         path: 'signin',
         component: SignInComponent,
+        canActivate: [],
         data: {
           title: '登入'
         },
       },
       {
         path: 'signup',
-        component: SignUpComponent
+        component: SignUpComponent,
+        canActivate: [],
+        data: {
+          title: '註冊'
+        },
       },
       {
         path: 'forgot-password',

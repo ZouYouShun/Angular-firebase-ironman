@@ -14,6 +14,7 @@ import { AngularFirestoreModule } from 'angularfire2/firestore';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { CoreModule } from './core/core.module';
+import { PagesModule } from 'app/pages/pages.module';
 
 @NgModule({
   imports: [
@@ -24,9 +25,10 @@ import { CoreModule } from './core/core.module';
     AngularFireDatabaseModule, // add realtime DB module
     AngularFirestoreModule.enablePersistence(), // add cloudstore DB module
     AngularFireAuthModule, // add auth module
+    SharedModule.forRoot(),
     AppRoutingModule,
     CoreModule,
-    SharedModule.forRoot()
+    PagesModule,
   ],
   declarations: [
     AppComponent,

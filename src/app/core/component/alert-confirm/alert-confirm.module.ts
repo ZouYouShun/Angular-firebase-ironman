@@ -14,7 +14,9 @@ import { AlertConfirmService } from './alert-confirm.service';
   declarations: [
     AlertConfirmComponent
   ],
-  entryComponents: [AlertConfirmComponent]
+  entryComponents: [
+    AlertConfirmComponent
+  ]
 })
 export class AlertConfirmModule {
   public static forRoot(): ModuleWithProviders {

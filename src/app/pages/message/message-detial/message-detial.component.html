@@ -1,0 +1,25 @@
+<section class="message-container">
+  <article>
+    <ul>
+      <li *ngFor="let message of messages$ | async">
+        {{message.content}}
+      </li>
+    </ul>
+  </article>
+  <footer>
+    <form [formGroup]="myForm" (ngSubmit)="add()"
+      fxLayout="row nowrap"
+      fxLayoutAlign="center center">
+      <mat-form-field fxFlex="1 1 70%" floatLabel="never" >
+        <textarea matInput
+          formControlName="content"
+          placeholder="{{user?.displayName}}想說什麼呢？"
+          matTextareaAutosize
+          matAutosizeMaxRows="5"></textarea>
+      </mat-form-field>
+      <div fxFlex="1 1 30%">
+        <button mat-raised-button>送出</button>
+      </div>
+    </form>
+  </footer>
+</section>

@@ -2,7 +2,7 @@ import 'rxjs/add/operator/takeUntil';
 
 import { Component, HostBinding } from '@angular/core';
 import { animateFactory } from '@shared/animation';
-import { CUBIC_BEZIER, DURATIONS } from '../../animation/animate.constant';
+import { DURATIONS, CUBIC_BEZIER } from '@shared/animation/animate.constant';
 
 
 // Alan:the reference:

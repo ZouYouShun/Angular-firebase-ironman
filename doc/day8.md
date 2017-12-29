@@ -146,7 +146,6 @@ constructor(public afAuth: AngularFireAuth) {
 
 這邊舉出一些比較值得講得部分，想知道詳細的朋友可以去看原始碼，有問題再做詢問
 
-* 
 ```js
 @Injectable()
 export class AuthService {

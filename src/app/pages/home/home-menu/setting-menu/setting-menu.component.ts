@@ -1,8 +1,7 @@
 import { Component } from '@angular/core';
+import { AlertConfirmModel, AlertConfirmService } from '@core/component/alert-confirm';
 import { AuthService } from '@core/service/auth.service';
-import { AlertConfirmModel, AlertConfirmService } from '@shared/component/alert-confirm';
-import { BlockViewService } from '@shared/service/block-view.service';
-import { RxViewer } from '@shared/ts/rx.viewer';
+import { BlockViewService } from '@core/service/block-view.service';
 
 @Component({
   selector: 'app-setting-menu',

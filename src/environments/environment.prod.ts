@@ -4,6 +4,7 @@ export const environment = {
     zhTw: 'onfirechat',
     enUS: 'onfirechat',
   },
+  nonAuthenticationUrl: ['/', 'auth', 'signin'],
   firebase: {
     apiKey: 'AIzaSyAg7zgatP_9WpjR1b1_3UzEiJU7LmE-EXw',
     authDomain: 'my-firebase-first-app.firebaseapp.com',

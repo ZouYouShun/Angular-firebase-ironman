@@ -13,8 +13,12 @@ export class SignUpComponent implements OnInit {
   signupForm: FormGroup;
 
   constructor(public _auth: AuthService, private _fb: FormBuilder) {
-    // 不管是誰進來這一頁直接登出。
-    this._auth.signOut();
+    // this._auth.currentUser$.take(1)
+    //   .subscribe(user => {
+    //     if (user) {
+    //       this._auth.signOut();
+    //     }
+    //   });
   }
 
   ngOnInit() {

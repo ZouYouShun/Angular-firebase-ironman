@@ -139,8 +139,9 @@ export function onlyOnBrowser(variableId) {
  這是decorator的方式，所以在decorator並沒有*this*這東西，我們使用船字串的方式來實做，必須注意一點的是，這裡的參數必須跟上方constructor中`@Inject(PLATFORM_ID) private platformId: Object`內部的參數名稱相同，這是筆者自己想的方法，不曉得有無更好的實作方法，有請大大們糾正！
 
 最後我們在任何想防護的route加上`canActivate: [AuthGuard]`或是`canLoad: [AuthGuard]`他就能針對回傳的結果來決定是否能進去該route了！
-
  
+本日範例：https://github.com/ZouYouShun/Angular-firebase-ironman/tree/day9_authentication_guard
+
 # 本日小節
 今天未route加上了保護，我們可以針對未認證的使用者作防禦，避免使用者在未認證的狀況進到系統中，並且我們時做了onlyOnBrowser方法，來進一步實做並讓系統能在SSR的狀況下運作，相關SSR的部份我們未來還會做講解。
 

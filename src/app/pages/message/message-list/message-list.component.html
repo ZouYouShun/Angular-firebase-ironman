@@ -1,0 +1,3 @@
+<mat-nav-list>
+  <a mat-list-item [routerLink]="user.uid" *ngFor="let user of users$ | async"> {{ user.displayName }} </a>
+</mat-nav-list>

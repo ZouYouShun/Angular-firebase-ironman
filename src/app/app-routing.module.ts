@@ -5,12 +5,15 @@ import { AuthGuard } from '@core/guards/auth.guard';
 const routes: Routes = [
   {
     path: '',
-    loadChildren: './pages/pages.module#PagesModule',
-    canActivate: [AuthGuard]
+    loadChildren: './pages/pages.module#PagesModule'
   },
   {
     path: 'auth',
     loadChildren: './auth/auth.module#AuthModule'
+  },
+  {
+    path: '**',
+    redirectTo: ''
   }
 ];
 

@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { MessageComponent } from './message.component';
-import { MessageListComponent } from './message-list/message-list.component';
+import { MessageDetialComponent } from './message-detial/message-detial.component';
 
 const routes: Routes = [
   {
@@ -10,7 +10,11 @@ const routes: Routes = [
     children: [
       {
         path: '',
-        component: MessageListComponent
+        component: MessageDetialComponent
+      },
+      {
+        path: ':id',
+        component: MessageDetialComponent
       },
     ]
   }

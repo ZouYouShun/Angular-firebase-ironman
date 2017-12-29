@@ -12,6 +12,7 @@ import { Observable } from 'rxjs/Observable';
 
 import { User } from '../model/user.model';
 import { BaseHttpService, CollectionHandler } from './base-http.service';
+import { environment } from '@env';
 
 @Injectable()
 export class AuthService {
@@ -32,7 +33,7 @@ export class AuthService {
 
     // 用來保存當前angularfire的使用者狀態
     this.fireUser$ = this._afAuth.authState;
-    // 由於這個Service會永遠存活，我們不需對她做unsubscribe
+    // 由於這個Service會永遠存活，我們不需對他做unsubscribe
     this._afAuth.authState
       .switchMap(user => this.updateUser(user))
       .switchMap(key => this.userHandler.getById(key))
@@ -79,7 +80,7 @@ export class AuthService {
   private signInBySocialMedia(provider, type) {
     this.storeUrl();
 
-    return Observable.fromPromise(this._afAuth.auth.signInWithPopup(provider))
+    return Observable.fromPromise(this._afAuth.auth.signInWithRedirect(provider))
       .switchMap(result => {
         const user = result.user;
         return this.addUser(user, type);
@@ -101,7 +102,8 @@ export class AuthService {
   }
 
   signOut() {
-    return Observable.fromPromise(this._afAuth.auth.signOut());
+    return Observable.fromPromise(this._afAuth.auth.signOut())
+      .do(() => this._router.navigate(environment.nonAuthenticationUrl));
   }
 
   private updateUser(user: firebase.User) {

@@ -1,0 +1,5 @@
+<input type="file" (change)="uploadFile($event)" />
+<div>{{ uploadPercent | async }}</div>
+<a [href]="downloadURL | async">{{ downloadURL | async }}</a>
+<img [src]="profileUrl | async" />
+<pre><code>{{ meta | async | json }}</code></pre>

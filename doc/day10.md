@@ -1,149 +1,242 @@
-# [Angular Firebase 入門與實做] Day-08 Authentication - 02 路由守衛
+# [Angular Firebase 入門與實做] Day-10 Storage 檔案處理
 
 每日一句來源：[Daily English](https://play.google.com/store/apps/details?id=net.eocbox.dailysentence)
 
-> You can't reach for anything new, if your hands are still full of yesterdays junk.
+> Celebrate what you've accomplished, but raise the bar a little higher each time you succeed.
 	
-今日範例：https://onfirechat.ga/message
-進去後會要求登入，登入後才能進入訊息介面(訊息頁面尚未實做完成，直接點左上回首頁即可，只是為了測試Guard)。
+# Storage
 
-今天我們來實做route的守衛，也就是Guard，這是Angular讓我們對route提供路由時的保護，防止未認證的使用者進到不該進去的頁面。
+今天我們說一次怎麼把檔案存到firebase！這對任何系統來說都是必需的功能！
 
-因為這是跟auth相關的，我們一樣放在core module之中，建立一個guard的資料夾，並使用cli建立一個guard
-`ng g guard auth`
+> storage的功能尚未正式釋出，但是在5.0.0-rc.5-next已經有該功能可以使用了
 
-實做如下
-auth.guard.ts
+## 更新angularfire2
+`npm i angularfire2@next`
+**未來若正式釋出筆者會再更新**
+
+筆者目前裝的版本為angularfire2@5.0.0-rc.5-next
+
+# import AngularFireStorageModule
+
+我們一樣加入StorageModule在AppModule，要注意不要打成AngularFire*Store*!!他們兩個有一點點像
 ```js
-import 'rxjs/add/operator/take';
 ...
-
-@Injectable()
-export class AuthGuard implements CanActivate, CanLoad {
-
-  constructor(
-    private _auth: AuthService,
-    private _router: Router) { }
-
-  canLoad(route: Route): Observable<boolean> | Promise<boolean> | boolean {
-    const url = `/${route.path}`;
-    return this.isLogin(url);
-  }
-
-  canActivate(
-    next: ActivatedRouteSnapshot,
-    state: RouterStateSnapshot): Observable<boolean> | Promise<boolean> | boolean {
-    return this.isLogin(state.url);
-  }
-
-  private isLogin(url: string): Observable<boolean> | Promise<boolean> | boolean {
-    // https://github.com/angular/angular/issues/18991
-    return this._auth.fireUser$
-      .take(1)
-      .map((user) => {
-        if (user) return true;
-
-        this._router.navigate(environment.nonAuthenticationUrl, { queryParams: { returnUrl: url } });
-        return false;
-      });
-  }
-}
-```
-我們implements CanActivate, CanLoad，這兩個方法我們較常使用，先建立兩個方法，未來可以在實做其他Guard。
-
-> 注意的是一定要記得使用`take(1)`包裝，因為在canLoad的部分，目前如果是不會complete的方法，他會直接回傳false，導致我們實作上不正常，詳細可以看此篇[issue](https://github.com/angular/angular/issues/18991)
-
-為了讓我們導頁登入後能再次回到原畫面，我們船一個queryParams過去，筆者定義為`returnUrl`，而要導過去的頁面筆者會在environment建立一筆nonAuthenticationUrl，讓我們未來如果想要導頁至其他地方時，可以只改一個地方。
-```json
-{
-  production: true,
-  nonAuthenticationUrl: ['/', 'auth', 'signin']
-  ...
-};
-```
-
-接著我們回到auth.service，在昨天取得使用者的地方加上一個方法`this.returnUrl(user);`並實做該方法
-
-```js
-@Injectable()
-export class AuthService {
-  currentUser = new BehaviorSubject<User>(null);
-  userHandler: CollectionHandler<User>;
-
-  constructor(
-    @Inject(PLATFORM_ID) private platformId: Object,
-    private _afAuth: AngularFireAuth,
-    private _http: BaseHttpService,
-    private _router: Router,
-    private _route: ActivatedRoute,
-  ) {
-    this.userHandler = this._http.collection<User>(`users`);
-
-    this._afAuth.authState
-      .switchMap(user => this.updateUser(user))
-      .switchMap(key => this.userHandler.getById(key))
-      .subscribe(user => { 
-        // 有人登入後就導頁
-        this.returnUrl(user);
-        this.currentUser.next(user); 
-      });
-  }
-  ...
-  
-  signInUpByGoogle() {
-    this.storeUrl(); // 在導頁前先存下來
+import { AngularFireStorageModule } from 'angularfire2/storage';
+...
+@NgModule({
+  imports: [
+    ...,
+    AngularFireStorageModule,
     ...
-  }
-  ... 
-
-  @onlyOnBrowser('platformId')
-  private storeUrl() {
-    const returnUrl = this._route.snapshot.queryParamMap.get('returnUrl') || '/';
-    localStorage.setItem('returnUrl', returnUrl);
-  }
-
-  @onlyOnBrowser('platformId')
-  private returnUrl(user: User) {
-    if (user) {
-      const returnUrl = this._route.snapshot.queryParamMap.get('returnUrl') || localStorage.getItem('returnUrl');
-      if (returnUrl) {
-        this._router.navigateByUrl(returnUrl);
-        localStorage.removeItem('returnUrl');
-      }
-    }
-  }
-  ....
-}
+  ],
+  declarations: [
+    AppComponent,
+  ],
+  providers: [],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
 ```
-解釋：
-1. 我們在每種登入前，去把當前的網址參數存下來
-2. 我們先使用queryParamMap的網址，若沒有串則使用localStorage(如果使用導頁，參數會不見)
-3. 最後再登入的時候，authState改變我們就能做到導頁的功能了
-4. 你可能會疑惑onlyOnBrowser('platformId')是做什麼的，這是為了將來SSR的實作，因為localstorage並不存在伺服器端，我們會用這個自己建立的decorator包起來，防止在伺服器端有錯誤。
 
-onlyOnBrowser.ts
+## 在component測試使用
+
+我們在app.component做測試
+
+* ts
+
 ```js
-import { isPlatformBrowser } from '@angular/common';
-export function onlyOnBrowser(variableId) {
-  return function (target, key, descriptor) {
-    const originalMethod = descriptor.value;
-    descriptor.value = function (...args) {
-      if (isPlatformBrowser(this[variableId])) {
-        originalMethod.apply(this, args);
-      }
-    };
-    return descriptor;
-  };
+...
+import { AngularFireStorage } from 'angularfire2/storage';
+...
+@Component({
+  selector: 'app-profile',
+  templateUrl: './profile.component.html',
+  styleUrls: ['./profile.component.scss']
+})
+export class ProfileComponent  {
+
+  constructor(private storage: AngularFireStorage) {
+  }
+
+  // 建立一個uploadFile的方法
+  uploadFile(event) {
+    const file: File = event.target.files[0];
+    // 雲端所存放的檔案名稱
+    // 檔名一樣的會就會覆蓋檔案
+    const filePath = `${new Date().getTime()}_${file.name}`;
+    
+    //檔案上傳任務建立，注意這裡並不會真正的上傳，只是個任務而已！
+    const task = this.storage.upload(filePath, file);
+
+    // 當我們.then()之後才會真正進行上傳
+    task.then()// 看這裡
+      .then(() => {// 還有這裡~
+        console.log('file upload success');
+      });
+  }
 }
 ```
- 這是decorator的方式，所以在decorator並沒有*this*這東西，我們使用船字串的方式來實做，必須注意一點的是，這裡的參數必須跟上方constructor中`@Inject(PLATFORM_ID) private platformId: Object`內部的參數名稱相同，這是筆者自己想的方法，不曉得有無更好的實作方法，有請大大們糾正！
 
-最後我們在任何想防護的route加上`canActivate: [AuthGuard]`或是`canLoad: [AuthGuard]`他就能針對回傳的結果來決定是否能進去該route了！
- 
-本日範例：https://github.com/ZouYouShun/Angular-firebase-ironman/tree/day9_authentication_guard
+* html
+
+```html
+<input type="file" (change)="uploadFile($event)" />
+```
+
+* 注意事項
+1. .then()或是其他方法之後才會建立實體並執行任務！
+2. 兩次上傳檔案名稱若一樣，會直接覆蓋
+
+## AngularFireUploadTask 任務相關方法
+
+上傳任務實際如下：
+```js
+export interface AngularFireUploadTask {
+    snapshotChanges(): Observable<storage.UploadTaskSnapshot | undefined>; // 檔案上傳相關資料流(類似store)
+    percentageChanges(): Observable<number | undefined>; // 進度百分比
+    downloadURL(): Observable<string | null>; // 下載的路徑，注意是observable，當檔案換位置，只要ID不變我們還是能找到檔案
+    pause(): boolean; // 暫停上傳
+    cancel(): boolean; // 取消上傳
+    resume(): boolean; // 回復上傳
+    then(): Promise<any>; // 開始上傳
+    catch(onRejected: (a: Error) => any): Promise<any>; //上傳的錯誤訊息
+}
+```
+相關功能如註解，值得注意的是，*只要有使用任何一個方法(cancel、pause除外)上傳任務就會被執行，並且上傳檔案！！！*
+備註：如果依據使用並不會建立兩次，只會建立一次(上傳一次)。
+
+我們這裡展示一下怎麼顯示檔案在頁面上，並且擁有暫停上傳、繼續上傳、取消上傳的功能
+
+## 顯示檔案
+
+ts
+```js
+  // 上傳任務本體
+  uploadTask: AngularFireUploadTask;
+
+  fileURL$: Observable<string>; // 檔案路徑
+  uploadPercent$: Observable<number>; // 上傳進度
+  meta$: Observable<any>; //相關資料
+
+  ...
+  uploadFile(event) {
+    const file: File = event.target.files[0];
+    const filePath = `${new Date().getTime()}_${file.name}`;
+    this.uploadTask = this.storage.upload(filePath, file);
+
+    this.uploadPercent$ = this.uploadTask.percentageChanges();
+    this.fileURL$ = this.uploadTask.downloadURL();
+    this.meta$ = this.uploadTask.snapshotChanges().map(d => d.metadata);
+    this.uploadTask.then()// 看這裡
+      .then(() => {// 還有這裡~
+        console.log('file upload success');
+      })
+      .catch((err) => { console.log(err); });
+  }
+
+  // 暫停
+  pause() {
+    this.uploadTask.pause();
+  }
+  // 取消
+  cancel() {
+    this.uploadTask.cancel();
+  }
+  // 繼續
+  resume() {
+    this.uploadTask.resume();
+  }
+```
+
+html
+```js
+<input type="file" (change)="uploadFile($event)" />
+<ng-container *ngIf="uploadPercent$ | async as uploadPercent">
+  <div>{{ uploadPercent }}</div>
+  <button mat-raised-button (click)="pause()">暫停</button>
+  <button mat-raised-button (click)="resume()">繼續</button>
+  <button mat-raised-button (click)="cancel()">取消</button>
+</ng-container>
+
+<ng-container *ngIf="fileURL$ | async as imgUrl">
+  <a [href]="imgUrl">{{ imgUrl }}</a>
+  <img [src]="imgUrl" />
+</ng-container>
+<pre><code>{{ meta$ | async | json }}</code></pre>
+```
+
+> 就這麼簡單！!!!我們就能對檔案做上傳、暫停、繼續、取消了!!!!
+
+覺得厲害!?還有更猛的QQ
+
+## Custom metadata with File
+我們可以針對檔案給予我們想設定的metadata!!!!
+我們可以針對檔案給予我們想設定的metadata!!!!
+我們可以針對檔案給予我們想設定的metadata!!!!(很重要說三次)
+
+> 這意思是什麼!!!資料直接跟著檔案，我們再也不用害怕檔案刪除，但是資料因為某些原因沒有刪除的狀況了!!!
+
+使用方法如下如下
+
+我們可以在完成的時候去修改資料
+```js
+this.uploadTask.then()// 看這裡
+  .then(() => {// 還有這裡~
+    const ref = this.storage.ref(filePath);
+    this.meta$ = ref.updateMetatdata({ customMetadata: { cool: 'very cool!!' } });
+    console.log('file upload success');
+  })
+  .catch((err) => { console.log(err); });
+```
+再次上傳，你會發現metadata真的被我們取得了！!!
+
+另外我們也可以直接連著資料一起上傳~
+```js
+const file = event.target.files[0];
+const filePath = 'name-your-file-path-here';
+const ref = this.storage.ref(filePath);
+const task = ref.put(file, { customMetadata: { cool: 'very cool!!' } });
+```
+## 取得檔案
+
+如果要直接取得檔案，也是使用ref的方式
+```js
+meta: Observable<any>;
+constructor(private storage: AngularFireStorage) {
+    const ref = this.storage.ref('dataUrl'); // 資料的路徑
+    this.meta$ = ref.getMetadata(); // 詳細資料
+    this.fileURL$$ = ref.downloadURL(); // 下載路徑
+}
+```
+
+## 刪除檔案
+
+如果要直接取得檔案，也是使用ref的方式
+```js
+meta: Observable<any>;
+constructor(private storage: AngularFireStorage) {
+    const ref = this.storage.ref('dataUrl');
+    // 要subscribe才會真的執行刪除喔!
+    ref.delete().subscribe(...)
+}
+```
+
+## 修改檔案
+
+如果要直接取得檔案，也是使用ref的方式
+```js
+meta: Observable<any>;
+constructor(private storage: AngularFireStorage) {
+    const ref = this.storage.ref('dataUrl');
+    
+    ref.put(file, { customMetadata: { cool: 'very cool!!' } });
+}
+```
+
+本日範例：https://github.com/ZouYouShun/Angular-firebase-ironman/tree/day10_firestorage
 
 # 本日小節
-今天未route加上了保護，我們可以針對未認證的使用者作防禦，避免使用者在未認證的狀況進到系統中，並且我們時做了onlyOnBrowser方法，來進一步實做並讓系統能在SSR的狀況下運作，相關SSR的部份我們未來還會做講解。
+firebase的檔案上傳可以說是相當的powerful！大家一定要試試看！雖然目前尚未正式release，但筆者使用的心得是沒有什麼問題，就是可能有部分API實做有點出入，有時是promise有時是Observable，這點要注意！不過是Typescript就還OK！會有錯誤訊息提醒我們=ˇ=
 
 # 參考文章
-https://github.com/angular/angular/issues/18991
+https://github.com/davideast/angularfire2/blob/c4f8cae2df52d2db86b4488398974ceb5e8a3a05/docs/storage/storage.md

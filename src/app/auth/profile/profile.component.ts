@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { AngularFireStorage } from 'angularfire2/storage';
+import { AngularFireStorage, AngularFireUploadTask } from 'angularfire2/storage';
 import { Observable } from 'rxjs/Observable';
 
 @Component({
@@ -9,14 +9,13 @@ import { Observable } from 'rxjs/Observable';
 })
 export class ProfileComponent implements OnInit {
 
-  uploadPercent: Observable<number>;
-  downloadURL: Observable<string>;
-  profileUrl: Observable<string | null>;
-  meta: Observable<any>;
+  uploadTask: AngularFireUploadTask;
+
+  fileURL$: Observable<string>;
+  uploadPercent$: Observable<number>;
+  meta$: Observable<any>;
+
   constructor(private storage: AngularFireStorage) {
-    const ref = this.storage.ref('name-your-file-path-here');
-    this.profileUrl = ref.getDownloadURL();
-    this.meta = ref.getMetadata();
   }
 
   ngOnInit() {
@@ -24,19 +23,36 @@ export class ProfileComponent implements OnInit {
 
   uploadFile(event) {
     const file: File = event.target.files[0];
-    const filePath = file.name;
-    const task = this.storage.upload(filePath, file);
+    const filePath = `${new Date().getTime()}_${file.name}`;
+    this.uploadTask = this.storage.upload(filePath, file);
 
-    // observe percentage changes
-    this.uploadPercent = task.percentageChanges();
-    // get notified when the download URL is available
-    this.downloadURL = task.downloadURL();
+    this.uploadPercent$ = this.uploadTask.percentageChanges();
+    this.fileURL$ = this.uploadTask.downloadURL();
+    this.meta$ = this.uploadTask.snapshotChanges().map(d => d.metadata);
+    this.uploadTask.then()// 看這裡
+      .then(() => {// 還有這裡~
+
+
+        const ref = this.storage.ref(filePath).delete().subscribe();
+        // this.meta$ = ref.updateMetatdata({ customMetadata: { cool: 'very cool!!' } });
+
+        console.log('file upload success');
+      })
+      .catch((err) => { console.log(err); });
   }
 
-  uploadFile2(event) {
-    const file = event.target.files[0];
-    const filePath = 'name-your-file-path-here';
-    const ref = this.storage.ref(filePath);
-    const task = ref.put(file, { customMetadata: { blah: 'blah' } });
+  pause() {
+    this.uploadTask.pause();
+  }
+
+  cancel() {
+    this.uploadTask.cancel();
+  }
+
+  resume() {
+    this.uploadTask.resume();
+  }
+
+  customMetadata() {
   }
 }

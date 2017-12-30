@@ -53,10 +53,10 @@ export class CollectionHandler<T> {
       req.valueChanges();
   }
 
-  add(data: object): Observable<DocumentHandler<{}>> {
+  add(data: object): Observable<DocumentHandler<T>> {
     if (!this.url) return Observable.of(null);
     return Observable.fromPromise(this._fireAction.add(storeTimeObject(data)))
-      .map(d => this.document(d.id))
+      .map(d => this.document<T>(d.id))
       .catch(error => handleError(error));
   }
 
@@ -95,19 +95,23 @@ export class CollectionHandler<T> {
 
 export class DocumentHandler<T> {
   url: string;
+  id: string;
   _fireAction: AngularFirestoreDocument<T>;
   constructor(
     private _afs: AngularFirestore,
     private _url: string | AngularFirestoreDocument<T>) {
     if (_url) {
       if (typeof (_url) === 'string') {
-        this.url = _url;
         this._fireAction = this._afs.doc<T>(_url);
+
+        this.url = _url;
+        this.id = this._fireAction.ref.id;
       } else {
         const fireCollection = <AngularFirestoreDocument<T>>this._url;
 
         this._fireAction = fireCollection;
         this.url = this._fireAction.ref.path;
+        this.id = this._fireAction.ref.id;
       }
     }
   }

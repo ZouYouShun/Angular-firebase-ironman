@@ -1,7 +1,8 @@
 <section class="message-container">
   <article>
     <ul>
-      <li *ngFor="let message of messages$ | async">
+      <li *ngFor="let message of messages$ | async"
+        [ngClass]="{ 'from': message?.uid !== user?.uid, 'to':   message?.uid === user?.uid }">
         {{message.content}}
       </li>
     </ul>
@@ -11,11 +12,10 @@
       fxLayout="row nowrap"
       fxLayoutAlign="center center">
       <mat-form-field fxFlex="1 1 70%" floatLabel="never" >
-        <textarea matInput
+        <input matInput
           formControlName="content"
           placeholder="{{user?.displayName}}想說什麼呢？"
-          matTextareaAutosize
-          matAutosizeMaxRows="5"></textarea>
+          >
       </mat-form-field>
       <div fxFlex="1 1 30%">
         <button mat-raised-button>送出</button>
@@ -23,3 +23,7 @@
     </form>
   </footer>
 </section>
+
+
+<!-- matTextareaAutosize
+          matAutosizeMaxRows="5" -->

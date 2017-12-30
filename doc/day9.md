@@ -1,4 +1,4 @@
-# [Angular Firebase 入門與實做] Day-08 Authentication - 02 路由守衛
+# [Angular Firebase 入門與實做] Day-09 Authentication - 02 路由守衛
 
 每日一句來源：[Daily English](https://play.google.com/store/apps/details?id=net.eocbox.dailysentence)
 

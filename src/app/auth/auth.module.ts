@@ -8,6 +8,7 @@ import { ResetPwdComponent } from './reset-pwd/reset-pwd.component';
 import { SignInComponent } from './sign-in/sign-in.component';
 import { SignUpComponent } from './sign-up/sign-up.component';
 import { SharedModule } from '@shared/shared.module';
+import { ProfileComponent } from './profile/profile.component';
 
 @NgModule({
   imports: [
@@ -20,7 +21,8 @@ import { SharedModule } from '@shared/shared.module';
     SignInComponent,
     SignUpComponent,
     ResetPwdComponent,
-    ForgotPwdComponent
-  ]
+    ForgotPwdComponent,
+    ProfileComponent
+]
 })
 export class AuthModule { }

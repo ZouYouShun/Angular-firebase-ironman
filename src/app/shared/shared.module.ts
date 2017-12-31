@@ -8,6 +8,8 @@ import { MyMaterialModuleModule } from './my-material-module.module';
 import { SafePipe } from './pipe/safe.pipe';
 import { CdkService } from './service/cdk.service';
 import { ImgPipe } from './pipe/img.pipe';
+import { PrettyJsonModule } from 'angular2-prettyjson';
+
 
 @NgModule({
   imports: [
@@ -26,8 +28,11 @@ import { ImgPipe } from './pipe/img.pipe';
     ReactiveFormsModule,
     MyMaterialModuleModule,
     FlexLayoutModule,
+    PrettyJsonModule,
+
     SafePipe,
     ImgPipe,
+
     ActionBoxComponent,
   ]
 })

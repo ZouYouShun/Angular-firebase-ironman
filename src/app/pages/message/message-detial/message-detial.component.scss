@@ -1,12 +1,13 @@
 .message-container {
   position: relative;
   height: 100%;
+  article{
+    overflow: auto;
+  }
   footer {
     border-top: 1px solid grey;
-    position: absolute;
-    bottom: 0;
-    left: 0;
     width: 100%;
+    box-sizing: border-box;
   }
   .to {
     background-color: #2095FE;

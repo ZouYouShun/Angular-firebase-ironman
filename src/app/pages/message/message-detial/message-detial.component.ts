@@ -2,7 +2,7 @@ import 'rxjs/add/observable/forkJoin';
 import 'rxjs/add/operator/do';
 import 'rxjs/add/operator/take';
 
-import { Component } from '@angular/core';
+import { Component, ViewChild, ElementRef, Renderer2 } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Message } from '@core/model/message';
@@ -22,6 +22,8 @@ import { Observable } from 'rxjs/Observable';
   styleUrls: ['./message-detial.component.scss']
 })
 export class MessageDetialComponent {
+
+  @ViewChild('article', { read: ElementRef }) article: ElementRef;
 
   messages$: Observable<any>;
 
@@ -44,8 +46,8 @@ export class MessageDetialComponent {
     private _http: BaseHttpService,
     private fb: FormBuilder,
     private _route: ActivatedRoute,
-    private db: AngularFirestore,
-    private auth: AuthService) {
+    private _auth: AuthService,
+    private _renderer: Renderer2) {
     this.myForm = this.fb.group({
       content: ''
     });
@@ -64,10 +66,10 @@ export class MessageDetialComponent {
     //   .do((d) => console.log(d));
     // this._http.document<Message>(`messages/${params.id}`).get()
     // this.messagesHandler.document<Message>(params.id).get()
-    this.messages$ = this.auth.currentUser$
+    this.messages$ = this._auth.currentUser$
       .filter(u => !!u)
       .switchMap(u => this._route.params, (u, params) => {
-        console.log(u);
+        // console.log(u);
         this.user = u;
         this.targetUserId = params.id;
         return this._http.document(`users/${u.uid}`).collection('rooms').document<UserRoom>(this.targetUserId).get();
@@ -90,20 +92,33 @@ export class MessageDetialComponent {
           });
         }
         return Observable.of(null);
+      })
+      .do(() => {
+        // console.dir(this.article.nativeElement.scrollHeight);
+        setTimeout(() => {
+          this.article.nativeElement.scroll({ top: this.article.nativeElement.scrollHeight, left: 0 });
+        }, 0);
       });
   }
 
   add() {
     let req: Observable<any>;
+    const content = this.myForm.value.content;
+    this.myForm.reset();
     // 先寫房間ID
     if (this.roomId) {
-      req = this.roomsHandler.set(this.roomId, <any>{}).switchMap(doc => {
+      req = this.messageHandler.add({
+        uid: this.user.uid,
+        content: content
+      });
+    } else {
+      req = this.roomsHandler.add(<any>{}).switchMap(doc => {
         this.roomId = doc.id;
         return Observable.forkJoin([
           doc.collection('users').set(this.user.uid, {}),
           doc.collection('messages').add({
             uid: this.user.uid,
-            content: this.myForm.value.content
+            content: content
           })]);
       }).switchMap(doc =>
         // 將房間ID寫回user的資料
@@ -111,16 +126,10 @@ export class MessageDetialComponent {
           this._http.document(`users/${this.user.uid}`).collection('rooms').set(this.targetUserId, { roomId: this.roomId }),
           this._http.document(`users/${this.targetUserId}`).collection('rooms').set(this.user.uid, { roomId: this.roomId })
         ]));
-    } else {
-      req = this.messageHandler.add({
-        uid: this.user.uid,
-        content: this.myForm.value.content
-      });
     }
 
     req.subscribe(() => {
       console.log('success!');
-      this.myForm.reset();
     });
   }
 

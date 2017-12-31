@@ -1,20 +1,20 @@
-<section class="message-container">
-  <article>
+<section class="message-container" fxLayout="column nowrap">
+  <article fxFlex="1 1 auto" #article>
     <ul>
       <li *ngFor="let message of messages$ | async"
         [ngClass]="{ 'from': message?.uid !== user?.uid, 'to':   message?.uid === user?.uid }">
-        {{message.content}}
+        {{message.content}}({{message.createdAt | date:'mm:ss'}})
       </li>
     </ul>
   </article>
-  <footer>
+  <footer fxFlex="1 1 65px">
     <form [formGroup]="myForm" (ngSubmit)="add()"
       fxLayout="row nowrap"
       fxLayoutAlign="center center">
-      <mat-form-field fxFlex="1 1 70%" floatLabel="never" >
+      <mat-form-field fxFlex="1 1 70%" fxFlexAlign="end">
         <input matInput
           formControlName="content"
-          placeholder="{{user?.displayName}}想說什麼呢？"
+          placeholder="{{user?.email}}想說什麼呢？"
           >
       </mat-form-field>
       <div fxFlex="1 1 30%">

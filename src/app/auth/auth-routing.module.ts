@@ -5,7 +5,6 @@ import { Routes, RouterModule } from '@angular/router';
 import { AuthComponent } from './auth.component';
 import { SignInComponent } from './sign-in/sign-in.component';
 import { SignUpComponent } from './sign-up/sign-up.component';
-import { ProfileComponent } from './profile/profile.component';
 import { AuthGuard } from '@core/guard/auth.guard';
 
 const routes: Routes = [
@@ -33,11 +32,6 @@ const routes: Routes = [
         data: {
           title: '註冊'
         },
-      },
-      {
-        path: 'profile',
-        component: ProfileComponent,
-        canActivate: [AuthGuard]
       },
       {
         path: 'forgot-password',

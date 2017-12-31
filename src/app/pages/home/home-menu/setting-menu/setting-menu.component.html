@@ -11,6 +11,10 @@
 
 
   <mat-menu #appMenu="matMenu">
+    <button mat-menu-item [routerLink]="['/user']">
+      <mat-icon>perm_identity</mat-icon>
+      <span>個人中心</span>
+    </button>
     <button mat-menu-item (click)="logOut()">
       <mat-icon>exit_to_app</mat-icon>
       <span>登出</span>
@@ -20,6 +24,6 @@
 
 <ng-template #login>
   <button mat-icon-button routerLink="/auth/signin">
-    <mat-icon>perm_identity</mat-icon>
+    <mat-icon>person</mat-icon>
   </button>
 </ng-template>

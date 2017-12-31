@@ -30,7 +30,7 @@ import { PagesModule } from 'app/pages/pages.module';
     SharedModule.forRoot(),
     AppRoutingModule,
     CoreModule,
-    PagesModule,
+    // PagesModule,
   ],
   declarations: [
     AppComponent,

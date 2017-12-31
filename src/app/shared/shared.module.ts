@@ -7,6 +7,7 @@ import { ActionBoxComponent } from './component/action-box/action-box.component'
 import { MyMaterialModuleModule } from './my-material-module.module';
 import { SafePipe } from './pipe/safe.pipe';
 import { CdkService } from './service/cdk.service';
+import { ImgPipe } from './pipe/img.pipe';
 
 @NgModule({
   imports: [
@@ -17,6 +18,7 @@ import { CdkService } from './service/cdk.service';
   declarations: [
     SafePipe,
     ActionBoxComponent,
+    ImgPipe
   ],
   exports: [
     CommonModule,
@@ -25,6 +27,7 @@ import { CdkService } from './service/cdk.service';
     MyMaterialModuleModule,
     FlexLayoutModule,
     SafePipe,
+    ImgPipe,
     ActionBoxComponent,
   ]
 })

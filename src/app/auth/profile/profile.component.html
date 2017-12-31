@@ -1,9 +1,12 @@
+<img *ngIf="'1514711588087_測試圖a.jpg' | img | async as img" [src]="img" />
+
 <input type="file" (change)="uploadFile($event)" />
 <ng-container *ngIf="uploadPercent$ | async as uploadPercent">
   <div>{{ uploadPercent }}</div>
   <button mat-raised-button (click)="pause()">暫停</button>
   <button mat-raised-button (click)="resume()">繼續</button>
   <button mat-raised-button (click)="cancel()">取消</button>
+  <button mat-raised-button (click)="delete()">刪除檔案</button>
 </ng-container>
 
 <ng-container *ngIf="fileURL$ | async as imgUrl">

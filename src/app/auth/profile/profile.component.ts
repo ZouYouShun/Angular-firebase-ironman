@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { AngularFireStorage, AngularFireUploadTask } from 'angularfire2/storage';
 import { Observable } from 'rxjs/Observable';
+import { UploadService, FileHandler } from '@core/service/upload.service';
+import { RxViewer } from '@shared/ts/rx.viewer';
 
 @Component({
   selector: 'app-profile',
@@ -9,13 +11,13 @@ import { Observable } from 'rxjs/Observable';
 })
 export class ProfileComponent implements OnInit {
 
-  uploadTask: AngularFireUploadTask;
-
   fileURL$: Observable<string>;
   uploadPercent$: Observable<number>;
   meta$: Observable<any>;
 
-  constructor(private storage: AngularFireStorage) {
+  fileHandler: FileHandler<{}>;
+
+  constructor(private _upload: UploadService) {
   }
 
   ngOnInit() {
@@ -24,35 +26,36 @@ export class ProfileComponent implements OnInit {
   uploadFile(event) {
     const file: File = event.target.files[0];
     const filePath = `${new Date().getTime()}_${file.name}`;
-    this.uploadTask = this.storage.upload(filePath, file);
+    this.fileHandler = this._upload.fileHandler(filePath);
 
-    this.uploadPercent$ = this.uploadTask.percentageChanges();
-    this.fileURL$ = this.uploadTask.downloadURL();
-    this.meta$ = this.uploadTask.snapshotChanges().map(d => d.metadata);
-    this.uploadTask.then()// 看這裡
-      .then(() => {// 還有這裡~
+    this.fileHandler.upload({ file: file }).subscribe(RxViewer);
 
+    this.uploadPercent$ = this.fileHandler.task.percentageChanges();
+    this.fileURL$ = this.fileHandler.task.downloadURL();
+    this.meta$ = this.fileHandler.task.snapshotChanges().map(d => d.metadata);
 
-        const ref = this.storage.ref(filePath).delete().subscribe();
-        // this.meta$ = ref.updateMetatdata({ customMetadata: { cool: 'very cool!!' } });
+    // setTimeout(() => {
+    //   this.fileHandler.edit({ file: file, data: { cool: 'kkk' } }).subscribe(RxViewer);
+    // }, 1000);
 
-        console.log('file upload success');
-      })
-      .catch((err) => { console.log(err); });
+    // setTimeout(() => {
+    //   this.fileHandler.delete().subscribe(RxViewer);
+    // }, 2000);
   }
 
   pause() {
-    this.uploadTask.pause();
+    this.fileHandler.task.pause();
   }
 
   cancel() {
-    this.uploadTask.cancel();
+    this.fileHandler.task.cancel();
   }
 
   resume() {
-    this.uploadTask.resume();
+    this.fileHandler.task.resume();
   }
 
-  customMetadata() {
+  delete() {
+    this.fileHandler.delete().subscribe(RxViewer);
   }
 }

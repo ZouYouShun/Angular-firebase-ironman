@@ -13,6 +13,7 @@ import { BaseHttpService } from './service/base-http.service';
 import { BaseService } from './service/base.service';
 import { BlockViewService } from './service/block-view.service';
 import { RouteLoadingService } from './service/route-loading.service';
+import { UploadService } from './service/upload.service';
 
 @NgModule({
   imports: [
@@ -34,7 +35,7 @@ import { RouteLoadingService } from './service/route-loading.service';
     AuthService,
     BlockViewService,
     RouteLoadingService,
-
+    UploadService,
     AuthGuard
   ]
 })

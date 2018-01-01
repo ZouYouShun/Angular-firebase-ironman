@@ -13,6 +13,8 @@ import { AuthService } from '@core/service/auth.service';
 import { BaseHttpService, CollectionHandler } from '@core/service/base-http.service';
 import { RxViewer } from '@shared/ts/rx.viewer';
 import { Observable } from 'rxjs/Observable';
+import { runAfterTimeout } from '@shared/decorator/timeout.decorator';
+import { AutoDestroy } from '@shared/ts/auto.destroy';
 
 
 @Component({
@@ -20,13 +22,12 @@ import { Observable } from 'rxjs/Observable';
   templateUrl: './message-detial.component.html',
   styleUrls: ['./message-detial.component.scss']
 })
-export class MessageDetialComponent {
+export class MessageDetialComponent extends AutoDestroy {
 
   @ViewChild('article', { read: ElementRef }) article: ElementRef;
 
-  messages$: Observable<Message>;
+  messages: Message[];
   messageForm: FormGroup;
-
   sender: User;
   addressee: User;
 
@@ -39,54 +40,65 @@ export class MessageDetialComponent {
     private _route: ActivatedRoute,
     private _auth: AuthService,
     private _renderer: Renderer2) {
+    super();
     this.messageForm = this.fb.group({
       content: ''
     });
     this.roomsHandler = this._http.collection('rooms');
 
-    this.messages$ =
-      this._route.params
-        .combineLatest(this._auth.currentUser$.filter(u => !!u))
-        .switchMap(data => {
-          const addresseeId = data[0].id;
-          this.sender = data[1];
+    this._route.params
+      .combineLatest(this._auth.currentUser$.filter(u => !!u))
+      .switchMap(data => {
+        // 清空messageHandler
+        this.init();
 
-          // 清空messageHandler
-          this.messageHandler = null;
+        const addresseeId = data[0].id;
+        this.sender = data[1];
 
-          return this._http.document<User>(`users/${addresseeId}`).get();
-        })
-        .switchMap(addressee => {
-          this.addressee = addressee;
-          // 取得送出者對應收件者的聊天室資料
-          return this._http.document(`users/${this.sender.uid}`)
-            .collection('rooms')
-            .document<UserRoom>(this.addressee.uid).get();
-        })
-        .switchMap(usersRoom => {
-          // 取得房間內容
-          if (usersRoom) {
-            return this.roomsHandler.document<Message>(usersRoom.roomId).get();
-          }
+        return this._http.document<User>(`users/${addresseeId}`).get();
+      })
+      .switchMap(addressee => {
+        this.addressee = addressee;
+        // 取得送出者對應收件者的聊天室資料
+        return this._http.document(`users/${this.sender.uid}`)
+          .collection('rooms')
+          .document<UserRoom>(this.addressee.uid).get();
+      })
+      .switchMap(usersRoom => {
+        // 取得房間內容
+        if (usersRoom) {
+          return this.roomsHandler.document<Message>(usersRoom.roomId).get();
+        }
 
-          return Observable.of(null);
-        })
-        .switchMap(room => {
-          if (room) {
-            this.messageHandler = this.roomsHandler.document(room.id).collection('messages');
-            return this.messageHandler.get({
-              isKey: false,
-              queryFn: ref => ref.orderBy('createdAt')
-            });
-          }
-          return Observable.of(null);
-        })
-        .do((data) => {
-          // console.dir(this.article.nativeElement.scrollHeight);
-          setTimeout(() => {
-            this.article.nativeElement.scroll({ top: this.article.nativeElement.scrollHeight, left: 0 });
-          }, 0);
-        });
+        return Observable.of(null);
+      })
+      .switchMap(room => {
+        if (room) {
+          this.messageHandler = this.roomsHandler.document(room.id).collection('messages');
+          return this.messageHandler.get({
+            isKey: false,
+            queryFn: ref => ref.orderBy('createdAt')
+          });
+        }
+        return Observable.of(null);
+      })
+      .takeUntil(this._destroy$)
+      .subscribe(messages => {
+        this.messages = messages;
+        this.scrollButtom();
+      });
+  }
+
+  @runAfterTimeout()
+  private scrollButtom() {
+    this.article.nativeElement.scroll({ top: this.article.nativeElement.scrollHeight, left: 0 });
+  }
+
+  private init() {
+    this.messages = [];
+    this.messageHandler = null;
+    this.sender = null;
+    this.addressee = null;
   }
 
   submitMessage() {
@@ -120,9 +132,7 @@ export class MessageDetialComponent {
       });
     }
 
-    req.subscribe(() => {
-      console.log('success!');
-    });
+    req.subscribe(RxViewer);
   }
 
   delete(message: any) {

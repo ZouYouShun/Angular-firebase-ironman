@@ -1,18 +1,20 @@
 <section class="message-container" fxLayout="column nowrap">
   <article fxFlex="1 1 auto" #article>
     <ul>
-      <ng-container *ngFor="let message of messages$ | async" >
-        <li class="mar-all-1 sender"
+      <ng-container *ngFor="let message of messages" >
+        <li class="mar-t-b-1 sender"
           *ngIf="message.uid === sender.uid; else addresseeView">
           <span class="content pad-all-1"
-            [matTooltip]="message.createdAt | date:'hh:mm'" matTooltipPosition="left"
-            [matTooltipHideDelay]="300">
+            [matTooltip]="message.createdAt | date:'hh:mm'" matTooltipPosition="left">
             {{message.content}}
           </span>
-          <img class="mar-l-1 avatar-img"
+
+          <i class="isSend material-icons"
+            [ngClass]="{complete: message.createdAt}">done</i>
+          <!-- <img class="mar-l-1 avatar-img"
             [src]="sender.photoURL || 'assets/img/avatar.jpg'"
             [matTooltip]="sender.displayName" matTooltipPosition="left"
-            alt="sender photo">
+            alt="sender photo"> -->
         </li>
         <ng-template #addresseeView>
           <li class="mar-all-1 addressee">
@@ -21,8 +23,7 @@
               [matTooltip]="addressee.displayName" matTooltipPosition="left"
               alt="addressee photo">
             <span class="content pad-all-1"
-              [matTooltip]="message.createdAt | date:'hh:mm'" matTooltipPosition="right"
-              [matTooltipHideDelay]="300">
+              [matTooltip]="message.createdAt | date:'hh:mm'" matTooltipPosition="right">
               {{message.content}}
             </span>
           </li>

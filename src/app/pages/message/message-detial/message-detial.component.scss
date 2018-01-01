@@ -9,14 +9,27 @@
       align-items: center;
       &.sender {
         justify-content: flex-end;
-        .content{
+        .content {
           border-radius: app-border-radius(square);
           background-color: #2095FE;
           color: #fff;
         }
+        .isSend {
+          display: inline-block;
+          margin: 0 10px 0 5px;
+          border-radius: app-border-radius(cycle);
+          border: 2px solid app-color(accent);
+          align-self: flex-end;
+          font-size: 10px;
+          background: white;
+          color: white;
+          &.complete {
+            background: app-color(accent);
+          }
+        }
       }
       &.addressee {
-        .content{
+        .content {
           border-radius: app-border-radius(square);
           background-color: #E5E4E9;
           color: #363636;

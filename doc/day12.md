@@ -6,6 +6,13 @@
 
 今日成果：https://onfirechat.ga/message
 
+大家可以用測試帳號登入，或是自行註冊
+帳號：test@gmail.com
+密碼：aa1234
+
+帳號：test2@gmail.com
+密碼：aa1234
+
 在開始使用functions之前我們先透過一個範例指出如果沒有使用functions會造成的問題。
 
 我們會透過實作*做一個類似FB的聊天室*的方式來解說，並且讓大家看到firebase這種realtime database真正power的地方!!

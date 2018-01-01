@@ -27,8 +27,8 @@ export class MessageDetialComponent {
   messages$: Observable<Message>;
   messageForm: FormGroup;
 
-  private sender: User;
-  private addressee: User;
+  sender: User;
+  addressee: User;
 
   private roomsHandler: CollectionHandler<Room>;
   private messageHandler: CollectionHandler<Message>;
@@ -89,9 +89,12 @@ export class MessageDetialComponent {
         });
   }
 
-  add() {
-    let req: Observable<any>;
+  submitMessage() {
     const content = this.messageForm.value.content;
+    if (content === '') {
+      return;
+    }
+    let req: Observable<any>;
     this.messageForm.reset();
     // 先寫房間ID
     if (this.messageHandler) {

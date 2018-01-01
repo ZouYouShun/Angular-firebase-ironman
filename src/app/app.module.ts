@@ -24,7 +24,8 @@ import { PagesModule } from 'app/pages/pages.module';
     HttpClientModule,
     AngularFireModule.initializeApp(environment.firebase), // init
     AngularFireDatabaseModule, // add realtime DB module
-    AngularFirestoreModule.enablePersistence(), // add cloudstore DB module
+    // AngularFirestoreModule.enablePersistence(), // add cloudstore DB module
+    AngularFirestoreModule, // add cloudstore DB module
     AngularFireAuthModule, // add auth module
     AngularFireStorageModule,
     SharedModule.forRoot(),

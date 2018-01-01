@@ -3,9 +3,9 @@
   <button
     mat-icon-button
     [matMenuTriggerFor]="appMenu">
-    <div class="personal-img" *ngIf="user.photoURL; else default" [style.background-image]="user.photoURL | safe: 'background-image'"></div>
+    <div class="avatar-img" *ngIf="user.photoURL; else default" [style.background-image]="user.photoURL | safe: 'background-image'"></div>
     <ng-template #default>
-      <div class="personal-img" [style.background-image]="'assets/img/avatar.jpg' | safe: 'background-image'"></div>
+      <div class="avatar-img" [style.background-image]="'assets/img/avatar.jpg' | safe: 'background-image'"></div>
     </ng-template>
   </button>
 

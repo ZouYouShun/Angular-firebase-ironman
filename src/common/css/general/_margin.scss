@@ -1,6 +1,6 @@
 @mixin add-margin($num:3, $space:20, $type:'all') {
   @for $i from 1 through $num {
-    .pad-#{$type}-#{$i} {
+    .mar-#{$type}-#{$i} {
       @if $type=='all' {
         margin: #{$i * $space}px;
       }

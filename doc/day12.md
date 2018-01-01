@@ -4,6 +4,8 @@
 
 > Those who are crazy enough to think they can change the world, then he can really change the world.
 
+今日成果：https://onfirechat.ga/message
+
 在開始使用functions之前我們先透過一個範例指出如果沒有使用functions會造成的問題。
 
 我們會透過實作*做一個類似FB的聊天室*的方式來解說，並且讓大家看到firebase這種realtime database真正power的地方!!
@@ -278,5 +280,6 @@ PS: 這裡我們也能用merge因為都只會回傳一次，但要注意，forkJ
 
 
 # 參考文章
-https://codecraft.tv/courses/angular/pipes/async-pipe/
-https://firebase.google.com/docs/storage/web/handle-errors?authuser=1
+https://www.learnrxjs.io
+http://rxmarbles.com
+http://reactivex.io/

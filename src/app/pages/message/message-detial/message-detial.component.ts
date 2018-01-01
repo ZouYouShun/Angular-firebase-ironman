@@ -3,7 +3,7 @@ import 'rxjs/add/operator/combineLatest';
 import 'rxjs/add/operator/do';
 import 'rxjs/add/operator/take';
 
-import { Component, ElementRef, Renderer2, ViewChild } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Message } from '@core/model/message';
@@ -11,10 +11,10 @@ import { Room, UserRoom } from '@core/model/room.model';
 import { User } from '@core/model/user.model';
 import { AuthService } from '@core/service/auth.service';
 import { BaseHttpService, CollectionHandler } from '@core/service/base-http.service';
-import { RxViewer } from '@shared/ts/rx.viewer';
-import { Observable } from 'rxjs/Observable';
 import { runAfterTimeout } from '@shared/decorator/timeout.decorator';
 import { AutoDestroy } from '@shared/ts/auto.destroy';
+import { RxViewer } from '@shared/ts/rx.viewer';
+import { Observable } from 'rxjs/Observable';
 
 
 @Component({
@@ -38,8 +38,7 @@ export class MessageDetialComponent extends AutoDestroy {
     private _http: BaseHttpService,
     private fb: FormBuilder,
     private _route: ActivatedRoute,
-    private _auth: AuthService,
-    private _renderer: Renderer2) {
+    private _auth: AuthService) {
     super();
     this.messageForm = this.fb.group({
       content: ''
@@ -48,14 +47,12 @@ export class MessageDetialComponent extends AutoDestroy {
 
     this._route.params
       .combineLatest(this._auth.currentUser$.filter(u => !!u))
-      .switchMap(data => {
-        // 清空messageHandler
+      .switchMap(([addressee, sender]) => {
         this.init();
 
-        const addresseeId = data[0].id;
-        this.sender = data[1];
+        this.sender = sender;
 
-        return this._http.document<User>(`users/${addresseeId}`).get();
+        return this._http.document<User>(`users/${addressee.id}`).get();
       })
       .switchMap(addressee => {
         this.addressee = addressee;
@@ -103,7 +100,7 @@ export class MessageDetialComponent extends AutoDestroy {
 
   submitMessage() {
     const content = this.messageForm.value.content;
-    if (content === '') {
+    if (!content) {
       return;
     }
     let req: Observable<any>;
@@ -139,11 +136,11 @@ export class MessageDetialComponent extends AutoDestroy {
     this.roomsHandler.delete(message.id).subscribe(RxViewer);
   }
 
-  updateItem(message: any, value?: string) {
-    if (message.update) {
-      // this.messagesHandler.update(message.id, { content: value }).subscribe(RxViewer);
-      message.update = false;
-    }
-    message.update = true;
-  }
+  // updateItem(message: any, value?: string) {
+  //   if (message.update) {
+  //     // this.messagesHandler.update(message.id, { content: value }).subscribe(RxViewer);
+  //     message.update = false;
+  //   }
+  //   message.update = true;
+  // }
 }

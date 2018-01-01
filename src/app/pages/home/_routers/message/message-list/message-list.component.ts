@@ -36,8 +36,6 @@ export class MessageListComponent {
         queryFn: queryFn,
         isKey: true
       });
-    }).do((d: any[]) => {
-      console.log(d);
     });
   }
 

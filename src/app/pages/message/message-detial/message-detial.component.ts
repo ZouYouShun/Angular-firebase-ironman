@@ -1,18 +1,19 @@
 import 'rxjs/add/observable/forkJoin';
+import 'rxjs/add/operator/combineLatest';
 import 'rxjs/add/operator/do';
 import 'rxjs/add/operator/take';
 
-import { Component } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Message } from '@core/model/message';
 import { Room, UserRoom } from '@core/model/room.model';
 import { User } from '@core/model/user.model';
 import { AuthService } from '@core/service/auth.service';
-import { BaseHttpService, CollectionHandler, DocumentHandler } from '@core/service/base-http.service';
+import { BaseHttpService, CollectionHandler } from '@core/service/base-http.service';
+import { runAfterTimeout } from '@shared/decorator/timeout.decorator';
+import { AutoDestroy } from '@shared/ts/auto.destroy';
 import { RxViewer } from '@shared/ts/rx.viewer';
-import { AngularFirestore, QueryFn } from 'angularfire2/firestore';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Observable } from 'rxjs/Observable';
 
 
@@ -21,118 +22,125 @@ import { Observable } from 'rxjs/Observable';
   templateUrl: './message-detial.component.html',
   styleUrls: ['./message-detial.component.scss']
 })
-export class MessageDetialComponent {
+export class MessageDetialComponent extends AutoDestroy {
 
-  messages$: Observable<any>;
+  @ViewChild('article', { read: ElementRef }) article: ElementRef;
 
-  user: User;
-  currentUser$;
-  messageHandler: CollectionHandler<Message>;
+  messages: Message[];
+  messageForm: FormGroup;
+  sender: User;
+  addressee: User;
 
-
-
-  roomsHandler: CollectionHandler<Room>;
-  userRoomsHandler: CollectionHandler<any>;
-  query = new BehaviorSubject<QueryFn>(ref => ref.orderBy('updatedAt'));
-  myForm: FormGroup;
-  lastMessages;
-
-  private roomId;
-  private targetUserId;
+  private roomsHandler: CollectionHandler<Room>;
+  private messageHandler: CollectionHandler<Message>;
 
   constructor(
     private _http: BaseHttpService,
     private fb: FormBuilder,
     private _route: ActivatedRoute,
-    private db: AngularFirestore,
-    private auth: AuthService) {
-    this.myForm = this.fb.group({
+    private _auth: AuthService) {
+    super();
+    this.messageForm = this.fb.group({
       content: ''
     });
     this.roomsHandler = this._http.collection('rooms');
 
+    this._route.params
+      .combineLatest(this._auth.currentUser$.filter(u => !!u))
+      .switchMap(([addressee, sender]) => {
+        this.init();
 
-    // this.messages$ = this.messagesHandler.get()
-    //   .switchMap(list => Observable.forkJoin(
-    //     list.map(item => this.messagesHandler.document(item.id).collection('messages').get().take(1))),
-    //   (rooms, messages) => rooms.map((room, index) => {
-    //     return {
-    //       ...room,
-    //       messages: messages[index]
-    //     };
-    //   }))
-    //   .do((d) => console.log(d));
-    // this._http.document<Message>(`messages/${params.id}`).get()
-    // this.messagesHandler.document<Message>(params.id).get()
-    this.messages$ = this.auth.currentUser$
-      .filter(u => !!u)
-      .switchMap(u => this._route.params, (u, params) => {
-        console.log(u);
-        this.user = u;
-        this.targetUserId = params.id;
-        return this._http.document(`users/${u.uid}`).collection('rooms').document<UserRoom>(this.targetUserId).get();
+        this.sender = sender;
+
+        return this._http.document<User>(`users/${addressee.id}`).get();
       })
-      .switchMap(u => u)
-      .switchMap(room => {
-        if (room) {
-          this.roomId = room.roomId;
-          return this.roomsHandler.document<Message>(room.roomId).get();
+      .switchMap(addressee => {
+        this.addressee = addressee;
+        // 取得送出者對應收件者的聊天室資料
+        return this._http.document(`users/${this.sender.uid}`)
+          .collection('rooms')
+          .document<UserRoom>(this.addressee.uid).get();
+      })
+      .switchMap(usersRoom => {
+        // 取得房間內容
+        if (usersRoom) {
+          return this.roomsHandler.document<Message>(usersRoom.roomId).get();
         }
 
         return Observable.of(null);
       })
-      .switchMap(item => {
-        if (item) {
-          this.messageHandler = this.roomsHandler.document(item.id).collection('messages');
+      .switchMap(room => {
+        if (room) {
+          this.messageHandler = this.roomsHandler.document(room.id).collection('messages');
           return this.messageHandler.get({
             isKey: false,
             queryFn: ref => ref.orderBy('createdAt')
           });
         }
         return Observable.of(null);
+      })
+      .takeUntil(this._destroy$)
+      .subscribe(messages => {
+        this.messages = messages;
+        this.scrollButtom();
       });
   }
 
-  add() {
+  @runAfterTimeout()
+  private scrollButtom() {
+    this.article.nativeElement.scroll({ top: this.article.nativeElement.scrollHeight, left: 0 });
+  }
+
+  private init() {
+    this.messages = [];
+    this.messageHandler = null;
+    this.sender = null;
+    this.addressee = null;
+  }
+
+  submitMessage() {
+    const content = this.messageForm.value.content;
+    if (!content) {
+      return;
+    }
     let req: Observable<any>;
+    this.messageForm.reset();
     // 先寫房間ID
-    if (this.roomId) {
-      req = this.roomsHandler.set(this.roomId, <any>{}).switchMap(doc => {
-        this.roomId = doc.id;
-        return Observable.forkJoin([
-          doc.collection('users').set(this.user.uid, {}),
-          doc.collection('messages').add({
-            uid: this.user.uid,
-            content: this.myForm.value.content
-          })]);
-      }).switchMap(doc =>
-        // 將房間ID寫回user的資料
-        Observable.forkJoin([
-          this._http.document(`users/${this.user.uid}`).collection('rooms').set(this.targetUserId, { roomId: this.roomId }),
-          this._http.document(`users/${this.targetUserId}`).collection('rooms').set(this.user.uid, { roomId: this.roomId })
-        ]));
-    } else {
+    if (this.messageHandler) {
       req = this.messageHandler.add({
-        uid: this.user.uid,
-        content: this.myForm.value.content
+        uid: this.sender.uid,
+        content: content
+      });
+    } else {
+      req = this.roomsHandler.add(<any>{}).switchMap(room => {
+        return Observable.forkJoin([
+          // 寫訊息
+          room.collection('messages').add({
+            uid: this.sender.uid,
+            content: content
+          }),
+          // 寫房間的使用者
+          room.collection('users').set(this.sender.uid, {}),
+          room.collection('users').set(this.addressee.uid, {}),
+          // 寫使用者的房間對應的ID
+          this._http.document(`users/${this.sender.uid}`).collection('rooms').set(this.addressee.uid, { roomId: room.id }),
+          this._http.document(`users/${this.addressee.uid}`).collection('rooms').set(this.sender.uid, { roomId: room.id })
+        ]);
       });
     }
 
-    req.subscribe(() => {
-      console.log('success!');
-      this.myForm.reset();
-    });
+    req.subscribe(RxViewer);
   }
 
   delete(message: any) {
     this.roomsHandler.delete(message.id).subscribe(RxViewer);
   }
 
-  updateItem(message: any, value?: string) {
-    if (message.update) {
-      // this.messagesHandler.update(message.id, { content: value }).subscribe(RxViewer);
-      message.update = false;
-    }
-    message.update = true;
-  }
+  // updateItem(message: any, value?: string) {
+  //   if (message.update) {
+  //     // this.messagesHandler.update(message.id, { content: value }).subscribe(RxViewer);
+  //     message.update = false;
+  //   }
+  //   message.update = true;
+  // }
 }

@@ -1,22 +1,45 @@
+@import '~common/css/_my-theme.variable.scss';
 .message-container {
   position: relative;
   height: 100%;
+  article {
+    overflow: auto;
+    li {
+      display: flex;
+      align-items: center;
+      &.sender {
+        justify-content: flex-end;
+        .content {
+          border-radius: app-border-radius(square);
+          background-color: #2095FE;
+          color: #fff;
+        }
+        .isSend {
+          display: inline-block;
+          margin: 0 10px 0 5px;
+          border-radius: app-border-radius(cycle);
+          border: 2px solid app-color(accent);
+          align-self: flex-end;
+          font-size: 10px;
+          background: white;
+          color: white;
+          &.complete {
+            background: app-color(accent);
+          }
+        }
+      }
+      &.addressee {
+        .content {
+          border-radius: app-border-radius(square);
+          background-color: #E5E4E9;
+          color: #363636;
+        }
+      }
+    }
+  }
   footer {
     border-top: 1px solid grey;
-    position: absolute;
-    bottom: 0;
-    left: 0;
     width: 100%;
-  }
-  .to {
-    background-color: #2095FE;
-    color: #fff;
-    margin-left: 100px;
-    text-align: right;
-  }
-  .from {
-    background-color: #E5E4E9;
-    color: #363636;
-    margin-right: 100px;
+    box-sizing: border-box;
   }
 }

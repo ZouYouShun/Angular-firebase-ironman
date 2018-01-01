@@ -1,0 +1,29 @@
+@mixin add-margin($num:3, $space:20, $type:'all') {
+  @for $i from 1 through $num {
+    .mar-#{$type}-#{$i} {
+      @if $type=='all' {
+        margin: #{$i * $space}px;
+      }
+      @else if $type=='t-b' {
+        margin-top: #{$i * $space}px;
+        margin-bottom: #{$i * $space}px;
+      }
+      @else if $type=='l-r' {
+        margin-right: #{$i * $space}px;
+        margin-left: #{$i * $space}px;
+      }
+      @else if $type=='l' {
+        margin-left: #{$i * $space}px;
+      }
+      @else if $type=='r' {
+        margin-right: #{$i * $space}px;
+      }
+      @else if $type=='t' {
+        margin-top: #{$i * $space}px;
+      }
+      @else if $type=='b' {
+        margin-bottom: #{$i * $space}px;
+      }
+    }
+  }
+}

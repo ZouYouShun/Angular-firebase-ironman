@@ -15,6 +15,7 @@ import {
   MatToolbarModule,
   MatTabsModule,
   MatIconRegistry,
+  MatTooltipModule,
 } from '@angular/material';
 
 const myMaterialModul = [
@@ -34,6 +35,7 @@ const myMaterialModul = [
   MatRadioModule,
   MatRippleModule,
   MatTabsModule,
+  MatTooltipModule,
   // MatChipsModule,
   // MatCardModule,
   // MatGridListModule

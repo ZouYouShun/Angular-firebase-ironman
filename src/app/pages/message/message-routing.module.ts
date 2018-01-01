@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { MessageComponent } from './message.component';
 import { MessageDetialComponent } from './message-detial/message-detial.component';
+import { MessageHomeComponent } from './message-home/message-home.component';
 
 const routes: Routes = [
   {
@@ -10,7 +11,7 @@ const routes: Routes = [
     children: [
       {
         path: '',
-        component: MessageDetialComponent
+        component: MessageHomeComponent
       },
       {
         path: ':id',

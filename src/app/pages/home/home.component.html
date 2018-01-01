@@ -1,5 +1,7 @@
 <div fxLayout="column" fxFlexFill>
   <!-- container -->
+
+  <app-home-menu [menu]="sidenav" [isScrollShrink]="false" [menus-data]="menus"></app-home-menu>
   <mat-sidenav-container fxFlex class="main-background" fxFlexFill>
     <!-- sidenav -->
     <mat-sidenav #sidenav mode="over" class="sidenav" style="width:200px">
@@ -11,7 +13,6 @@
     <!-- main page -->
     <mat-sidenav-content #containerElm fxLayout="column">
       <!-- top menu -->
-      <app-home-menu [menu]="sidenav" [isScrollShrink]="false" [menus-data]="menus"></app-home-menu>
       <section fxFlexFill>
         <router-outlet></router-outlet>
       </section>

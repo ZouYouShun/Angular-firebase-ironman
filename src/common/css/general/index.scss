@@ -4,13 +4,23 @@
 @import './_color.scss';
 @import './_display.scss';
 @import './_padding.scss';
-@include add-padding(3, 20, 't-b');
-@include add-padding(3, 20, 'l-r');
+@import './_margin.scss';
+@include add-padding(3, 16, 't-b');
+@include add-padding(3, 16, 'l-r');
 @include add-padding(3, 16, 'l');
 @include add-padding(1, 16, 'r');
 @include add-padding(1, 16, 't');
 @include add-padding(1, 16, 'b');
-@include add-padding(3, 20);
+@include add-padding(3, 16);
+
+@include add-margin(3, 16, 't-b');
+@include add-margin(3, 16, 'l-r');
+@include add-margin(3, 16, 'l');
+@include add-margin(1, 16, 'r');
+@include add-margin(1, 16, 't');
+@include add-margin(1, 16, 'b');
+@include add-margin(3, 16);
+
 @include type-color('color');
 @include type-color('background-color');
 @include add-style(font-size, $app-font-size);

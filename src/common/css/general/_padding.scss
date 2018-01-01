@@ -1,10 +1,10 @@
 @mixin add-padding($num:3, $space:20, $type:'all') {
   @for $i from 1 through $num {
-    .pad-#{$type}-#{$i * $space} {
+    .pad-#{$type}-#{$i} {
       @if $type=='all' {
         padding: #{$i * $space}px;
       }
-      @if $type=='t-b' {
+      @else if $type=='t-b' {
         padding-top: #{$i * $space}px;
         padding-bottom: #{$i * $space}px;
       }

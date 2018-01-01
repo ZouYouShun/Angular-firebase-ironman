@@ -1,23 +1,27 @@
+@import '~common/css/_my-theme.variable.scss';
 .message-container {
   position: relative;
   height: 100%;
   article{
     overflow: auto;
+    li{
+      border-radius: app-border-radius(square);
+      &.to {
+        background-color: #2095FE;
+        color: #fff;
+        margin-left: 100px;
+        text-align: right;
+      }
+      &.from {
+        background-color: #E5E4E9;
+        color: #363636;
+        margin-right: 100px;
+      }
+    }
   }
   footer {
     border-top: 1px solid grey;
     width: 100%;
     box-sizing: border-box;
-  }
-  .to {
-    background-color: #2095FE;
-    color: #fff;
-    margin-left: 100px;
-    text-align: right;
-  }
-  .from {
-    background-color: #E5E4E9;
-    color: #363636;
-    margin-right: 100px;
   }
 }

@@ -1,0 +1,6 @@
+@import '~common/css/_my-theme.variable.scss';
+.active {
+  mat-icon {
+    color: app-color(accent);
+  }
+}

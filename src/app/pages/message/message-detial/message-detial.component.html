@@ -1,8 +1,8 @@
 <section class="message-container" fxLayout="column nowrap">
   <header>
-    <mat-toolbar fxLayoutAlign="start center" color="primary" class="mat-elevation-z2">
+    <mat-toolbar fxLayoutAlign="start center" color="accent" class="mat-elevation-z2">
       <img class="avatar-img mar-r-1" [src]="addressee?.photoURL || 'assets/img/avatar.jpg'">
-      <h2>
+      <h2 class="c-white">
         {{addressee?.displayName}}
       </h2>
     </mat-toolbar>
@@ -38,8 +38,9 @@
       </ng-container>
     </ul>
   </article>
-  <footer class="mat-elevation-z2">
+  <footer class="mat-elevation-z2 bg-white">
     <form [formGroup]="messageForm" (ngSubmit)="submitMessage()"
+      class="pad-l-1"
       fxLayout="row nowrap"
       fxLayoutAlign="center center">
       <mat-form-field fxFlex="1 1 auto" fxFlexAlign="end">
@@ -48,8 +49,8 @@
           placeholder="{{sender?.email}}想說什麼呢？"
           >
       </mat-form-field>
-      <div class="t-al-c">
-        <button mat-raised-button color="primary">送出</button>
+      <div class="t-al-c pad-l-r-1">
+        <button mat-raised-button color="accent">送出</button>
       </div>
     </form>
   </footer>

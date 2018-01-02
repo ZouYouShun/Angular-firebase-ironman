@@ -27,7 +27,7 @@ $app-form-theme:mat-light-theme($app-form-primary, $app-form-accent, $app-form-w
   // @include mat-dialog-theme($app-theme);
   // @include mat-expansion-panel-theme($app-theme);
   // @include mat-grid-list-theme($app-theme);
-  // @include mat-icon-theme($app-theme);
+  @include mat-icon-theme($app-theme);
   // @include mat-paginator-theme($app-theme);
   // @include mat-progress-bar-theme($app-theme);
   // @include mat-radio-theme($app-theme);

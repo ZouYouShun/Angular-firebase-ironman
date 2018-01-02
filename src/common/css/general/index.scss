@@ -5,6 +5,7 @@
 @import './_display.scss';
 @import './_padding.scss';
 @import './_margin.scss';
+@import './_scrollbar.scss';
 @include add-padding(3, 16, 't-b');
 @include add-padding(3, 16, 'l-r');
 @include add-padding(3, 16, 'l');
@@ -12,7 +13,6 @@
 @include add-padding(1, 16, 't');
 @include add-padding(1, 16, 'b');
 @include add-padding(3, 16);
-
 @include add-margin(3, 16, 't-b');
 @include add-margin(3, 16, 'l-r');
 @include add-margin(3, 16, 'l');
@@ -20,15 +20,23 @@
 @include add-margin(1, 16, 't');
 @include add-margin(1, 16, 'b');
 @include add-margin(3, 16);
-
 @include add-color('c', 'color', $app-color);
 @include add-color('bg', 'background-color', $app-color);
-
 .c-white {
   color: white;
 }
+
 .c-black {
-  color: white;
+  color: black;
+}
+
+.bg-white {
+  background-color: white;
+}
+
+.bg-black {
+  background-color: black;
 }
 
 @include add-style(font-size, $app-font-size);
+@include add-scrollbar(app-color(grey, 0.5), app-color(grey, 0.8));

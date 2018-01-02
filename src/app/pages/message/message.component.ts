@@ -10,7 +10,7 @@ export class MessageComponent {
   menus: MenuModel[] = [
     {
       icon: 'message',
-      url: 't',
+      url: 'r',
       title: 'message'
     },
     {

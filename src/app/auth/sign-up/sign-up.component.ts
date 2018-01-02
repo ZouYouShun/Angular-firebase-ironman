@@ -39,15 +39,19 @@ export class SignUpComponent implements OnInit {
   get password() { return this.signupForm.get('password'); }
 
   signup() {
-    this._auth.signUpByEmail(this.email.value, this.password.value, this.name.value).subscribe(RxViewer);
+    this._auth.signUpByEmail({
+      email: this.email.value,
+      password: this.password.value,
+      name: this.name.value
+    }).subscribe(RxViewer);
   }
 
   signInUpByGoogle() {
-    this._auth.signInUpByGoogle().subscribe();
+    this._auth.signInUpByGoogle(true).subscribe();
   }
 
   signInUpByFacebook() {
-    this._auth.signInUpByFacebook().subscribe();
+    this._auth.signInUpByFacebook(true).subscribe();
   }
 
 }

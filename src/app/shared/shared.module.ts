@@ -10,11 +10,13 @@ import { CdkService } from './service/cdk.service';
 import { ImgPipe } from './pipe/img.pipe';
 import { PrettyJsonModule } from 'angular2-prettyjson';
 
+import { A11yModule } from '@angular/cdk/a11y';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
+    A11yModule,
     MyMaterialModuleModule,
   ],
   declarations: [
@@ -25,6 +27,7 @@ import { PrettyJsonModule } from 'angular2-prettyjson';
   exports: [
     CommonModule,
     FormsModule,
+    A11yModule,
     ReactiveFormsModule,
     MyMaterialModuleModule,
     FlexLayoutModule,

@@ -1,4 +1,5 @@
 import 'rxjs/add/operator/catch';
+import 'rxjs/add/operator/do';
 import 'rxjs/add/operator/concatMap';
 import 'rxjs/add/operator/switchMap';
 import 'rxjs/add/observable/fromPromise';
@@ -15,6 +16,8 @@ import { Observable } from 'rxjs/Observable';
 import { User } from '../model/user.model';
 import { BaseHttpService, CollectionHandler } from './base-http.service';
 import { environment } from '@env';
+import { BlockViewService } from '@core/service/block-view.service';
+import { AlertConfirmService, AlertConfirmModel } from '@core/component/alert-confirm';
 
 @Injectable()
 export class AuthService {
@@ -30,6 +33,8 @@ export class AuthService {
     private _http: BaseHttpService,
     private _router: Router,
     private _route: ActivatedRoute,
+    private _block: BlockViewService,
+    private _alc: AlertConfirmService
   ) {
     this.userHandler = this._http.collection<User>(`users`);
 
@@ -37,9 +42,14 @@ export class AuthService {
     this.fireUser$ = this._afAuth.authState;
     // 由於這個Service會永遠存活，我們不需對他做unsubscribe
     this._afAuth.authState
-      .switchMap(user => this.updateUser(user))
+      .do(() => this._block.block('登入中'))
+      .switchMap(user => {
+        console.log(user);
+        return this.updateUser(user);
+      })
       .switchMap(key => this.userHandler.document<User>(key).get())
       .subscribe(user => {
+        this._block.unblock();
         this.returnUrl(user);
         this.currentUser$.next(user);
       });
@@ -47,34 +57,40 @@ export class AuthService {
 
 
   // 注意！當註冊後也會更改當前authState，也會接到user，視同於登入
-  signUpByEmail(email: string, password: string, name: string) {
-    return Observable.fromPromise(this._afAuth.auth.createUserWithEmailAndPassword(email, password))
-      .switchMap(result => {
-        const user = Object.assign({}, result, { displayName: name });
-        return this.addUser(user, 'email');
-      })
-      .do(() => {
-        this.signOut();
-        this._router.navigateByUrl('/auth/signin');
-      })
-      .catch(err => this.ErrorHandler(err));
+  signUpByEmail(obj: { email: string, password: string, name: string }) {
+    if (obj.name) {
+      return Observable.fromPromise(this._afAuth.auth.createUserWithEmailAndPassword(obj.email, obj.password))
+        .switchMap(result => {
+          const user = Object.assign({}, result, { displayName: obj.name });
+          return this.addUser(user, 'email');
+        })
+        .do(() => {
+          this.signOut();
+          this._router.navigateByUrl('/auth/signin');
+        })
+        .catch(err => this.ErrorHandler(err));
+    }
+    this._alc.alert(new AlertConfirmModel('註冊失敗', '未輸入名子', 'warning'));
+    return Observable.of(null);
   }
 
-  signInUpByGoogle() {
-    return this.signInBySocialMedia(new firebase.auth.GoogleAuthProvider(), 'google');
+  signInUpByGoogle(isSignUp = false) {
+    return this.signInUpBySocialMedia(new firebase.auth.GoogleAuthProvider(), 'google', isSignUp);
   }
 
-  signInUpByFacebook() {
-    return this.signInBySocialMedia(new firebase.auth.FacebookAuthProvider(), 'facebook');
+  signInUpByFacebook(isSignUp = false) {
+    return this.signInUpBySocialMedia(new firebase.auth.FacebookAuthProvider(), 'facebook', isSignUp);
   }
 
   signInByEmail(email: string, password: string) {
     this.storeUrl();
-    return Observable.fromPromise(this._afAuth.auth.signInWithEmailAndPassword(email, password))
-      .catch(err => this.ErrorHandler(err));
+    return Observable.fromPromise(
+      this._afAuth.auth.signInWithEmailAndPassword(email, password)
+        .catch(err => this.ErrorHandler(err))
+    );
   }
 
-  private signInBySocialMedia(provider, type) {
+  private signInUpBySocialMedia(provider, type, isSignUp = false) {
     this.storeUrl();
 
     return Observable.fromPromise(this._afAuth.auth.signInWithPopup(provider))
@@ -82,7 +98,7 @@ export class AuthService {
         const user = result.user;
         return this.addUser(user, type);
       })
-      .catch(err => this.ErrorHandler(err));
+      .catch(err => this.ErrorHandler(err, isSignUp ? '註冊失敗' : '登入失敗'));
   }
 
   @onlyOnBrowser('platformId')
@@ -137,8 +153,33 @@ export class AuthService {
     return this.userHandler.set(data.uid, data);
   }
 
-  private ErrorHandler(err) {
+  private ErrorHandler(err: firebase.auth.Error, title = '登入失敗') {
     console.log(err);
+    let message = '系統錯誤，請聯絡管理人員';
+    switch (err.code) {
+      case 'auth/account-exists-with-different-credential':
+      case 'auth/email-already-in-use':
+        message = '帳號已存在';
+        break;
+      case 'auth/invalid-email':
+        message = '無效的帳號';
+        break;
+      case 'auth/wrong-password':
+        message = '密碼錯誤';
+        break;
+      case 'auth/weak-password':
+        message = '密碼格式錯誤';
+        break;
+      case 'auth/popup-closed-by-user':
+        message = '';
+        break;
+      default:
+        break;
+    }
+    console.log(message);
+    if (message) {
+      this._alc.alert(new AlertConfirmModel(title, message, 'warning'));
+    }
     return Observable.of(`Error: ${err}`);
   }
 }

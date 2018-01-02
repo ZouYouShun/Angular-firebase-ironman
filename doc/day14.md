@@ -1,4 +1,4 @@
-# [Angular Firebase 入門與實做] Day-14 Cloud Functions
+# [Angular Firebase 入門與實做] Day-14 Cloud Functions route
 
 每日一句來源：[Daily English](https://play.google.com/store/apps/details?id=net.eocbox.dailysentence)
 
@@ -183,6 +183,10 @@ this._http.get('/helloWorld').subscribe(RxViewer);
 # 本日小節
 今天透過cors、express解決跨域的問題，並且透過httpClient interceptor來修改網址，讓我們在http撰寫上更加方便，另外記得當未來正式上線後，`Access-Control-Allow-Origin`要修改回自己的系統網址，避免其他人隨意post攻擊站台。
 
+### 本日範例：
+
+Angular: https://github.com/ZouYouShun/Angular-firebase-ironman/tree/day14_functions_route
+functions: https://github.com/ZouYouShun/Angular-firebase-ironman-functions
 
 # 參考文章
 https://firebase.google.com/docs/functions/typescript

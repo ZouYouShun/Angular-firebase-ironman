@@ -42,3 +42,4 @@ testem.log
 Thumbs.db
 
 functions/node_modules
+functions/lib

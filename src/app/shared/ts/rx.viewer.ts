@@ -1,5 +1,5 @@
 export const RxViewer = {
   next: x => console.log(x),
-  error: err => console.error('something wrong occurred: ' + err),
+  error: err => console.error(err),
   complete: () => console.log('complete'),
 };

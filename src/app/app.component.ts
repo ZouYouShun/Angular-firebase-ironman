@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
 import { AuthService } from '@core/service/auth.service';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { RxViewer } from '@shared/ts/rx.viewer';
 
 @Component({
   selector: 'app-root',
@@ -8,8 +10,10 @@ import { AuthService } from '@core/service/auth.service';
 })
 export class AppComponent {
 
-  constructor(private _auth: AuthService) {
+  constructor(private _auth: AuthService, private _http: HttpClient) {
     console.log('App working!');
+    this._http.get('https://us-central1-my-firebase-first-app.cloudfunctions.net/helloWorld')
+      .subscribe(RxViewer);
   }
 
 }

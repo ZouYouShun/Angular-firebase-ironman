@@ -13,8 +13,7 @@
     <mat-nav-list>
       <a mat-list-item *ngFor="let menu of menus"
         [routerLink]="menu.url"
-        routerLinkActive="bg-white active"
-        [routerLinkActiveOptions]="{exact: true}">
+        routerLinkActive="bg-white active">
         <mat-icon [attr.aria-label]="menu.title" class="c-white">{{menu.icon}}</mat-icon>
       </a>
     </mat-nav-list>

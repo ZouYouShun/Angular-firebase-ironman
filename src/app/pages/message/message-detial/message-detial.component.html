@@ -1,7 +1,7 @@
 <section class="message-container" fxLayout="column nowrap">
   <header>
     <mat-toolbar fxLayoutAlign="start center" color="accent" class="mat-elevation-z2">
-      <img class="avatar-img mar-r-1" [src]="addressee?.photoURL || 'assets/img/avatar.jpg'">
+      <img class="avatar-img mar-r-1" [src]="addressee?.photoURL | safe: 'url'">
       <h2 class="c-white">
         {{addressee?.displayName}}
       </h2>
@@ -13,9 +13,7 @@
         <li class="mar-t-b-1 sender"
           *ngIf="message.uid === sender.uid; else addresseeView">
           <span fxFlexAlign="end" class="mar-r-1 mat-subheading-1 margin-0">{{message.createdAt | date:'hh:mm'}}</span>
-          <span class="content pad-all-1">
-            {{message.content}}
-          </span>
+          <span class="content pad-all-1" [innerHTML]="message.content"></span>
 
           <i class="isSend material-icons"
             [ngClass]="{complete: message.createdAt}">done</i>
@@ -27,7 +25,7 @@
         <ng-template #addresseeView>
           <li class="mar-all-1 addressee">
             <img class="avatar-img mar-r-1 "
-              [src]="addressee.photoURL || 'assets/img/avatar.jpg'"
+              [src]="addressee.photoURL | safe: 'url'"
               alt="addressee photo">
             <span class="content pad-all-1">
               {{message.content}}
@@ -44,10 +42,14 @@
       fxLayout="row nowrap"
       fxLayoutAlign="center center">
       <mat-form-field fxFlex="1 1 auto" fxFlexAlign="end">
-        <input matInput autocomplete="off"
+        <textarea matInput autocomplete="off"
           formControlName="content"
+          matTextareaAutosize
+          matAutosizeMaxRows="3"
+          matAutosizeMinRows="1"
           placeholder="{{sender?.email}}想說什麼呢？"
-          >
+          (keydown.enter)="submitMessage($event)"
+          ></textarea>
       </mat-form-field>
       <div class="t-al-c pad-l-r-1">
         <button mat-raised-button color="accent">送出</button>

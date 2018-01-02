@@ -3,9 +3,9 @@
     <mat-nav-list>
       <a mat-list-item *ngFor="let user of users$ | async"
         [routerLink]="[user.uid]"
-        routerLinkActive="active"
-        [routerLinkActiveOptions]="{exact: true}">
-        {{ user.displayName }} - {{user.email}}
+        routerLinkActive="active">
+        <img matListAvatar [src]="user.photoURL | safe: 'url'" />
+        <p matLine>{{ user.displayName }}</p>
       </a>
     </mat-nav-list>
   </mat-drawer>

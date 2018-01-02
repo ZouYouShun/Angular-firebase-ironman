@@ -13,21 +13,21 @@ export class MessageComponent {
       url: 'r',
       title: 'message'
     },
-    {
-      icon: 'person',
-      url: [{ outlets: { right: ['add-friend'] } }],
-      title: 'friend'
-    },
-    {
-      icon: 'people',
-      url: 'group',
-      title: 'group'
-    },
-    {
-      icon: 'person_add',
-      url: 'add-friend',
-      title: 'add friend'
-    }
+    // {
+    //   icon: 'person',
+    //   url: [{ outlets: { right: ['add-friend'] } }],
+    //   title: 'friend'
+    // },
+    // {
+    //   icon: 'people',
+    //   url: 'group',
+    //   title: 'group'
+    // },
+    // {
+    //   icon: 'person_add',
+    //   url: 'add-friend',
+    //   title: 'add friend'
+    // }
   ];
   constructor() {
 

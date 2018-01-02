@@ -15,6 +15,7 @@ import { runAfterTimeout } from '@shared/decorator/timeout.decorator';
 import { AutoDestroy } from '@shared/ts/auto.destroy';
 import { RxViewer } from '@shared/ts/rx.viewer';
 import { Observable } from 'rxjs/Observable';
+import { replaceToBr } from '@shared/ts/data/replaceToBr';
 
 
 @Component({
@@ -98,13 +99,16 @@ export class MessageDetialComponent extends AutoDestroy {
     this.addressee = null;
   }
 
-  submitMessage() {
-    const content = this.messageForm.value.content;
-    if (!content) {
+  submitMessage(event) {
+    if (event) event.preventDefault();
+    let content = this.messageForm.value.content;
+    this.messageForm.reset();
+    if (!content.trim()) {
       return;
     }
     let req: Observable<any>;
-    this.messageForm.reset();
+    content = replaceToBr(content);
+
     // 先寫房間ID
     if (this.messageHandler) {
       req = this.messageHandler.add({

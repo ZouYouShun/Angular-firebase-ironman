@@ -21,9 +21,15 @@ export class SafePipe implements PipeTransform {
         return this._sanitizer.bypassSecurityTrustStyle(
           `url('https://i.ytimg.com/vi/${url[url.length - 1]}/hqdefault.jpg')`
         ); // https://i.ytimg.com/vi/HSOtku1j600/hqdefault.jpg
-      case 'script': return this._sanitizer.bypassSecurityTrustScript(value);
-      case 'url': return this._sanitizer.bypassSecurityTrustUrl(value);
-      case 'resourceUrl': return this._sanitizer.bypassSecurityTrustResourceUrl(value);
+      case 'script':
+        return this._sanitizer.bypassSecurityTrustScript(value);
+      case 'url':
+        if (!value) {
+          value = 'assets/img/avatar.jpg';
+        }
+        return this._sanitizer.bypassSecurityTrustUrl(value);
+      case 'resourceUrl':
+        return this._sanitizer.bypassSecurityTrustResourceUrl(value);
       default: throw new Error(`Invalid safe type specified: ${type}`);
     }
   }

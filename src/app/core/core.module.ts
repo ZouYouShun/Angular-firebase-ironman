@@ -14,6 +14,8 @@ import { BaseService } from './service/base.service';
 import { BlockViewService } from './service/block-view.service';
 import { RouteLoadingService } from './service/route-loading.service';
 import { UploadService } from './service/upload.service';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { ApiInterceptor } from './interceptor/api.interceptor';
 
 @NgModule({
   imports: [
@@ -36,7 +38,8 @@ import { UploadService } from './service/upload.service';
     BlockViewService,
     RouteLoadingService,
     UploadService,
-    AuthGuard
+    AuthGuard,
+    { provide: HTTP_INTERCEPTORS, useClass: ApiInterceptor, multi: true },
   ]
 })
 export class CoreModule {

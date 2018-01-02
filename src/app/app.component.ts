@@ -12,7 +12,7 @@ export class AppComponent {
 
   constructor(private _auth: AuthService, private _http: HttpClient) {
     console.log('App working!');
-    this._http.get('https://us-central1-my-firebase-first-app.cloudfunctions.net/helloWorld')
+    this._http.get('helloWorld')
       .subscribe(RxViewer);
   }
 

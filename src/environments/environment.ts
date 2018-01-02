@@ -5,6 +5,7 @@
 
 export const environment = {
   production: false,
+  serverUrl: 'http://localhost:5000/my-firebase-first-app/us-central1',
   websiteTitle: {
     zhTw: 'onfirechat',
     enUS: 'onfirechat',

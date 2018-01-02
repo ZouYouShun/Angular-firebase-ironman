@@ -27,9 +27,7 @@
             <img class="avatar-img mar-r-1 "
               [src]="addressee.photoURL | safe: 'url'"
               alt="addressee photo">
-            <span class="content pad-all-1">
-              {{message.content}}
-            </span>
+            <span class="content pad-all-1" [innerHTML]="message.content"></span>
             <span fxFlexAlign="end" class="mar-l-1 mat-subheading-1 margin-0">{{message.createdAt | date:'hh:mm'}}</span>
           </li>
         </ng-template>

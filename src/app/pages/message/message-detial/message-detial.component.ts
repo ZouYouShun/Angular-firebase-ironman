@@ -99,7 +99,7 @@ export class MessageDetialComponent extends AutoDestroy {
     this.addressee = null;
   }
 
-  submitMessage(event) {
+  submitMessage(event?) {
     if (event) event.preventDefault();
     let content = this.messageForm.value.content;
     this.messageForm.reset();

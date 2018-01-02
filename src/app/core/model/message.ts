@@ -1,6 +1,6 @@
-import { Base } from '@core/model/base.model';
+import { BaseModel } from '@core/model/base.model';
 
-export interface Message extends Base {
+export interface MessageModel extends BaseModel {
   // uid: string;
   users: string[];
   content: string;

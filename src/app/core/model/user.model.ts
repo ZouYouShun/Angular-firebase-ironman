@@ -1,6 +1,6 @@
-import { Room } from './room.model';
+import { RoomModel } from './room.model';
 
-export interface User {
+export interface UserModel {
   uid?: string;
   email: string;
   displayName?: string;
@@ -8,5 +8,5 @@ export interface User {
   catchPhrase?: string;
   photoURL?: string;
   lastSignInTime?: string;
-  rooms?: { [s: string]: Room };
+  rooms?: { [s: string]: RoomModel };
 }

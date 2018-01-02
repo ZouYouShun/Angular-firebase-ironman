@@ -1,8 +1,8 @@
-import { Base } from '@core/model/base.model';
+import { BaseModel } from '@core/model/base.model';
 
-export class Room extends Base {
+export class RoomModel extends BaseModel {
 }
 
-export interface UserRoom {
+export interface UserRoomModel {
   roomId: string;
 }

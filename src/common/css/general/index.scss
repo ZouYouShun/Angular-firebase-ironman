@@ -21,6 +21,14 @@
 @include add-margin(1, 16, 'b');
 @include add-margin(3, 16);
 
-@include type-color('color');
-@include type-color('background-color');
+@include add-color('c', 'color', $app-color);
+@include add-color('bg', 'background-color', $app-color);
+
+.c-white {
+  color: white;
+}
+.c-black {
+  color: white;
+}
+
 @include add-style(font-size, $app-font-size);

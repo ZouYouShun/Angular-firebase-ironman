@@ -1,17 +1,20 @@
-<div fxLayout="column" fxFlexFill fxLayoutAlign="center center">
+<div fxLayout="column"
+  fxFlexFill
+  fxLayoutAlign="center center"
+  cdkTrapFocus cdkTrapFocusAutoCapture>
   <div class="container">
     <header class="pad-t-1 t-al-c">
       <img src="/assets/img/firebase.png">
       <ul class="width-full tab-group t-al-c cursor-pointer pad-t-1" fxLayout="row nowrap">
-        <li fxFlex="1 1 50%" class="background-color-primary"
+        <li fxFlex="1 1 50%" class="bg-primary"
           mat-ripple
-          routerLinkActive="background-color-accent"
+          routerLinkActive="bg-accent"
           routerLink="/auth/signin">
           <p>登入</p>
         </li>
-        <li fxFlex="1 1 50%" class="background-color-primary"
+        <li fxFlex="1 1 50%" class="bg-primary"
           mat-ripple
-          routerLinkActive="background-color-accent"
+          routerLinkActive="bg-accent"
           routerLink="/auth/signup">
           <p>註冊</p>
         </li>

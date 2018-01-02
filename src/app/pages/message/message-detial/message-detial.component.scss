@@ -1,7 +1,10 @@
 @import '~common/css/_my-theme.variable.scss';
+$border:1px solid grey;
 .message-container {
   position: relative;
   height: 100%;
+  header {
+  }
   article {
     overflow: auto;
     li {
@@ -38,8 +41,5 @@
     }
   }
   footer {
-    border-top: 1px solid grey;
-    width: 100%;
-    box-sizing: border-box;
   }
 }

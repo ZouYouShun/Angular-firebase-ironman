@@ -13,7 +13,7 @@ import * as firebase from 'firebase';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Observable } from 'rxjs/Observable';
 
-import { User } from '../model/user.model';
+import { UserModel } from '../model/user.model';
 import { BaseHttpService, CollectionHandler } from './base-http.service';
 import { environment } from '@env';
 import { BlockViewService } from '@core/service/block-view.service';
@@ -24,8 +24,8 @@ export class AuthService {
 
   fireUser$: Observable<firebase.User>;
 
-  currentUser$ = new BehaviorSubject<User>(null);
-  userHandler: CollectionHandler<User>;
+  currentUser$ = new BehaviorSubject<UserModel>(null);
+  userHandler: CollectionHandler<UserModel>;
 
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
@@ -36,7 +36,7 @@ export class AuthService {
     private _block: BlockViewService,
     private _alc: AlertConfirmService
   ) {
-    this.userHandler = this._http.collection<User>(`users`);
+    this.userHandler = this._http.collection<UserModel>(`users`);
 
     // 用來保存當前angularfire的使用者狀態
     this.fireUser$ = this._afAuth.authState;
@@ -47,7 +47,7 @@ export class AuthService {
         console.log(user);
         return this.updateUser(user);
       })
-      .switchMap(key => this.userHandler.document<User>(key).get())
+      .switchMap(key => this.userHandler.document<UserModel>(key).get())
       .subscribe(user => {
         this._block.unblock();
         this.returnUrl(user);
@@ -108,7 +108,7 @@ export class AuthService {
   }
 
   @onlyOnBrowser('platformId')
-  private returnUrl(user: User) {
+  private returnUrl(user: UserModel) {
     if (user) {
       const returnUrl = this._route.snapshot.queryParamMap.get('returnUrl') || localStorage.getItem('returnUrl');
       if (returnUrl) {
@@ -131,7 +131,7 @@ export class AuthService {
 
   private updateUser(user: firebase.User) {
     if (user) {
-      const data: User = {
+      const data: UserModel = {
         email: user.email,
         photoURL: user.photoURL,
         lastSignInTime: user.metadata.lastSignInTime
@@ -142,7 +142,7 @@ export class AuthService {
   }
 
   private addUser(user: firebase.User, types: 'google' | 'email' | 'facebook') {
-    const data: User = {
+    const data: UserModel = {
       uid: user.uid,
       email: user.email,
       displayName: user.displayName,

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivate, CanLoad, Route, Router, RouterStateSnapshot } from '@angular/router';
 import { Observable } from 'rxjs/Observable';
 
-import { User } from '../model/user.model';
+import { UserModel } from '../model/user.model';
 import { AuthService } from '../service/auth.service';
 
 @Injectable()
@@ -25,7 +25,7 @@ export class AdminAuthGuard implements CanActivate, CanLoad {
 
   isAdmin(url: string): Observable<boolean> | Promise<boolean> | boolean {
     return this._auth.currentUser$
-      .map((user: User) => {
+      .map((user: UserModel) => {
         if (!user) {
           this._router.navigate(['/no-permissions']);
           return false;

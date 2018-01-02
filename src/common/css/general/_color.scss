@@ -1,8 +1,8 @@
 @import '~common/css/_my-theme.variable.scss';
-@mixin type-color($type) {
+@mixin add-color($alise, $type, $color) {
   @each $property,
-  $value in $app-color {
-    .#{$type}-#{$property} {
+  $value in $color {
+    .#{$alise}-#{$property} {
       #{$type}: mat-color($value)
     }
   }

@@ -1,8 +1,11 @@
 import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
-import { MessageComponent } from './message.component';
+import { RouterModule, Routes } from '@angular/router';
+import { MessageRoomListComponent } from './message-room-list/message-room-list.component';
+
 import { MessageDetialComponent } from './message-detial/message-detial.component';
+import { MessageFriendListComponent } from './message-friend-list/message-friend-list.component';
 import { MessageHomeComponent } from './message-home/message-home.component';
+import { MessageComponent } from './message.component';
 
 const routes: Routes = [
   {
@@ -11,11 +14,26 @@ const routes: Routes = [
     children: [
       {
         path: '',
-        component: MessageHomeComponent
+        pathMatch: 'full',
+        redirectTo: 'r'
       },
       {
-        path: ':id',
-        component: MessageDetialComponent
+        path: 'r',
+        component: MessageRoomListComponent,
+        children: [
+          {
+            path: '',
+            component: MessageHomeComponent
+          },
+          {
+            path: ':id',
+            component: MessageDetialComponent
+          }
+        ]
+      },
+      {
+        path: 'u',
+        component: MessageFriendListComponent
       },
     ]
   }

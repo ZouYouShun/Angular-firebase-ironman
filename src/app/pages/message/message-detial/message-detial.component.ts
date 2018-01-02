@@ -6,9 +6,9 @@ import 'rxjs/add/operator/take';
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { Message } from '@core/model/message';
-import { Room, UserRoom } from '@core/model/room.model';
-import { User } from '@core/model/user.model';
+import { MessageModel } from '@core/model/message';
+import { RoomModel, UserRoomModel } from '@core/model/room.model';
+import { UserModel } from '@core/model/user.model';
 import { AuthService } from '@core/service/auth.service';
 import { BaseHttpService, CollectionHandler } from '@core/service/base-http.service';
 import { runAfterTimeout } from '@shared/decorator/timeout.decorator';
@@ -26,13 +26,13 @@ export class MessageDetialComponent extends AutoDestroy {
 
   @ViewChild('article', { read: ElementRef }) article: ElementRef;
 
-  messages: Message[];
+  messages: MessageModel[];
   messageForm: FormGroup;
-  sender: User;
-  addressee: User;
+  sender: UserModel;
+  addressee: UserModel;
 
-  private roomsHandler: CollectionHandler<Room>;
-  private messageHandler: CollectionHandler<Message>;
+  private roomsHandler: CollectionHandler<RoomModel>;
+  private messageHandler: CollectionHandler<MessageModel>;
 
   constructor(
     private _http: BaseHttpService,
@@ -52,19 +52,19 @@ export class MessageDetialComponent extends AutoDestroy {
 
         this.sender = sender;
 
-        return this._http.document<User>(`users/${addressee.id}`).get();
+        return this._http.document<UserModel>(`users/${addressee.id}`).get();
       })
       .switchMap(addressee => {
         this.addressee = addressee;
         // 取得送出者對應收件者的聊天室資料
         return this._http.document(`users/${this.sender.uid}`)
           .collection('rooms')
-          .document<UserRoom>(this.addressee.uid).get();
+          .document<UserRoomModel>(this.addressee.uid).get();
       })
       .switchMap(usersRoom => {
         // 取得房間內容
         if (usersRoom) {
-          return this.roomsHandler.document<Message>(usersRoom.roomId).get();
+          return this.roomsHandler.document<MessageModel>(usersRoom.roomId).get();
         }
 
         return Observable.of(null);

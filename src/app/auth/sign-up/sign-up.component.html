@@ -1,14 +1,14 @@
 <ul>
   <li>
     <button mat-button class="width-full fb-button" (click)="signInUpByFacebook()">
-      <i class="icon-facebook color-white md-size-2"></i>
-      <span class="color-white">使用Facebook註冊</span>
+      <i class="icon-facebook c-white md-size-2"></i>
+      <span class="c-white">使用Facebook註冊</span>
     </button>
   </li>
   <li class="margin-top">
     <button mat-button class="width-full google-button" (click)="signInUpByGoogle()">
-      <i class="icon-google color-white md-size-2"></i>
-      <span class="color-white">使用Google註冊</span>
+      <i class="icon-google c-white md-size-2"></i>
+      <span class="c-white">使用Google註冊</span>
     </button>
   </li>
   <li class="margin-top">
@@ -16,7 +16,7 @@
       <mat-form-field class="width-full" required>
         <mat-label>
           信箱
-          <i class="color-red">*</i>
+          <i class="c-red">*</i>
         </mat-label>
         <input matInput type="email" placeholder="輸入信箱地址" formControlName="email">
         <mat-error *ngIf="email.invalid && email.touched">信箱格式不正確</mat-error>
@@ -24,7 +24,7 @@
       <mat-form-field class="width-full" required>
         <mat-label>
           密碼
-          <i class="color-red">*</i>
+          <i class="c-red">*</i>
         </mat-label>
         <input matInput type="password" placeholder="密碼必須大於六碼，並且最少有一個數字" formControlName="password">
         <mat-error *ngIf="password.invalid && password.touched">
@@ -34,7 +34,7 @@
       <mat-form-field class="width-full" required>
         <mat-label>
           姓名
-          <i class="color-red">*</i>
+          <i class="c-red">*</i>
         </mat-label>
         <input matInput type="text" placeholder="打一個喜歡的名子" formControlName="name">
         <mat-error *ngIf="name.invalid && name.touched">

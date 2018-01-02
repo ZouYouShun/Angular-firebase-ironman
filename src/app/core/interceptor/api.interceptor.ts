@@ -9,7 +9,8 @@ export class ApiInterceptor implements HttpInterceptor {
   intercept(req: HttpRequest<any>, next: HttpHandler) {
     return next.handle(
       req.clone({
-        url: `${environment.serverUrl}/${req.url}`
+        // the last / is coordinate with firebase cloud functions
+        url: `${environment.serverUrl}/${req.url}/`
       }));
   }
 }

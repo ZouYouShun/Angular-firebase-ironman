@@ -1,8 +1,8 @@
-# [Angular Firebase 入門與實做] Day-14 Cloud Functions route
+# [Angular Firebase 入門與實做] Day-14 Cloud Functions HTTP Triggers
 
 每日一句來源：[Daily English](https://play.google.com/store/apps/details?id=net.eocbox.dailysentence)
 
-> Luck is not chance, it's toil. Fortune's expensive smile is earned.
+> No matter what label is thrown you way, only you can define yourself.
 
 今日成果： https://us-central1-my-firebase-first-app.cloudfunctions.net/helloWorld
 
@@ -74,7 +74,7 @@ firebase >
 
 加上後再次使用angular做測試，我們把網址改成http://localhost:5000
 
-我們可以在次測試把cors拿掉看看，你會發現又出現跨域錯誤了，所以我們再次家回去，如此一來就能解決跨域的問題了。
+我們可以在次測試把cors拿掉看看，你會發現又出現跨域錯誤了。
 
 # 使用Express管理Route
 
@@ -162,7 +162,7 @@ export class ApiInterceptor implements HttpInterceptor {
     return next.handle(
       req.clone({
         // 請在environment機上serverUrl的property，prod就放上線後的網址
-        url: `${environment.serverUrl}/${req.url}` 
+        url: `${environment.serverUrl}/${req.url}/` 
       }));
   }
 }

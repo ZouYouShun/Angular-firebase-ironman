@@ -1,14 +1,15 @@
 # [Angular Firebase 入門與實做] Day-14 Cloud Functions HTTP Triggers 02
 
-
 每日一句來源：[Daily English](https://play.google.com/store/apps/details?id=net.eocbox.dailysentence)
 
-> No matter what label is thrown you way, only you can define yourself.
+> As I began to love myself, I found that anguish and emotional suffering are only warning signs that I was living against my own truth. Today I know, this is "AUTHENTICITY".
+
+> 當我真正開始愛自己，我才認識到，所有的痛苦和感情的折磨，都只是在提醒我：我的生活違背了自己的本心。今天我明白了，這叫做"真實"。--卓別林《當我開始愛自己》
+
 
 昨天我們介紹了triggers今天我們使用http來包裝方法藉此來減少我們在前端的程式碼，
 
-在day13的這一段程式碼
-
+我們今天針對[day13](https://ithelp.ithome.com.tw/articles/10195548)下面這段rx操作，把操作移到functions
 ```js
 req = this.roomsHandler.add(<any>{}).switchMap(room => {
   // 我們這邊會使用forkJoin把所有的observable合併成一個observable
@@ -28,8 +29,9 @@ req = this.roomsHandler.add(<any>{}).switchMap(room => {
 });
 ```
 
-我們可以把所有省略掉，只需使用一個http即可，我們依舊使用express的route來做包裝，
+我們的目表是只使用一個http來取代所有rx的操作，下面我們使用express的route來做包裝，並實作http
 
+# Http Trigger 搭配使用express 實做
 我們建立一個messageApi實做如下
 ```js
 import { Router } from 'express';
@@ -43,13 +45,14 @@ export const messageApi = Router()
       const firestore = admin.firestore();
       // user ref
       const usersRef = firestore.collection('users');
-      // add room
+      // add room 這裡使用es6 的await，因為我們使用的是typescript且firebase的nodejs也有支援，我們可以開心的使用他
       const room = await firestore.collection('rooms').add(storeTimeObject({}));
       const messageData = req.body.message;
 
       const roomsUsers = room.collection('users');
       const messagesRef = room.collection('messages');
 
+      // 這裡使用Promise.all把所有的promise組裝再一起一併發送出去
       return Promise.all([
         // add message
         messagesRef
@@ -75,12 +78,14 @@ export const messageApi = Router()
           .doc(messageData.sender)
           .set(storeTimeObject({ roomId: room.id }))
       ]).then((result) => {
+        //注意這裡一定要回傳res，不然方法不會結束
         return res.success({
           message: 'add message success',
           obj: result
         });
       });
     } catch (error) {
+      //注意這裡一定要回傳res，不然方法不會結束
       return res.status(500).json({
         message: 'fail',
         obj: error
@@ -88,7 +93,10 @@ export const messageApi = Router()
     }
   });
 ```
-大家可以直接看Types來了解如何撰寫程式，要對資料庫做修改我們都會使用admin來做操作，要注意必須在index.ts認證並初始化App
+相關admin的API，大家可以直接看Types來了解如何撰寫程式，或是[官方文件](https://firebase.google.com/docs/reference/functions/?authuser=0)
+要對資料庫做修改我們都會使用admin來做操作，要注意必須在index.ts認證並初始化App。
+
+## 在index.ts認證並初始化App
 ```js
 import * as admin from 'firebase-admin';
 admin.initializeApp(functions.config().firebase);
@@ -99,11 +107,11 @@ export const apiRouter = express.Router()
     .use('/message', messageApi) // 我們建立一個messageApi
 ```
 
-回到我們的angular應用中
+# Angular應用修改
 
-因為我們要使用http client去post方法，我們也可以將http使用先前的包裝方式包裝起來，
+因為我們要使用HttpClient去post方法，我們也可以將http使用先前的包裝方式包裝起來，
 
-# 使用 BaseHttpService包裝http request
+## 使用 BaseHttpService包裝http request
 
 我們回到base.http.service中
 加入以下方法
@@ -122,7 +130,7 @@ export const apiRouter = express.Router()
   }
 ```
 
-## MyHttpHandler
+### MyHttpHandler
 ```js
 export interface MyHttpConfig {
   headers?: HttpHeaders | {
@@ -184,6 +192,9 @@ export class MyHttpHandler<T> {
   }
 }
 ```
+這是筆者習慣的實作方式，大家可以依據自己習慣的方式做包裝使用。
+
+### 修改message-detial
 
 我們把message-detial裡面剛剛那一段直接修改成下面這樣，變成一個post方法
 ```js
@@ -197,6 +208,22 @@ req = this._http.request('/api/message/roomWithMessage').post({
 ```
 接著我們回到APP中做測試，我們會發現我們的post成功了，且資料也正確的透過Realtime的方式回到前端來，我們的code是不是乾淨了許多呢？
 
+本日範例：https://github.com/ZouYouShun/Angular-firebase-ironman/tree/day15_implements
+
+
+# 成果
+https://onfirechat.ga/message
+
+帳號：test@gmail.com
+密碼：aa1234
+
+帳號：test2@gmail.com
+密碼：aa1234
 
 # 本日小節
 今天我們使用http改善我們在app中做的很多的post來回，並且使用base-http包裝request的post方法，有了http我們就像在call 一般的後端一樣，在後端做處理，並透過realtime的方式將資料做更新，並且我們實做了block的功能，讓使用者知道當前的狀況。
+
+
+# 參考文章
+https://firebase.google.com/docs/functions/http-events?authuser=0
+https://firebase.google.com/docs/reference/functions/?authuser=0

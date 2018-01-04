@@ -27,6 +27,8 @@ export class MessageDetialComponent extends AutoDestroy {
 
   @ViewChild('article', { read: ElementRef }) article: ElementRef;
 
+  messageLoading = false;
+
   messages: MessageModel[];
   messageForm: FormGroup;
   sender: UserModel;
@@ -57,6 +59,7 @@ export class MessageDetialComponent extends AutoDestroy {
       })
       .switchMap(addressee => {
         this.addressee = addressee;
+        this.messageLoading = true;
         // 取得送出者對應收件者的聊天室資料
         return this._http.document(`users/${this.sender.uid}`)
           .collection('rooms')
@@ -83,6 +86,7 @@ export class MessageDetialComponent extends AutoDestroy {
       })
       .takeUntil(this._destroy$)
       .subscribe(messages => {
+        this.messageLoading = false;
         this.messages = messages;
         this.scrollButtom();
       });

@@ -1,4 +1,4 @@
-# [Angular Firebase 入門與實做] Day-14 Cloud Functions HTTP Triggers 02
+# [Angular Firebase 入門與實做] Day-15 Cloud Functions HTTP Triggers 02
 
 每日一句來源：[Daily English](https://play.google.com/store/apps/details?id=net.eocbox.dailysentence)
 
@@ -208,8 +208,11 @@ req = this._http.request('/api/message/roomWithMessage').post({
 ```
 接著我們回到APP中做測試，我們會發現我們的post成功了，且資料也正確的透過Realtime的方式回到前端來，我們的code是不是乾淨了許多呢？
 
-本日範例：https://github.com/ZouYouShun/Angular-firebase-ironman/tree/day15_implements
-
+# 本日原始碼
+|名稱|網址|
+|---|---|
+|Angular|https://github.com/ZouYouShun/Angular-firebase-ironman/tree/day15_implements|
+|functions| https://github.com/ZouYouShun/Angular-firebase-ironman-functions/tree/day15_implements|
 
 # 成果
 https://onfirechat.ga/message

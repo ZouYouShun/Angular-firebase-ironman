@@ -63,6 +63,7 @@ export class MessageDetialComponent extends AutoDestroy {
           .document<UserRoomModel>(this.addressee.uid).get();
       })
       .switchMap(usersRoom => {
+        console.log('get room!');
         // 取得房間內容
         if (usersRoom) {
           return this.roomsHandler.document<MessageModel>(usersRoom.roomId).get();
@@ -112,24 +113,17 @@ export class MessageDetialComponent extends AutoDestroy {
     // 先寫房間ID
     if (this.messageHandler) {
       req = this.messageHandler.add({
-        uid: this.sender.uid,
+        sender: this.sender.uid,
+        addressee: this.addressee.uid,
         content: content
       });
     } else {
-      req = this.roomsHandler.add(<any>{}).switchMap(room => {
-        return Observable.forkJoin([
-          // 寫訊息
-          room.collection('messages').add({
-            uid: this.sender.uid,
-            content: content
-          }),
-          // 寫房間的使用者
-          room.collection('users').set(this.sender.uid, {}),
-          room.collection('users').set(this.addressee.uid, {}),
-          // 寫使用者的房間對應的ID
-          this._http.document(`users/${this.sender.uid}`).collection('rooms').set(this.addressee.uid, { roomId: room.id }),
-          this._http.document(`users/${this.addressee.uid}`).collection('rooms').set(this.sender.uid, { roomId: room.id })
-        ]);
+      req = this._http.request('/api/message/roomWithMessage').post({
+        message: {
+          sender: this.sender.uid,
+          addressee: this.addressee.uid,
+          content: content
+        }
       });
     }
 

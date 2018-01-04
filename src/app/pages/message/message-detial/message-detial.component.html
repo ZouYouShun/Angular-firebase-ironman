@@ -11,7 +11,7 @@
     <ul>
       <ng-container *ngFor="let message of messages" >
         <li class="mar-t-b-1 sender"
-          *ngIf="message.uid === sender.uid; else addresseeView">
+          *ngIf="message.sender === sender.uid; else addresseeView">
           <span fxFlexAlign="end" class="mar-r-1 mat-subheading-1 margin-0">{{message.createdAt | date:'hh:mm'}}</span>
           <span class="content pad-all-1" [innerHTML]="message.content"></span>
 

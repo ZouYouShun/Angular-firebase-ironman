@@ -143,6 +143,8 @@ export const helloWorld = functions.https.onRequest(new Server().bootstrap());
 
 如果你的電腦也是裝8.X的版本，你會發現黨我們直接/helloWorld後面沒有斜線的時候在本機是可以的，但是在firebase是無法的，這可能是node版本導致，因此筆者建議前端在使用時最後都要加上斜線，會比較保險。
 
+> 注意： 若你已經開啟serve狀態，在建立新的http trigger後必須重新執行watch，才會重新hosting API在本機
+
 # Angular 開發網址切換小技巧
 
 像我們剛剛做了切換網址的動作，而且每個http發送都需要加上網址，實在麻煩又不漂亮，我們可以使用httpClient interceptor的功能，來攔截發送的req做修改後在發送出去，以下實作：

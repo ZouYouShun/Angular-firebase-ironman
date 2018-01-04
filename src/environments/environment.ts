@@ -5,7 +5,7 @@
 
 export const environment = {
   production: false,
-  serverUrl: 'http://localhost:5000/my-firebase-first-app/us-central1',
+  serverUrl: 'https://us-central1-my-firebase-first-app.cloudfunctions.net',
   websiteTitle: {
     zhTw: 'onfirechat',
     enUS: 'onfirechat',

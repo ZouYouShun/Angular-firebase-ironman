@@ -53,7 +53,7 @@ export class CollectionHandler<T> {
       req.valueChanges();
   }
 
-  add(data: object): Observable<DocumentHandler<T>> {
+  add(data: T): Observable<DocumentHandler<T>> {
     if (!this.url) return Observable.of(null);
     return Observable.fromPromise(this._fireAction.add(storeTimeObject(data)))
       .map(d => this.document<T>(d.id))

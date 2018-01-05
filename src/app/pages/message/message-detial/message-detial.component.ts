@@ -156,7 +156,7 @@ export class MessageDetialComponent extends AutoDestroy {
       });
     }
 
-    req.subscribe(RxViewer);
+    req.subscribe();
   }
 
   delete(message: any) {

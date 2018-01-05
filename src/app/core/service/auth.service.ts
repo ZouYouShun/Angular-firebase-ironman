@@ -45,13 +45,12 @@ export class AuthService {
     this._afAuth.authState
       // .do(() => this._block.block('登入中'))
       .switchMap(user => {
-        console.log(user);
         return this.updateUser(user);
       })
       .switchMap(key => this.userHandler.document<UserModel>(key).get())
       .subscribe(user => {
         // user.ref.collection('rooms').get().then((x) => console.dir(x));
-        console.log(user);
+        // console.log(user);
         this._block.unblock();
         this.returnUrl(user);
         this.user = user;

@@ -32,13 +32,13 @@ export class MessageService {
         });
       })
       .do(rooms => {
-        console.log(rooms);
+        // console.log(rooms);
         this.rooms$.next(rooms);
       });
 
     this.userFriend$ = this._http.collection<UserModel[]>('users').get()
       .do(users => {
-        console.log(users);
+        // console.log(users);
         this.friendsObj = this.usersToObject(users);
         this.friends$.next(users);
       });

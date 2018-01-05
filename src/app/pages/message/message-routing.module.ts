@@ -45,6 +45,10 @@ const routes: Routes = [
           }
         ]
       },
+      {
+        path: '**',
+        redirectTo: 'r'
+      },
     ]
   }
 ];

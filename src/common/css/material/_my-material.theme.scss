@@ -6,8 +6,10 @@ $app-form-warn:mat-palette($mat-red, 500);
 $app-form-theme:mat-light-theme($app-form-primary, $app-form-accent, $app-form-warn);
 @mixin my-material() {
   @include md-icon-align(5);
-
+  // font
   @include mat-core($app-typgography);
+
+  // component
   @include mat-core-theme($app-form-theme);
   @include mat-button-theme($app-theme);
   @include mat-card-theme($app-theme);

@@ -6,7 +6,7 @@ import 'rxjs/add/operator/take';
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { MessageModel } from '@core/model/message';
+import { MessageModel } from '@core/model/message.model';
 import { RoomModel, UserRoomModel } from '@core/model/room.model';
 import { UserModel } from '@core/model/user.model';
 import { AuthService } from '@core/service/auth.service';

@@ -24,6 +24,7 @@ export class AuthService {
 
   fireUser$: Observable<firebase.User>;
 
+  user: UserModel;
   currentUser$ = new BehaviorSubject<UserModel>(null);
   userHandler: CollectionHandler<UserModel>;
 
@@ -53,6 +54,7 @@ export class AuthService {
         console.log(user);
         this._block.unblock();
         this.returnUrl(user);
+        this.user = user;
         this.currentUser$.next(user);
       });
   }

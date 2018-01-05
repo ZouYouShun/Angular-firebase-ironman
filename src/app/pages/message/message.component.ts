@@ -35,7 +35,7 @@ export class MessageComponent extends AutoDestroy {
   users$;
   constructor(private _message: MessageService) {
     super();
-    this.users$ = this._message.getFriend()
+    this.users$ = this._message.getNecessaryData()
       .takeUntil(this._destroy$)
       .subscribe();
   }

@@ -1,8 +1,7 @@
 import { BaseModel } from './base.model';
-import { MessageModel } from './message';
+import { MessageModel } from './message.model';
 
 export class RoomModel extends BaseModel {
-  last: MessageModel;
 }
 
 export enum ROOM_TYPE {
@@ -12,4 +11,5 @@ export enum ROOM_TYPE {
 export interface UserRoomModel extends BaseModel {
   roomId: string;
   type: ROOM_TYPE;
+  last: MessageModel;
 }

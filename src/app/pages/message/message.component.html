@@ -2,15 +2,15 @@
   <mat-drawer mode="side" opened="true" fxLayout="column" class="bg-accent mat-elevation-z2">
 
 
-    <mat-nav-list>
+    <mat-nav-list fxFlexOrder="3">
       <a mat-list-item [routerLink]="['/']">
         <mat-icon aria-label="home" class="c-white">keyboard_return</mat-icon>
       </a>
     </mat-nav-list>
 
-    <span class="fill-remaining-space"></span>
+    <span class="fill-remaining-space" fxFlexOrder="2"></span>
 
-    <mat-nav-list>
+    <mat-nav-list fxFlexOrder="1">
       <a mat-list-item *ngFor="let menu of menus"
         [routerLink]="menu.url"
         routerLinkActive="bg-white active">

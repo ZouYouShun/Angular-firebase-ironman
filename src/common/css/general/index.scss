@@ -38,5 +38,5 @@
   background-color: black;
 }
 
-@include add-style(font-size, $app-font-size);
+@include add-style('fs', font-size, $app-font-size);
 @include add-scrollbar(app-color(grey, 0.5), app-color(grey, 0.8));

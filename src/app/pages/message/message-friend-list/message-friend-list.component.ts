@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { UserModel } from '@core/model/user.model';
-import { BaseHttpService, CollectionHandler } from '@core/service/base-http.service';
+import { MessageService } from 'app/pages/message/message.service';
 
 @Component({
   selector: 'app-message-friend-list',
@@ -9,12 +9,9 @@ import { BaseHttpService, CollectionHandler } from '@core/service/base-http.serv
 })
 export class MessageFriendListComponent implements OnInit {
 
-  usersHandler: CollectionHandler<{}>;
-  users$;
-  constructor(private _http: BaseHttpService) {
-    this.usersHandler = this._http.collection<UserModel[]>('users');
-
-    this.users$ = this.usersHandler.get();
+  friends$;
+  constructor(private _message: MessageService) {
+    this.friends$ = this._message.friends$;
   }
 
   ngOnInit() {

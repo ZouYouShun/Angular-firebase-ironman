@@ -42,7 +42,7 @@ export class AuthService {
     this.fireUser$ = this._afAuth.authState;
     // 由於這個Service會永遠存活，我們不需對他做unsubscribe
     this._afAuth.authState
-      .do(() => this._block.block('登入中'))
+      // .do(() => this._block.block('登入中'))
       .switchMap(user => {
         console.log(user);
         return this.updateUser(user);

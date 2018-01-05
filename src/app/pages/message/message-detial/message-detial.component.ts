@@ -18,6 +18,7 @@ import { RxViewer } from '@shared/ts/rx.viewer';
 import { Observable } from 'rxjs/Observable';
 
 import { MessageFriendListComponent } from '../message-friend-list/message-friend-list.component';
+import { MessageService } from 'app/pages/message/message.service';
 
 
 @Component({
@@ -38,21 +39,24 @@ export class MessageDetialComponent extends AutoDestroy {
 
   private roomsHandler: CollectionHandler<RoomModel>;
   private messageHandler: CollectionHandler<MessageModel>;
+  friends;
 
   constructor(
     private _http: BaseHttpService,
-    private fb: FormBuilder,
+    private _fb: FormBuilder,
     private _route: ActivatedRoute,
-    private _auth: AuthService) {
+    private _auth: AuthService,
+    private _message: MessageService) {
     super();
-    this.messageForm = this.fb.group({
+    this.messageForm = this._fb.group({
       content: ''
     });
+
     this.roomsHandler = this._http.collection('rooms');
-    // console.dir(this._route.data);
-    // console.dir(this._route.data);
-    // console.dir(this._route.data);
-    console.dir(this._route.parent.component);
+
+    // this.friends = this._message.ff;
+
+    // this._message.friends$.subscribe(u => this.friends = u);
 
     if (this._route.parent.component === MessageFriendListComponent) {
       this.getMessageByUserId();

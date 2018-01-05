@@ -1,8 +1,15 @@
-import { BaseModel } from '@core/model/base.model';
+import { BaseModel } from './base.model';
+import { MessageModel } from './message.model';
 
 export class RoomModel extends BaseModel {
 }
 
-export interface UserRoomModel {
+export enum ROOM_TYPE {
+  OneToOne = 1
+}
+
+export interface UserRoomModel extends BaseModel {
   roomId: string;
+  type: ROOM_TYPE;
+  last: MessageModel;
 }

@@ -1,8 +1,8 @@
 @import '~common/css/_my-theme.variable.scss';
-@mixin add-style($type, $array) {
+@mixin add-style($alise, $type, $array) {
   @each $property,
   $value in $array {
-    .#{$type}-#{$property} {
+    .#{$alise}-#{$property} {
       #{$type}: $value
     }
   }

@@ -1,15 +1,12 @@
-# [Angular Firebase 入門與實做] Day-15 Cloud Functions Cloud Firestore Triggers
+# [Angular Firebase 入門與實做] Day-16 Cloud Functions Cloud Firestore Triggers
 
 每日一句來源：[Daily English](https://play.google.com/store/apps/details?id=net.eocbox.dailysentence)
 
-> No matter what label is thrown you way, only you can define yourself.
+> There is nothing noble in being superior to some other man. the True nobility is in being superior to your previous self. -- 優於別人，並不高貴，真正的高貴應該是優於過去的自己 (海明威)
 
-今日成果： https://us-central1-my-firebase-first-app.cloudfunctions.net/helloWorld
+今日成果： https://onfirechat.ga/message
 
 昨天了解了HTTP Triggers了，我們今天接著講Cloud Firestore Triggers。
-
-對於入門來說，筆者很推薦大家看這個系列的影片，雖然是英文的但是說得很清楚，英文也很好聽(老師也很美XD
-https://www.youtube.com/watch?v=EvV9Vk9iOCQ&list=PLl-K7zZEsYLkPZHe41m4jfAxUi0JjLgSM
 
 # Cloud Firestore Triggers
 
@@ -19,7 +16,7 @@ https://www.youtube.com/watch?v=EvV9Vk9iOCQ&list=PLl-K7zZEsYLkPZHe41m4jfAxUi0JjL
 1. 等待資料有變動
 2. 資料變動，觸發Functions執行任務
 3. 任務執行時會得到兩個變數，分別是修改前的資料(original data)和修改後的資料(new data)，我們可以針對他們做想做的事情。
-4. 任務完成，回到1。
+4. 任務完成，回到1繼續等待資料有變動。
 
 ## 事件類型
 要觸發事件有四種類型
@@ -76,6 +73,10 @@ users({data:'new'})
 有了shell我們可以基本的的對functions做本機的測試，另外這裡的除了上面方法外，也可以宣告物件以便我們使用，如下圖
 ![](https://res.cloudinary.com/dw7ecdxlp/image/upload/shell2_oswdrs.jpg)
 
+
+但是筆者還是覺得相當不方便，他並無法連動到雲端的資料庫，所以當我們真正要使用上還是得deploy到firebase上看console來知道是否正常，目前看來是還沒有更好的方式，希望以後firebase能更新。
+
+
 接著我們針對方法內可以調用的方法做介紹
 
 # onCreate、onUpdate、onDelete、onWrite 基本使用
@@ -107,46 +108,55 @@ export interface DeltaDocumentSnapshot {
 大致有以上屬性，使用上有一點很重要！就是在使用previous要確定數值確實存在(建立的時候不存在，取得會是null，若.data()會暴掉)
 
 下面我們實作一個trigger來試試看，
+
+## 實作最新訊息功能
+![](https://res.cloudinary.com/dw7ecdxlp/image/upload/v1515156271/trigger1_jyx9m7.jpg)
+
+以下實做邏輯：
+  當寫入一筆最新訊息時更新使用者的room的最後訊息，讓我們在查看room時能最快速知道*最後一句留言是什麼*
 ```js
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
-import { storeTimeObject } from '../libs/timestamp';
+import { storeTimeObject } from '../../libs/timestamp';
 
-export const writeRoomsMessagesFunction = functions.firestore
-  .document('rooms/{roomId}/messages/{messageId}').onCreate((event) => {
+// 當訊息有資料寫入時觸發
+export const roomsMessagefirestore = functions.firestore
+  .document('/rooms/{roomId}/messages/{messageId}').onCreate((event) => {
+    const firestore = admin.firestore();
 
     const roomId = event.params.roomId;
-    const messageData = event.data.data();
+    const messageId = event.params.messageId;
 
-    const roomsUsers = admin.firestore().doc(`rooms/${roomId}`).collection('users');
-    const usersRef = admin.firestore().collection('users');
+    const message = event.data.data();
 
+      // 更新這個人對應到另一個人的最後一句資料
     return Promise.all([
-      roomsUsers
-        .doc(messageData.sender)
-        .set(storeTimeObject({})),
-      roomsUsers
-        .doc(messageData.addressee)
-        .set(storeTimeObject({})),
-      usersRef
-        .doc(messageData.sender)
+      firestore.doc(`users/${message.sender}`)
         .collection('rooms')
-        .doc(messageData.addressee)
-        .set(storeTimeObject({ roomId: roomId })),
-      usersRef
-        .doc(messageData.addressee)
+        .doc(message.addressee)
+        .update(storeTimeObject({ last: message }, false)),
+      // 兩個人的都要更新
+      firestore.doc(`users/${message.addressee}`)
         .collection('rooms')
-        .doc(messageData.sender)
-        .set(storeTimeObject({ roomId: roomId }))
-    ]).then((result) => {
-      console.log(result);
-      return result;
-    });
+        .doc(message.sender)
+        .update(storeTimeObject({ last: message }, false)),
+    ])
   });
+
 ```
 
-上面的方法是當我們新增訊息時會觸發這個trigger，
+接著當我們新增room底下的訊息時就會觸發這個trigger然後前端透過realtime的特性，就能得到資料了，
+展示如下
+![](https://res.cloudinary.com/dw7ecdxlp/image/upload/v1515156002/storeTrigger_rtvz5w.gif)
 
 
+# 本日小節
+今天我們介紹了firestore 的 trigger，可以說是相當方便，讓我們可以大幅的減少我們在client的邏輯，並且透過他我們就算是直接在firebase的管理中心修改內容也是可以觸發的，大大提升了我們系統的穩定，舉例來說，當我們想刪除room時，我們只需透過刪除主要的room其餘的動作都透trigger來執行，就能做到把資料刪除乾淨的行為，client可以保持邏輯清晰，可說是很不錯，但是就是在開發上還是很多不便利，本機雖然可以透過shell的方式做到基本的測試，但是依舊無法像在雲端一樣的直接操作資料庫，希望未來我們可能可以透過firebase提供的工具來連線到雲端做本地端的操作，不然每次都要deploy實在是相當不方便。
 
+
+對於入門來說，筆者很推薦大家看這個系列的影片，雖然是英文的但是說得很清楚，英文也很好聽(老師也很美XD
+https://www.youtube.com/watch?v=EvV9Vk9iOCQ&list=PLl-K7zZEsYLkPZHe41m4jfAxUi0JjLgSM
+
+# 參考文章
+https://firebase.google.com/docs/functions/firestore-events?authuser=0
 https://firebase.google.com/docs/reference/admin/node/admin.firestore.FieldValue?authuser=0

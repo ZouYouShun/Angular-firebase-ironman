@@ -1,39 +1,57 @@
 <section class="message-container" fxLayout="column nowrap">
+
   <header>
     <mat-toolbar fxLayoutAlign="start center" color="accent" class="mat-elevation-z2">
-      <img class="avatar-img mar-r-1" [src]="addressee?.photoURL | safe: 'url'">
-      <h2 class="c-white">
-        {{addressee?.displayName}}
-      </h2>
+      <ng-container *ngIf="_message.friendsObj[addresseeId] as addressee">
+        <img class="avatar-img mar-r-1" [src]="addressee?.photoURL | safe: 'url'">
+        <h2 class="c-white">
+          {{addressee?.displayName}}
+        </h2>
+      </ng-container>
     </mat-toolbar>
   </header>
-  <article fxFlex="1 1 auto" #article>
-    <ul>
-      <ng-container *ngFor="let message of messages" >
-        <li class="mar-t-b-1 sender"
-          *ngIf="message.sender === sender.uid; else addresseeView">
-          <span fxFlexAlign="end" class="mar-r-1 mat-subheading-1 margin-0">{{message.createdAt | date:'hh:mm'}}</span>
-          <span class="content pad-all-1" [innerHTML]="message.content"></span>
 
-          <i class="isSend material-icons"
-            [ngClass]="{complete: message.createdAt}">done</i>
-          <!-- <img class="mar-l-1 avatar-img"
-            [src]="sender.photoURL || 'assets/img/avatar.jpg'"
-            [matTooltip]="sender.displayName" matTooltipPosition="left"
-            alt="sender photo"> -->
-        </li>
-        <ng-template #addresseeView>
-          <li class="mar-all-1 addressee">
-            <img class="avatar-img mar-r-1 "
-              [src]="addressee.photoURL | safe: 'url'"
-              alt="addressee photo">
+  <div *ngIf="messageLoading; else articles"
+    fxLayoutAlign="center center"
+    fxFlex="1 1 auto">
+    <mat-progress-spinner mode="indeterminate" color="accent" [diameter]="30"></mat-progress-spinner>
+  </div>
+  <ng-template #articles>
+    <article fxFlex="1 1 auto" #article fxFlexFill
+      *ngIf="messages && messages.length !== 0; else noMessage;">
+      <ul>
+        <ng-container *ngFor="let message of messages">
+          <li class="mar-t-b-1 sender"
+            *ngIf="message.sender === sender.uid; else addresseeView">
+            <span fxFlexAlign="end" class="mar-r-1 mat-subheading-1 margin-0">{{message.createdAt | date:'hh:mm'}}</span>
             <span class="content pad-all-1" [innerHTML]="message.content"></span>
-            <span fxFlexAlign="end" class="mar-l-1 mat-subheading-1 margin-0">{{message.createdAt | date:'hh:mm'}}</span>
+
+            <i class="isSend material-icons"
+              [ngClass]="{complete: message.createdAt}">done</i>
+            <!-- <img class="mar-l-1 avatar-img"
+              [src]="sender.photoURL || 'assets/img/avatar.jpg'"
+              [matTooltip]="sender.displayName" matTooltipPosition="left"
+              alt="sender photo"> -->
           </li>
-        </ng-template>
-      </ng-container>
-    </ul>
-  </article>
+          <ng-template #addresseeView>
+            <li class="mar-all-1 addressee" *ngIf="_message.friendsObj[message.sender] as addressee">
+              <img class="avatar-img mar-r-1 "
+                [src]="addressee?.photoURL | safe: 'url'"
+                alt="addressee photo">
+              <span class="content pad-all-1" [innerHTML]="message.content"></span>
+              <span fxFlexAlign="end" class="mar-l-1 mat-subheading-1 margin-0">{{message.createdAt | date:'hh:mm'}}</span>
+            </li>
+          </ng-template>
+        </ng-container>
+      </ul>
+    </article>
+    <ng-template #noMessage>
+      <div fxFlex="1 1 auto" fxLayoutAlign="center center">
+        <h2>開始對話吧！</h2>
+      </div>
+    </ng-template>
+  </ng-template>
+
   <footer class="mat-elevation-z2 bg-white">
     <form [formGroup]="messageForm" (ngSubmit)="submitMessage()"
       class="pad-l-1"

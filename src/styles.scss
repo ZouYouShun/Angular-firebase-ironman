@@ -1,12 +1,11 @@
 /* You can add global styles to this file, and also import other style files */
+
 @import 'assets/font/icomoon/style.css';
 @import url('https://fonts.googleapis.com/icon?family=Material+Icons');
-
 @import '~common/css/normalize.css';
 @import '~common/css/_my-theme.variable.scss';
 @import '~common/css/material/_my-material.theme.scss';
 @include my-material();
-
 @import '~common/css/component/index.scss';
 @import '~common/css/general/index.scss';
 // set global typgography, and box-sizing
@@ -61,6 +60,7 @@ a {
   border-radius: app-border-radius(cycle);
   overflow: hidden;
 }
+
 .margin-0 {
   margin-top: 0;
   margin-bottom: 0;
@@ -86,7 +86,6 @@ a {
   background: #dd4b39
 }
 
-
 .avatar-img {
   display: inline-block;
   height: 40px;
@@ -94,4 +93,8 @@ a {
   border-radius: 50%;
   flex-shrink: 0;
   background-size: cover;
+}
+
+.nomal-active {
+  background: rgba(0, 0, 0, 0.04);
 }

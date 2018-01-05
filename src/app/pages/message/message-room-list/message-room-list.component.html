@@ -1,12 +1,21 @@
 <mat-drawer-container fxFlexFill>
-  <mat-drawer mode="side" opened="true" style="width:200px" class="mat-elevation-z2">
+  <mat-drawer mode="side" opened="true" style="width:300px" class="mat-elevation-z2">
     <mat-nav-list>
-      <a mat-list-item *ngFor="let user of users$ | async"
-        [routerLink]="[user.uid]"
-        routerLinkActive="active">
-        <img matListAvatar [src]="user.photoURL | safe: 'url'" />
-        <p matLine>{{ user.displayName }}</p>
-      </a>
+      <ng-container *ngFor="let room of _message.rooms$ | async">
+        <a mat-list-item *ngIf="room.type === 1 && _message.friendsObj[room.id] as user"
+          [routerLink]="[room.roomId, room.id]"
+          routerLinkActive="nomal-active">
+          <img matListAvatar [src]="user.photoURL | safe: 'url'" />
+          <h2 mat-line>{{user.displayName}}</h2>
+          <p mat-line class="c-grey">
+            <span *ngIf="_auth.user.id===room.last.sender; else sender">you</span>
+            <ng-template #sender>
+              <span>{{_message.friendsObj[room.last.sender].displayName}}</span>
+            </ng-template>
+            : {{room.last.content}}
+          </p>
+        </a>
+      </ng-container>
     </mat-nav-list>
   </mat-drawer>
   <mat-drawer-content>

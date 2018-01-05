@@ -24,6 +24,7 @@ export class AuthService {
 
   fireUser$: Observable<firebase.User>;
 
+  user: UserModel;
   currentUser$ = new BehaviorSubject<UserModel>(null);
   userHandler: CollectionHandler<UserModel>;
 
@@ -42,15 +43,17 @@ export class AuthService {
     this.fireUser$ = this._afAuth.authState;
     // 由於這個Service會永遠存活，我們不需對他做unsubscribe
     this._afAuth.authState
-      .do(() => this._block.block('登入中'))
+      // .do(() => this._block.block('登入中'))
       .switchMap(user => {
-        console.log(user);
         return this.updateUser(user);
       })
       .switchMap(key => this.userHandler.document<UserModel>(key).get())
       .subscribe(user => {
+        // user.ref.collection('rooms').get().then((x) => console.dir(x));
+        // console.log(user);
         this._block.unblock();
         this.returnUrl(user);
+        this.user = user;
         this.currentUser$.next(user);
       });
   }

@@ -1,22 +1,18 @@
-import { Component, OnInit } from '@angular/core';
-import { UserModel } from '@core/model/user.model';
-import { BaseHttpService, CollectionHandler } from '@core/service/base-http.service';
+import { Component } from '@angular/core';
+import { AuthService } from '@core/service/auth.service';
+import { MessageService } from 'app/pages/message/message.service';
 
 @Component({
   selector: 'app-message-room-list',
   templateUrl: './message-room-list.component.html',
   styleUrls: ['./message-room-list.component.scss']
 })
-export class MessageRoomListComponent implements OnInit {
+export class MessageRoomListComponent  {
 
-  usersHandler: CollectionHandler<{}>;
-  users$;
-  constructor(private _http: BaseHttpService) {
-    this.usersHandler = this._http.collection<UserModel>('users');
-
-    this.users$ = this.usersHandler.get(); }
-
-  ngOnInit() {
+  constructor(
+    public _auth: AuthService,
+    public _message: MessageService) {
   }
+
 
 }

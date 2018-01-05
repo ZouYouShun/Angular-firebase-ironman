@@ -26,14 +26,28 @@ const routes: Routes = [
             component: MessageHomeComponent
           },
           {
-            path: ':id',
+            path: ':roomId/:addresseeId',
             component: MessageDetialComponent
           }
         ]
       },
       {
-        path: 'u',
-        component: MessageFriendListComponent
+        path: 'friend',
+        component: MessageFriendListComponent,
+        children: [
+          {
+            path: '',
+            component: MessageHomeComponent
+          },
+          {
+            path: ':addresseeId',
+            component: MessageDetialComponent
+          }
+        ]
+      },
+      {
+        path: '**',
+        redirectTo: 'r'
       },
     ]
   }

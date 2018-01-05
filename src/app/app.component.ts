@@ -10,10 +10,8 @@ import { RxViewer } from '@shared/ts/rx.viewer';
 })
 export class AppComponent {
 
-  constructor(private _auth: AuthService, private _http: HttpClient) {
+  constructor(private _auth: AuthService) {
     console.log('App working!');
-    this._http.get('helloWorld')
-      .subscribe(RxViewer);
   }
 
 }

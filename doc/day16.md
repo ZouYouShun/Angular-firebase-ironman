@@ -149,6 +149,11 @@ export const roomsMessagefirestore = functions.firestore
 展示如下
 ![](https://res.cloudinary.com/dw7ecdxlp/image/upload/v1515156002/storeTrigger_rtvz5w.gif)
 
+# 本日原始碼
+|名稱|網址|
+|---|---|
+|Angular|https://github.com/ZouYouShun/Angular-firebase-ironman/tree/day16_functions_firestore|
+|functions| https://github.com/ZouYouShun/Angular-firebase-ironman-functions/tree/day16_functions_firestore|
 
 # 本日小節
 今天我們介紹了firestore 的 trigger，可以說是相當方便，讓我們可以大幅的減少我們在client的邏輯，並且透過他我們就算是直接在firebase的管理中心修改內容也是可以觸發的，大大提升了我們系統的穩定，舉例來說，當我們想刪除room時，我們只需透過刪除主要的room其餘的動作都透trigger來執行，就能做到把資料刪除乾淨的行為，client可以保持邏輯清晰，可說是很不錯，但是就是在開發上還是很多不便利，本機雖然可以透過shell的方式做到基本的測試，但是依舊無法像在雲端一樣的直接操作資料庫，希望未來我們可能可以透過firebase提供的工具來連線到雲端做本地端的操作，不然每次都要deploy實在是相當不方便。

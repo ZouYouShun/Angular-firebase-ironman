@@ -8,16 +8,16 @@ import { MenuModel } from '@core/model/menu.model';
 })
 export class MessageComponent {
   menus: MenuModel[] = [
-    {
-      icon: 'message',
-      url: 'r',
-      title: 'message'
-    },
     // {
-    //   icon: 'person',
-    //   url: [{ outlets: { right: ['add-friend'] } }],
-    //   title: 'friend'
+    //   icon: 'message',
+    //   url: 'r',
+    //   title: 'message'
     // },
+    {
+      icon: 'person',
+      url: 'friend',
+      title: 'friend'
+    },
     // {
     //   icon: 'people',
     //   url: 'group',

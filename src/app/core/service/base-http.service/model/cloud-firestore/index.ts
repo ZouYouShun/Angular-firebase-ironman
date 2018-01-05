@@ -41,10 +41,11 @@ export class CollectionHandler<T> {
         return actions.map(a => {
           if (a.payload.doc.exists) {
             const metadata = a.payload.doc.metadata;
+            const ref = a.payload.doc.ref;
             const data = a.payload.doc.data();
             const doc = a.payload.doc;
             const id = a.payload.doc.id;
-            return { id, doc, metadata, ...data };
+            return { id, doc, ref, metadata, ...data };
           }
           return null;
         }) as any;
@@ -123,10 +124,11 @@ export class DocumentHandler<T> {
       this._fireAction.snapshotChanges()
         .map(a => {
           if (a.payload.exists) {
+            const ref = a.payload.ref;
             const metadata = a.payload.metadata;
             const data = a.payload.data();
             const id = a.payload.id;
-            return ({ id, metadata, ...data }) as any;
+            return ({ id, metadata, ref, ...data }) as any;
           }
           return null;
         })

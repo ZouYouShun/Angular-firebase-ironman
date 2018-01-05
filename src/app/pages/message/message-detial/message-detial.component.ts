@@ -13,9 +13,11 @@ import { AuthService } from '@core/service/auth.service';
 import { BaseHttpService, CollectionHandler } from '@core/service/base-http.service';
 import { runAfterTimeout } from '@shared/decorator/timeout.decorator';
 import { AutoDestroy } from '@shared/ts/auto.destroy';
+import { replaceToBr } from '@shared/ts/data/replaceToBr';
 import { RxViewer } from '@shared/ts/rx.viewer';
 import { Observable } from 'rxjs/Observable';
-import { replaceToBr } from '@shared/ts/data/replaceToBr';
+
+import { MessageFriendListComponent } from '../message-friend-list/message-friend-list.component';
 
 
 @Component({
@@ -47,15 +49,25 @@ export class MessageDetialComponent extends AutoDestroy {
       content: ''
     });
     this.roomsHandler = this._http.collection('rooms');
+    // console.dir(this._route.data);
+    // console.dir(this._route.data);
+    // console.dir(this._route.data);
+    console.dir(this._route.parent.component);
 
+    if (this._route.parent.component === MessageFriendListComponent) {
+      this.getMessageByUserId();
+    } else {
+      this.getMessageByRoomId();
+    }
+  }
+
+  private getMessageByUserId() {
     this._route.params
       .combineLatest(this._auth.currentUser$.filter(u => !!u))
-      .switchMap(([addressee, sender]) => {
+      .switchMap(([params, sender]) => {
         this.init();
-
         this.sender = sender;
-
-        return this._http.document<UserModel>(`users/${addressee.id}`).get();
+        return this._http.document<UserModel>(`users/${params.id}`).get();
       })
       .switchMap(addressee => {
         this.addressee = addressee;
@@ -71,18 +83,27 @@ export class MessageDetialComponent extends AutoDestroy {
         if (usersRoom) {
           return this.roomsHandler.document<MessageModel>(usersRoom.roomId).get();
         }
-
         return Observable.of(null);
       })
-      .switchMap(room => {
-        if (room) {
-          this.messageHandler = this.roomsHandler.document(room.id).collection('messages');
-          return this.messageHandler.get({
-            isKey: false,
-            queryFn: ref => ref.orderBy('createdAt')
-          });
-        }
-        return Observable.of(null);
+      .switchMap(room => this.getRoomsMessages(room))
+      .takeUntil(this._destroy$)
+      .subscribe(messages => {
+        this.messageLoading = false;
+        this.messages = messages;
+        this.scrollButtom();
+      });
+  }
+
+  private getMessageByRoomId() {
+    // 取得房間資料
+    // 取得所有人的資料
+    this._route.params
+      .combineLatest(this._auth.currentUser$.filter(u => !!u))
+      .switchMap(([params, sender]) => {
+        this.messageLoading = true;
+        this.init();
+        this.sender = sender;
+        return this.getRoomsMessages(params);
       })
       .takeUntil(this._destroy$)
       .subscribe(messages => {
@@ -90,6 +111,17 @@ export class MessageDetialComponent extends AutoDestroy {
         this.messages = messages;
         this.scrollButtom();
       });
+  }
+
+  private getRoomsMessages(room) {
+    if (room) {
+      this.messageHandler = this.roomsHandler.document(room.id).collection('messages');
+      return this.messageHandler.get({
+        isKey: false,
+        queryFn: ref => ref.orderBy('createdAt')
+      });
+    }
+    return Observable.of(null);
   }
 
   @runAfterTimeout()
@@ -114,20 +146,17 @@ export class MessageDetialComponent extends AutoDestroy {
     let req: Observable<any>;
     content = replaceToBr(content);
 
-    // 先寫房間ID
+    const message: MessageModel = {
+      sender: this.sender.uid,
+      addressee: this.addressee.uid,
+      content: content
+    };
+
     if (this.messageHandler) {
-      req = this.messageHandler.add({
-        sender: this.sender.uid,
-        addressee: this.addressee.uid,
-        content: content
-      });
+      req = this.messageHandler.add(message);
     } else {
       req = this._http.request('/api/message/roomWithMessage').post({
-        message: {
-          sender: this.sender.uid,
-          addressee: this.addressee.uid,
-          content: content
-        }
+        message: message
       });
     }
 

@@ -32,8 +32,18 @@ const routes: Routes = [
         ]
       },
       {
-        path: 'u',
-        component: MessageFriendListComponent
+        path: 'friend',
+        component: MessageFriendListComponent,
+        children: [
+          {
+            path: '',
+            component: MessageHomeComponent
+          },
+          {
+            path: ':id',
+            component: MessageDetialComponent
+          }
+        ]
       },
     ]
   }

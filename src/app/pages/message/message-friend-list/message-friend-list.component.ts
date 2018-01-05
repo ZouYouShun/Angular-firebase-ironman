@@ -12,9 +12,10 @@ export class MessageFriendListComponent implements OnInit {
   usersHandler: CollectionHandler<{}>;
   users$;
   constructor(private _http: BaseHttpService) {
-    this.usersHandler = this._http.collection<UserModel>('users');
+    this.usersHandler = this._http.collection<UserModel[]>('users');
 
-    this.users$ = this.usersHandler.get(); }
+    this.users$ = this.usersHandler.get();
+  }
 
   ngOnInit() {
   }

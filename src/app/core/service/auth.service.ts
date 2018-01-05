@@ -49,6 +49,8 @@ export class AuthService {
       })
       .switchMap(key => this.userHandler.document<UserModel>(key).get())
       .subscribe(user => {
+        // user.ref.collection('rooms').get().then((x) => console.dir(x));
+        console.log(user);
         this._block.unblock();
         this.returnUrl(user);
         this.currentUser$.next(user);

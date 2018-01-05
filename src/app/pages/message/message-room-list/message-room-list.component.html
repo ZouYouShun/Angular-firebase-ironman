@@ -1,11 +1,12 @@
 <mat-drawer-container fxFlexFill>
   <mat-drawer mode="side" opened="true" style="width:200px" class="mat-elevation-z2">
     <mat-nav-list>
-      <a mat-list-item *ngFor="let user of users$ | async"
-        [routerLink]="[user.uid]"
+      <a mat-list-item *ngFor="let room of rooms$ | async"
+        [routerLink]="[room.id]"
         routerLinkActive="active">
-        <img matListAvatar [src]="user.photoURL | safe: 'url'" />
-        <p matLine>{{ user.displayName }}</p>
+        {{room.last.displayName}} --
+        <!-- <img matListAvatar [src]="user.photoURL | safe: 'url'" /> -->
+        <!-- <p matLine>{{ user.displayName }}</p> -->
       </a>
     </mat-nav-list>
   </mat-drawer>

@@ -107,41 +107,26 @@ export interface DeltaDocumentSnapshot {
 大致有以上屬性，使用上有一點很重要！就是在使用previous要確定數值確實存在(建立的時候不存在，取得會是null，若.data()會暴掉)
 
 下面我們實作一個trigger來試試看，
+
+
+以下時做邏輯：
+  當有新訊息時寫入一筆最新訊息在該room，讓我們在查看room時能最快速知道*最後一句留言是什麼*
 ```js
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
-import { storeTimeObject } from '../libs/timestamp';
 
-export const writeRoomsMessagesFunction = functions.firestore
-  .document('rooms/{roomId}/messages/{messageId}').onCreate((event) => {
+export const roomsMessagefirestore = functions.firestore
+  .document('/rooms/{roomId}/messages/{messageId}').onWrite((event) => {
+    const firestore = admin.firestore();
 
     const roomId = event.params.roomId;
-    const messageData = event.data.data();
+    const messageId = event.params.messageId;
 
-    const roomsUsers = admin.firestore().doc(`rooms/${roomId}`).collection('users');
-    const usersRef = admin.firestore().collection('users');
+    const message = event.data.data();
 
-    return Promise.all([
-      roomsUsers
-        .doc(messageData.sender)
-        .set(storeTimeObject({})),
-      roomsUsers
-        .doc(messageData.addressee)
-        .set(storeTimeObject({})),
-      usersRef
-        .doc(messageData.sender)
-        .collection('rooms')
-        .doc(messageData.addressee)
-        .set(storeTimeObject({ roomId: roomId })),
-      usersRef
-        .doc(messageData.addressee)
-        .collection('rooms')
-        .doc(messageData.sender)
-        .set(storeTimeObject({ roomId: roomId }))
-    ]).then((result) => {
-      console.log(result);
-      return result;
-    });
+    const messageRef: FirebaseFirestore.DocumentReference = event.data.ref;
+
+    return messageRef.parent.parent.update({ last: message });
   });
 ```
 

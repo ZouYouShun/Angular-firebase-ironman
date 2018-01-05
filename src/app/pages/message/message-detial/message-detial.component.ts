@@ -30,12 +30,14 @@ export class MessageDetialComponent extends AutoDestroy {
 
   @ViewChild('article', { read: ElementRef }) article: ElementRef;
 
-  messageLoading = false;
+  messageLoading = true;
 
   messages: MessageModel[];
   messageForm: FormGroup;
+
   sender: UserModel;
-  addressee: UserModel;
+
+  addresseeId: string;
 
   private roomsHandler: CollectionHandler<RoomModel>;
   private messageHandler: CollectionHandler<MessageModel>;
@@ -46,17 +48,13 @@ export class MessageDetialComponent extends AutoDestroy {
     private _fb: FormBuilder,
     private _route: ActivatedRoute,
     private _auth: AuthService,
-    private _message: MessageService) {
+    public _message: MessageService) {
     super();
     this.messageForm = this._fb.group({
       content: ''
     });
 
     this.roomsHandler = this._http.collection('rooms');
-
-    // this.friends = this._message.ff;
-
-    // this._message.friends$.subscribe(u => this.friends = u);
 
     if (this._route.parent.component === MessageFriendListComponent) {
       this.getMessageByUserId();
@@ -69,26 +67,14 @@ export class MessageDetialComponent extends AutoDestroy {
     this._route.params
       .combineLatest(this._auth.currentUser$.filter(u => !!u))
       .switchMap(([params, sender]) => {
-        this.init();
-        this.sender = sender;
-        return this._http.document<UserModel>(`users/${params.id}`).get();
-      })
-      .switchMap(addressee => {
-        this.addressee = addressee;
-        this.messageLoading = true;
-        // 取得送出者對應收件者的聊天室資料
+
+        this.init(sender, params.id);
+
         return this._http.document(`users/${this.sender.uid}`)
           .collection('rooms')
-          .document<UserRoomModel>(this.addressee.uid).get();
+          .document<UserRoomModel>(this.addresseeId).get();
       })
-      .switchMap(usersRoom => {
-        console.log('get room!');
-        // 取得房間內容
-        if (usersRoom) {
-          return this.roomsHandler.document<MessageModel>(usersRoom.roomId).get();
-        }
-        return Observable.of(null);
-      })
+      .switchMap(usersRoom => this.getUsersRoom(usersRoom))
       .switchMap(room => this.getRoomsMessages(room))
       .takeUntil(this._destroy$)
       .subscribe(messages => {
@@ -105,8 +91,9 @@ export class MessageDetialComponent extends AutoDestroy {
       .combineLatest(this._auth.currentUser$.filter(u => !!u))
       .switchMap(([params, sender]) => {
         this.messageLoading = true;
-        this.init();
-        this.sender = sender;
+
+        this.init(sender);
+
         return this.getRoomsMessages(params);
       })
       .takeUntil(this._destroy$)
@@ -115,6 +102,13 @@ export class MessageDetialComponent extends AutoDestroy {
         this.messages = messages;
         this.scrollButtom();
       });
+  }
+
+  private getUsersRoom(usersRoom) {
+    if (usersRoom) {
+      return this.roomsHandler.document<MessageModel>(usersRoom.roomId).get();
+    }
+    return Observable.of(null);
   }
 
   private getRoomsMessages(room) {
@@ -133,11 +127,12 @@ export class MessageDetialComponent extends AutoDestroy {
     this.article.nativeElement.scroll({ top: this.article.nativeElement.scrollHeight, left: 0 });
   }
 
-  private init() {
+  private init(sender, addresseeId = null) {
     this.messages = [];
+    this.messageLoading = true;
     this.messageHandler = null;
-    this.sender = null;
-    this.addressee = null;
+    this.sender = sender;
+    this.addresseeId = addresseeId;
   }
 
   submitMessage(event?) {
@@ -152,7 +147,7 @@ export class MessageDetialComponent extends AutoDestroy {
 
     const message: MessageModel = {
       sender: this.sender.uid,
-      addressee: this.addressee.uid,
+      addressee: this.addresseeId,
       content: content
     };
 

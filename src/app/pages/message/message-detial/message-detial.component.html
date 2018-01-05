@@ -1,20 +1,24 @@
 <section class="message-container" fxLayout="column nowrap">
+
   <header>
     <mat-toolbar fxLayoutAlign="start center" color="accent" class="mat-elevation-z2">
-      <img class="avatar-img mar-r-1" [src]="addressee?.photoURL | safe: 'url'">
-      <h2 class="c-white">
-        {{addressee?.displayName}}
-      </h2>
+      <ng-container *ngIf="_message.friendsObj[addresseeId] as addressee">
+        <img class="avatar-img mar-r-1" [src]="addressee?.photoURL | safe: 'url'">
+        <h2 class="c-white">
+          {{addressee?.displayName}}
+        </h2>
+      </ng-container>
     </mat-toolbar>
   </header>
-  <article fxFlex="1 1 auto" #article fxFlexFill>
-    <div *ngIf="messageLoading; else articles"
-      fxLayoutAlign="center center"
-      fxFlexFill>
-      <mat-progress-spinner mode="indeterminate" color="accent" [diameter]="30"></mat-progress-spinner>
-    </div>
-    <ng-template #articles>
-      <ul *ngIf="!messageLoading">
+
+  <div *ngIf="messageLoading; else articles"
+    fxLayoutAlign="center center"
+    fxFlex="1 1 auto">
+    <mat-progress-spinner mode="indeterminate" color="accent" [diameter]="30"></mat-progress-spinner>
+  </div>
+  <ng-template #articles>
+    <article fxFlex="1 1 auto" #article fxFlexFill>
+      <ul>
         <ng-container *ngFor="let message of messages">
           <li class="mar-t-b-1 sender"
             *ngIf="message.sender === sender.uid; else addresseeView">
@@ -29,7 +33,7 @@
               alt="sender photo"> -->
           </li>
           <ng-template #addresseeView>
-            <li class="mar-all-1 addressee">
+            <li class="mar-all-1 addressee" *ngIf="_message.friendsObj[message.sender] as addressee">
               <img class="avatar-img mar-r-1 "
                 [src]="addressee?.photoURL | safe: 'url'"
                 alt="addressee photo">
@@ -39,9 +43,9 @@
           </ng-template>
         </ng-container>
       </ul>
-    </ng-template>
+    </article>
+  </ng-template>
 
-  </article>
   <footer class="mat-elevation-z2 bg-white">
     <form [formGroup]="messageForm" (ngSubmit)="submitMessage()"
       class="pad-l-1"

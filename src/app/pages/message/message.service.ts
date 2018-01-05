@@ -16,7 +16,7 @@ export class MessageService {
 
   // 存使用者
   friends$ = new BehaviorSubject<UserModel[]>(null);
-  friendsObj;
+  friendsObj = {}; // Firend To Obj way
   constructor(private _http: BaseHttpService) {
     this.usersHandler = this._http.collection<UserModel[]>('users');
   }

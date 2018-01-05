@@ -15,10 +15,11 @@ import { runAfterTimeout } from '@shared/decorator/timeout.decorator';
 import { AutoDestroy } from '@shared/ts/auto.destroy';
 import { replaceToBr } from '@shared/ts/data/replaceToBr';
 import { RxViewer } from '@shared/ts/rx.viewer';
+import { MessageRoomListComponent } from 'app/pages/message/message-room-list/message-room-list.component';
+import { MessageService } from 'app/pages/message/message.service';
 import { Observable } from 'rxjs/Observable';
 
 import { MessageFriendListComponent } from '../message-friend-list/message-friend-list.component';
-import { MessageService } from 'app/pages/message/message.service';
 
 
 @Component({
@@ -58,7 +59,7 @@ export class MessageDetialComponent extends AutoDestroy {
 
     if (this._route.parent.component === MessageFriendListComponent) {
       this.getMessageByUserId();
-    } else {
+    } else if (this._route.parent.component === MessageRoomListComponent) {
       this.getMessageByRoomId();
     }
   }
@@ -67,15 +68,16 @@ export class MessageDetialComponent extends AutoDestroy {
     this._route.params
       .combineLatest(this._auth.currentUser$.filter(u => !!u))
       .switchMap(([params, sender]) => {
-
-        this.init(sender, params.id);
-
+        this.init(sender, params.addresseeId);
         return this._http.document(`users/${this.sender.uid}`)
           .collection('rooms')
           .document<UserRoomModel>(this.addresseeId).get();
       })
       .switchMap(usersRoom => this.getUsersRoom(usersRoom))
-      .switchMap(room => this.getRoomsMessages(room))
+      .switchMap(room => {
+        if (room) return this.getRoomsMessages(room.id);
+        return Observable.of(null);
+      })
       .takeUntil(this._destroy$)
       .subscribe(messages => {
         this.messageLoading = false;
@@ -90,11 +92,8 @@ export class MessageDetialComponent extends AutoDestroy {
     this._route.params
       .combineLatest(this._auth.currentUser$.filter(u => !!u))
       .switchMap(([params, sender]) => {
-        this.messageLoading = true;
-
-        this.init(sender);
-
-        return this.getRoomsMessages(params);
+        this.init(sender, params.addresseeId);
+        return this.getRoomsMessages(params.roomId);
       })
       .takeUntil(this._destroy$)
       .subscribe(messages => {
@@ -104,27 +103,25 @@ export class MessageDetialComponent extends AutoDestroy {
       });
   }
 
-  private getUsersRoom(usersRoom) {
+  private getUsersRoom(usersRoom): Observable<MessageModel> {
     if (usersRoom) {
       return this.roomsHandler.document<MessageModel>(usersRoom.roomId).get();
     }
     return Observable.of(null);
   }
 
-  private getRoomsMessages(room) {
-    if (room) {
-      this.messageHandler = this.roomsHandler.document(room.id).collection('messages');
-      return this.messageHandler.get({
-        isKey: false,
-        queryFn: ref => ref.orderBy('createdAt')
-      });
-    }
-    return Observable.of(null);
+  private getRoomsMessages(roomId): Observable<any> {
+    this.messageHandler = this.roomsHandler.document(roomId).collection('messages');
+    return this.messageHandler.get({
+      isKey: false,
+      queryFn: ref => ref.orderBy('createdAt')
+    });
   }
 
   @runAfterTimeout()
   private scrollButtom() {
-    this.article.nativeElement.scroll({ top: this.article.nativeElement.scrollHeight, left: 0 });
+    if (this.article)
+      this.article.nativeElement.scroll({ top: this.article.nativeElement.scrollHeight, left: 0 });
   }
 
   private init(sender, addresseeId = null) {

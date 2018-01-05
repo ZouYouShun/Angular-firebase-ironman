@@ -17,7 +17,8 @@
     <mat-progress-spinner mode="indeterminate" color="accent" [diameter]="30"></mat-progress-spinner>
   </div>
   <ng-template #articles>
-    <article fxFlex="1 1 auto" #article fxFlexFill>
+    <article fxFlex="1 1 auto" #article fxFlexFill
+      *ngIf="messages && messages.length !== 0; else noMessage;">
       <ul>
         <ng-container *ngFor="let message of messages">
           <li class="mar-t-b-1 sender"
@@ -44,6 +45,11 @@
         </ng-container>
       </ul>
     </article>
+    <ng-template #noMessage>
+      <div fxFlex="1 1 auto" fxLayoutAlign="center center">
+        <h2>開始對話吧！</h2>
+      </div>
+    </ng-template>
   </ng-template>
 
   <footer class="mat-elevation-z2 bg-white">

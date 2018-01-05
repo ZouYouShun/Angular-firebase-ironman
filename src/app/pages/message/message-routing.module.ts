@@ -26,7 +26,7 @@ const routes: Routes = [
             component: MessageHomeComponent
           },
           {
-            path: ':id',
+            path: ':roomId/:addresseeId',
             component: MessageDetialComponent
           }
         ]
@@ -40,7 +40,7 @@ const routes: Routes = [
             component: MessageHomeComponent
           },
           {
-            path: ':id',
+            path: ':addresseeId',
             component: MessageDetialComponent
           }
         ]

@@ -17,18 +17,21 @@ export class ProfileComponent implements OnInit {
 
   fileHandler: FileHandler<{}>;
 
+  file$;
+
   constructor(private _upload: UploadService) {
   }
 
   ngOnInit() {
+    this.file$ = this._upload.fileHandler('201711081351-rIXwT.jpg').get();
   }
 
   uploadFile(event) {
     const file: File = event.target.files[0];
-    const filePath = `${new Date().getTime()}_${file.name}`;
+    const filePath = `/aaaa/${new Date().getTime()}_${file.name}`;
     this.fileHandler = this._upload.fileHandler(filePath);
 
-    this.fileHandler.upload({ file: file }).subscribe(RxViewer);
+    this.fileHandler.upload({ file: file, data: { test: '!!!!!!!!!!!!!!!' } }).subscribe(RxViewer);
 
     this.uploadPercent$ = this.fileHandler.task.percentageChanges();
     this.fileURL$ = this.fileHandler.task.downloadURL();

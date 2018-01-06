@@ -14,6 +14,10 @@ export class FileHandler<T> {
     this.ref = _storage.ref(filePath);
   }
 
+  get() {
+    return this.ref.getDownloadURL();
+  }
+
   upload(obj: { file: File, data?: T }): Observable<firebase.storage.UploadTaskSnapshot> {
     this.task = obj.data ?
       this.ref.put(obj.file, { customMetadata: <any>obj.data }) :

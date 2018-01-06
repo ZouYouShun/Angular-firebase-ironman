@@ -52,8 +52,8 @@
     </ng-template>
   </ng-template>
 
-  <footer class="mat-elevation-z2 bg-white">
-    <form [formGroup]="messageForm" (ngSubmit)="submitMessage()"
+  <footer class="mat-elevation-z2 bg-white" #elm>
+    <form [formGroup]="messageForm" (ngSubmit)="submitMessage(elm)"
       class="pad-l-1"
       fxLayout="row nowrap"
       fxLayoutAlign="center center">

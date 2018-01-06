@@ -56,16 +56,23 @@ export class MessageDetialComponent extends AutoDestroy {
     });
 
     this.roomsHandler = this._http.collection('rooms');
-
+    let message$: Observable<any>;
     if (this._route.parent.component === MessageFriendListComponent) {
-      this.getMessageByUserId();
+      message$ = this.getMessageByUserId();
     } else if (this._route.parent.component === MessageRoomListComponent) {
-      this.getMessageByRoomId();
+      message$ = this.getMessageByRoomId();
     }
+    message$
+      .takeUntil(this._destroy$)
+      .subscribe(messages => {
+        this.messageLoading = false;
+        this.messages = messages;
+        this.scrollButtom();
+      });
   }
 
   private getMessageByUserId() {
-    this._route.params
+    return this._route.params
       .combineLatest(this._auth.currentUser$.filter(u => !!u))
       .switchMap(([params, sender]) => {
         this.init(sender, params.addresseeId);
@@ -77,29 +84,17 @@ export class MessageDetialComponent extends AutoDestroy {
       .switchMap(room => {
         if (room) return this.getRoomsMessages(room.id);
         return Observable.of(null);
-      })
-      .takeUntil(this._destroy$)
-      .subscribe(messages => {
-        this.messageLoading = false;
-        this.messages = messages;
-        this.scrollButtom();
       });
   }
 
   private getMessageByRoomId() {
     // 取得房間資料
     // 取得所有人的資料
-    this._route.params
+    return this._route.params
       .combineLatest(this._auth.currentUser$.filter(u => !!u))
       .switchMap(([params, sender]) => {
         this.init(sender, params.addresseeId);
         return this.getRoomsMessages(params.roomId);
-      })
-      .takeUntil(this._destroy$)
-      .subscribe(messages => {
-        this.messageLoading = false;
-        this.messages = messages;
-        this.scrollButtom();
       });
   }
 
@@ -119,9 +114,13 @@ export class MessageDetialComponent extends AutoDestroy {
   }
 
   @runAfterTimeout()
-  private scrollButtom() {
+  private scrollButtom(behavior: 'auto' | 'smooth' = 'auto') {
     if (this.article)
-      this.article.nativeElement.scroll({ top: this.article.nativeElement.scrollHeight, left: 0 });
+      this.article.nativeElement.scroll({
+        top: this.article.nativeElement.scrollHeight,
+        left: 0,
+        behavior: behavior
+      });
   }
 
   private init(sender, addresseeId = null) {
@@ -133,6 +132,7 @@ export class MessageDetialComponent extends AutoDestroy {
   }
 
   submitMessage(event?) {
+    console.dir(event);
     if (event) event.preventDefault();
     let content = this.messageForm.value.content;
     this.messageForm.reset();

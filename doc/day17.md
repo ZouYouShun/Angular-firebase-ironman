@@ -2,9 +2,7 @@
 
 每日一句來源：[Daily English](https://play.google.com/store/apps/details?id=net.eocbox.dailysentence)
 
-> There is nothing noble in being superior to some other man. the True nobility is in being superior to your previous self. -- 優於別人，並不高貴，真正的高貴應該是優於過去的自己 (海明威)
-
-今日成果： https://onfirechat.ga/message
+> A pessimist sees the difficulty in every opportunity; an optimist sees the opportunity in every difficulty. -- 悲觀主義者在每個機會裡看到困難；樂觀主義者在每個困難中看到機會。
 
 
 # Cloud Storage Triggers
@@ -345,16 +343,15 @@ module.exports = new MoveFile();
 # 本日原始碼
 |名稱|網址|
 |---|---|
-|Angular|https://github.com/ZouYouShun/Angular-firebase-ironman/tree/day16_functions_firestore|
-|functions| https://github.com/ZouYouShun/Angular-firebase-ironman-functions/tree/day16_functions_firestore|
+|functions| https://github.com/ZouYouShun/Angular-firebase-ironman-functions/tree/day17_functions_storage|
 
 # 本日小節
-今天我們介紹了firestore 的 trigger，可以說是相當方便，讓我們可以大幅的減少我們在client的邏輯，並且透過他我們就算是直接在firebase的管理中心修改內容也是可以觸發的，大大提升了我們系統的穩定，舉例來說，當我們想刪除room時，我們只需透過刪除主要的room其餘的動作都透trigger來執行，就能做到把資料刪除乾淨的行為，client可以保持邏輯清晰，可說是很不錯，但是就是在開發上還是很多不便利，本機雖然可以透過shell的方式做到基本的測試，但是依舊無法像在雲端一樣的直接操作資料庫，希望未來我們可能可以透過firebase提供的工具來連線到雲端做本地端的操作，不然每次都要deploy實在是相當不方便。
+今天我們介紹了store的trigger，整體算是非常的好用，我們可以透過上傳一個檔案觸發很多想做的事情，讓他自己去做，雖說好用但是因為如果我們有循環撰寫檔案的行為，要特別小心使用，不然會造成很多不必要的functions call，另外就是在未付費的狀況下，我們不能使用多個bucket，因此監聽是對整個storage的，無法針對特定的資料夾或是檔案，這會造成不必要的觸發及判斷，要享有完整個功能還是得付錢的(廢話嗎XD)，不過還是相當powerful!筆者很喜歡這類的trigger，再也不用擔心資料在檔案不再的狀況了，多餘的檔案不會存在了！
 
-
-對於入門來說，筆者很推薦大家看這個系列的影片，雖然是英文的但是說得很清楚，英文也很好聽(老師也很美XD
-https://www.youtube.com/watch?v=EvV9Vk9iOCQ&list=PLl-K7zZEsYLkPZHe41m4jfAxUi0JjLgSM
+雖然一切都很不錯，但目前在debug上面還是很不方便，必須deploy上去，看console才能比較容易做測試，官方有建議使用[gsutil](https://cloud.google.com/storage/docs/gsutil)來測試上傳，但是筆者覺得還是不太方便，也或許是自己不太熟悉的關係，有興趣的朋友可以試試看。
 
 # 參考文章
-https://firebase.google.com/docs/functions/firestore-events?authuser=0
-https://firebase.google.com/docs/reference/admin/node/admin.firestore.FieldValue?authuser=0
+https://cloud.google.com/storage/docs/gsutil
+https://firebase.google.com/docs/functions/gcp-storage-events?authuser=0
+https://www.youtube.com/watch?v=pDLpEn3PbmE&index=4&list=PLl-K7zZEsYLkPZHe41m4jfAxUi0JjLgSM
+https://www.youtube.com/watch?v=3lzEgwiSs-M&index=5&list=PLl-K7zZEsYLkPZHe41m4jfAxUi0JjLgSM

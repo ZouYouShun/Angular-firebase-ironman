@@ -9,6 +9,7 @@ import { HttpClient } from '@angular/common/http';
 import { BlockViewService } from '@core/service/block-view.service';
 import { AlertConfirmService } from '@core/component/alert-confirm';
 import { MyHttpHandler } from './model/myhttp-handler.model';
+import { FileError } from 'ngxf-uploader';
 
 @Injectable()
 export class BaseHttpService {
@@ -39,5 +40,19 @@ export class BaseHttpService {
 
   object<T>(url: string) {
     return new ObjectHandler<T>(this._db, url);
+  }
+
+  fileErrorHandler(errror: FileError) {
+    switch (errror) {
+      case FileError.NumError:
+        this._alc.alert('檔案數量錯誤');
+        break;
+      case FileError.SizeError:
+        this._alc.alert('檔案大小錯誤');
+        break;
+      case FileError.TypeError:
+        this._alc.alert('檔案格式錯誤');
+        break;
+    }
   }
 }

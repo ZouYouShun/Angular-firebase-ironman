@@ -20,6 +20,7 @@ import { MessageService } from 'app/pages/message/message.service';
 import { Observable } from 'rxjs/Observable';
 
 import { MessageFriendListComponent } from '../message-friend-list/message-friend-list.component';
+import { FileError } from 'ngxf-uploader';
 
 
 @Component({
@@ -132,11 +133,10 @@ export class MessageDetialComponent extends AutoDestroy {
   }
 
   submitMessage(event?) {
-    console.dir(event);
     if (event) event.preventDefault();
     let content = this.messageForm.value.content;
     this.messageForm.reset();
-    if (!content.trim()) {
+    if (!content || !content.trim()) {
       return;
     }
     let req: Observable<any>;
@@ -157,6 +157,14 @@ export class MessageDetialComponent extends AutoDestroy {
     }
 
     req.subscribe();
+  }
+
+  uploadFile(file: File | FileError) {
+    if (!(file instanceof File)) {
+      this._http.fileErrorHandler(file);
+      return;
+    }
+    console.log(file);
   }
 
   delete(message: any) {

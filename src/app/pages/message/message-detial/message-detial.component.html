@@ -1,4 +1,11 @@
-<section class="message-container" fxLayout="column nowrap">
+<section class="message-container" fxLayout="column nowrap"
+  (ngxf-drop)="uploadFile($event)"
+  drop-class="drop"
+  accept="image/*,.svg">
+  <div class="block">
+    <!-- <h2>上傳檔案</h2> -->
+    <mat-icon class="mat-size-5 c-white">cloud_upload</mat-icon>
+  </div>
 
   <header>
     <mat-toolbar fxLayoutAlign="start center" color="accent" class="mat-elevation-z2">
@@ -52,8 +59,8 @@
     </ng-template>
   </ng-template>
 
-  <footer class="mat-elevation-z2 bg-white" #elm>
-    <form [formGroup]="messageForm" (ngSubmit)="submitMessage(elm)"
+  <footer class="mat-elevation-z2 bg-white">
+    <form [formGroup]="messageForm" (ngSubmit)="submitMessage()"
       class="pad-l-1"
       fxLayout="row nowrap"
       fxLayoutAlign="center center">
@@ -68,12 +75,22 @@
           ></textarea>
       </mat-form-field>
       <div class="t-al-c pad-l-r-1">
-        <button mat-raised-button color="accent">送出</button>
+        <!-- <button mat-raised-button color="accent">送出</button> -->
+        <button mat-icon-button type="button" (click)="fileSelect.click()">
+          <mat-icon color="accent">add_to_photos</mat-icon>
+        </button>
+        <button mat-icon-button>
+          <mat-icon color="accent">send</mat-icon>
+        </button>
       </div>
     </form>
   </footer>
 </section>
 
+<input type="file" #fileSelect
+  (ngxf-select)="uploadFile($event)"
+  [ngxf-validate]="{ size: { min: 50, max:1000000 } }"
+  accept="image/*,.svg">
 
 <!-- matTextareaAutosize
           matAutosizeMaxRows="5" -->

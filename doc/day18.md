@@ -1,167 +1,230 @@
-# [Angular Firebase 入門與實做] Day-17 Cloud Functions Authentication Triggers
+# [Angular Firebase 入門與實做] Day-18 Cloud Functions Cloud Storage Triggers 02 檔案上傳、拖曳檔案
 
 每日一句來源：[Daily English](https://play.google.com/store/apps/details?id=net.eocbox.dailysentence)
 
-> There is nothing noble in being superior to some other man. the True nobility is in being superior to your previous self. -- 優於別人，並不高貴，真正的高貴應該是優於過去的自己 (海明威)
+> The first and greatest victory is to conquer yourself; to be conquered by yourself is of all things most shameful and vile. -- 戰勝自己是最首要、最偉大的勝利，無法克制自己是最令人羞愧、最可憐的失敗。
 
-今日成果： https://onfirechat.ga/message
+今天我們就來使用昨天寫的trigger來實做Angular看看，實做一個使用者自行上傳照片的功能
 
-昨天了解了HTTP Triggers了，我們今天接著講Cloud Firestore Triggers。
+我們今天會使用[ngxf-uploader](https://github.com/ZouYouShun/ngxf-uploader)來實做檔案上傳的功能，
+`npm i ngxf-uploader`
+相關的API可以點網址過去觀看。
 
-# Cloud Firestore Triggers
+透過他我們可以簡單的出脫動檔案，上傳檔案的功能
 
-透過他我們可以不需要改我們客戶端的程式碼，當資料有變動時，自動觸發去執行任務，
-
-基本上他是這麼運作的
-1. 等待資料有變動
-2. 資料變動，觸發Functions執行任務
-3. 任務執行時會得到兩個變數，分別是修改前的資料(original data)和修改後的資料(new data)，我們可以針對他們做想做的事情。
-4. 任務完成，回到1繼續等待資料有變動。
-
-## 事件類型
-要觸發事件有四種類型
-| 類型 | 觸發狀況 |
-| --- |-----|
-|onCreate| 當資料*建立*時觸發 |
-|onUpdate| 當資料*修改*時觸發 |
-|onDelete| 當資料*刪除*時觸發 |
-|onWrite | 當資料*發生上面三種任何一種*時觸發 |
-
-> 注意，我們只能針對 document 發生變動做處理，無法針對單一欄位
-
-# 實作 Cloud Firestore Triggers
-我們回到index.ts建立一個firestore trigger
-
+首先加入module
 ```js
-export const users = functions.firestore
-    .document('users/{userId}').onWrite((event) => {
-        console.log(event);
-        return 'complete'; // 記得一定要return一個value，每個trigger最後都會有一個return可以是promise或是value
-    });
+...
+import { NgxfUploaderModule } from 'ngxf-uploader';
+
+@NgModule({
+  imports: [
+    // 由於我們沒有要使用httpClient來上傳，我們使用firebase的方法，因此我們不使用他提供的service
+    NgxfUploaderModule 
+    ...
+  ],
+  declarations: [
+    ...
+  ]
+})
+export class UserModule { }
 ```
 
-當我們使用serve的方式，你會發現，我們看不到usersHandler的方法，這是因為除了http之外的所有方法，都不能使用serve的方式，而是要使用另一種shell的方式，因此我們需要在修改一下package.json裡面的script
+接著我們就能在component使用他的API了
 
-將start改成直接執行不再編譯了
-```json
-"start": "firebase experimental:functions:shell",
+```html
+<button mat-raised-button color="primary" (click)="fileSelect.click()">
+  上傳檔案
+</button>
+
+<div class="block"
+     (ngxf-drop)="uploadFile($event)"
+     drop-class="drop"
+     accept="image/*,.svg" multiple>
+  <label class="upload-button">
+    choice file.
+  </label>
+</div>
+<input type="file" #fileSelect
+  (ngxf-select)="uploadFile($event)"
+  [ngxf-validate]="{ size: { min: 50, max:1000000 } }"
+  accept="image/*,.svg">
 ```
+> 要注意如果有使用multiple的話她回傳的會是一個 File[]，在使用上要注意，accept在drop上也可以給
 
-# 使用shell debug
-
-我們開兩個終端機，一個跑編譯，另一個跑shell，用這種方式來debug，注意每次我們有新增functions或是改functions的name時都要重新跑shell才能執行，但是如果是只有改方法內的內容，不需要重新執行。
-```
-npm run build-w
-npm start
-```
-
-當我們執行後會看到以下畫面
-![](https://res.cloudinary.com/dw7ecdxlp/image/upload/shell_zm5qoi.jpg)
-他會顯示我們有那些functions，並且我們可以在下面做執行
+ts
 ```js
-// 執行方法，使用方法名稱當作函數，裡面可以傳入參數，在firestore這裡我們使用的是物件的方式
+// 注入錯誤訊息的型別
+import { FileError } from 'ngxf-uploader';
+...
 
-users({data:'new'})
+uploadFile(file: File | FileError): void {
+  console.log(file);
+  // 判斷是檔案還是錯誤訊息
+  if (!(file instanceof File)) {
+    this.alertError(file);
+    return;
+  }
+  const filePath = `/users/${new Date().getTime()}_${file.name}`;
+  this.fileHandler = this._upload.fileHandler(filePath);
+
+  this.fileHandler.upload({ file: file })
+    .subscribe(RxViewer);
+
+  this.uploadPercent$ = this.fileHandler.task.percentageChanges();
+  this.fileURL$ = this.fileHandler.task.downloadURL();
+  this.meta$ = this.fileHandler.task.snapshotChanges().map(d => d.metadata);
+}
+  
 ```
-傳入的物件有幾種
-|參數 | 說明| 範例 |
-|-----|-----|---|
-| 一個資料物件 | 此物件為當前的物件，不論是新增、刪除、或是修改都一樣，這個物件代表當前(修改之後)的狀態| users({data:'myData'})|
-| 一個資料物件裡面有兩個屬性before、after裡面又分別放了一個物件 | before屬性的物件為原物件、after屬性的物件為新物件|users({data:'myData'})|
-| 兩個參數 |第一個參數如上、第二個參數為params，例如document('input/{group}/{id}')，那們可以傳入的參數對應的為{params: {group: 'a', id: 123}}|users({before: {data: 'old'}, after: {data: 'new'} }, {params: {userId: '1'}})|
 
-有了shell我們可以基本的的對functions做本機的測試，另外這裡的除了上面方法外，也可以宣告物件以便我們使用，如下圖
-![](https://res.cloudinary.com/dw7ecdxlp/image/upload/shell2_oswdrs.jpg)
-
-
-但是筆者還是覺得相當不方便，他並無法連動到雲端的資料庫，所以當我們真正要使用上還是得deploy到firebase上看console來知道是否正常，目前看來是還沒有更好的方式，希望以後firebase能更新。
-
-
-接著我們針對方法內可以調用的方法做介紹
-
-# onCreate、onUpdate、onDelete、onWrite 基本使用
-
-由於四個的基本使用都差不多，就不做重複地介紹，基本上就是相對事件發生時，會觸發相對應的事件
+我們可以加入這個判斷來知道透過ngxf-uploader獲得了什麼資訊
 ```js
-export const users = functions.firestore
-    .document('users/{userId}').onCreate((event) => { // {userId}這樣可以取得所有users的
-        const nowData = event.data.data(); // 我們可以使用event.data取得當前的資料
-        console.log(nowData);
-        
-        return 'complete!';
-    });
-```
-event.data回傳的屬性有以下
-```js
-export interface DeltaDocumentSnapshot {
-    exists: Boolean;
-    ref: any; // DocumentSnapshot
-    id: string;
-    createTime: string;
-    updateTime: string;
-    readTime: string;
-    previous: any; // DocumentSnapshot 這個屬性只有在有上一個數值時能使用
-    data: () => any; // 取得當前的資料
-    get: (key: string) => any; // 取得某個property的數值
+alertError(msg: FileError) {
+  switch (msg) {
+    case FileError.NumError:
+      alert('Number Error');
+      break;
+    case FileError.SizeError:
+      alert('Size Error');
+      break;
+    case FileError.TypeError:
+      alert('Type Error');
+      break;
+  }
 }
 ```
-大致有以上屬性，使用上有一點很重要！就是在使用previous要確定數值確實存在(建立的時候不存在，取得會是null，若.data()會暴掉)
 
-下面我們實作一個trigger來試試看，
+接著我們繼續修改聊天室為她加上檔案上傳的功能
 
-## 實作最新訊息功能
-![](https://res.cloudinary.com/dw7ecdxlp/image/upload/v1515156271/trigger1_jyx9m7.jpg)
+#### HTML
 
-以下實做邏輯：
-  當寫入一筆最新訊息時更新使用者的room的最後訊息，讓我們在查看room時能最快速知道*最後一句留言是什麼*
-```js
-import * as functions from 'firebase-functions';
-import * as admin from 'firebase-admin';
-import { storeTimeObject } from '../../libs/timestamp';
+我們一樣擺上input並給定ngxf-select並且設定相關限制
+```html
+<input type="file" #fileSelect
+  (ngxf-select)="uploadFile($event)"
+  [ngxf-validate]="{ size: { min: 50, max:1000000 } }"
+  accept="image/*,.svg">  
+```
+也為整個聊天區塊加上拖曳的功能，並且一樣綁上參數，在增加一個當我們拖曳過去後的效果大概像這樣
+![](https://res.cloudinary.com/dw7ecdxlp/image/upload/v1515413621/1515413577530_unr8md.gif)
 
-// 當訊息有資料寫入時觸發
-export const roomsMessagefirestore = functions.firestore
-  .document('/rooms/{roomId}/messages/{messageId}').onCreate((event) => {
-    const firestore = admin.firestore();
+```html
+<section class="message-container" fxLayout="column nowrap"
+  (ngxf-drop)="uploadFile($event)"
+  drop-class="drop"
+  accept="image/*,.svg">
 
-    const roomId = event.params.roomId;
-    const messageId = event.params.messageId;
-
-    const message = event.data.data();
-
-      // 更新這個人對應到另一個人的最後一句資料
-    return Promise.all([
-      firestore.doc(`users/${message.sender}`)
-        .collection('rooms')
-        .doc(message.addressee)
-        .update(storeTimeObject({ last: message }, false)),
-      // 兩個人的都要更新
-      firestore.doc(`users/${message.addressee}`)
-        .collection('rooms')
-        .doc(message.sender)
-        .update(storeTimeObject({ last: message }, false)),
-    ])
-  });
-
+  <div class="block">
+    <mat-icon class="mat-size-5 c-white">cloud_upload</mat-icon>
+  </div>
+  ...
 ```
 
-接著當我們新增room底下的訊息時就會觸發這個trigger然後前端透過realtime的特性，就能得到資料了，
-展示如下
-![](https://res.cloudinary.com/dw7ecdxlp/image/upload/v1515156002/storeTrigger_rtvz5w.gif)
+再來修改送出訊息的地方，因為在form裡面，我們要給定type="button"才不會觸發這個form的送出事件，並且給予click事件點擊我們的input file。
+```html
+<div class="t-al-c pad-l-r-1">
+  <button mat-icon-button type="button" (click)="fileSelect.click()">
+    <mat-icon color="accent">add_to_photos</mat-icon>
+  </button>
+  <button mat-icon-button>
+    <mat-icon color="accent">send</mat-icon>
+  </button>
+</div>
+```
 
-# 本日原始碼
-|名稱|網址|
-|---|---|
-|Angular|https://github.com/ZouYouShun/Angular-firebase-ironman/tree/day16_functions_firestore|
-|functions| https://github.com/ZouYouShun/Angular-firebase-ironman-functions/tree/day16_functions_firestore|
+#### TS
+
+接著來到TS的部分，我們可以將fileErrorHandler搬移至我們的upload.service.ts，並且加上我們的警告視窗。
+```js
+@Injectable()
+export class UploadService {
+
+  constructor(
+    private _storage: AngularFireStorage,
+    private _alc: AlertConfirmService) { }
+
+  fileHandler<T>(path: string) {
+    return new FileHandler<T>(this._storage, path);
+  }
+
+  fileErrorHandler(errror: FileError) {
+    switch (errror) {
+      case FileError.NumError:
+        this._alc.alert('檔案數量錯誤');
+        break;
+      case FileError.SizeError:
+        this._alc.alert('檔案大小錯誤');
+        break;
+      case FileError.TypeError:
+        this._alc.alert('檔案格式錯誤');
+        break;
+    }
+  }
+}
+
+```
+由於我們現在多了檔案類型的訊息，我們可以定義一個列舉來存放種類
+
+message.model.ts
+```js
+export enum MESSAGE_TYPE {
+  MESSAGE = 'message',
+  FILE = 'file'
+}
+
+export interface MessageModel extends BaseModel {
+  sender: string;
+  addressee: string;
+  content: string;
+  type: MESSAGE_TYPE;
+}
+```
+
+接著回到component，加上uploadFile的方法，得到檔案後先做錯誤的判斷，接著我們實作上傳檔案
+```js
+
+uploadFile(file: File | FileError) {
+  if (!(file instanceof File)) {
+    this._upload.fileErrorHandler(file);
+    return;
+  }
+
+  const filePath = `${new Date().getTime()}_${file.name}`;
+  const fileHandler = this._upload.fileHandler(filePath);
+
+  // 我們這裡把兩個rx一起送出，並且為我們的訊息加上類型
+  return Observable.merge(
+    this.getMessageObs(filePath, MESSAGE_TYPE.FILE)), 
+    fileHandler.upload({ file: file })
+      .subscribe(RxViewer);
+}
+```
+
+接著我們可以測試看看是否上傳成功，並建立縮圖。
+
+目前筆者測試很奇怪*有時*圖片是不會產生的，或許是目前storage的trigger感覺尚存在問題，且從訊息中心那並未得到任何錯誤，感覺像是並且完全沒有觸發，我想是尚有BUG，也或是因為筆者是免費版本的關係，但由於沒有錯誤訊息，暫時無法了解原因，若將來筆者有所了解再告知大家，不過我們這裡至少知道了有此功能能使用。
+
+最後我們可以使用先前教過大家的pipe來顯示檔案，並且當檔案載入中的時候給予一個小動畫
+```html
+<ng-container *ngIf="message.content | img | async as img; else imgloading">
+  <div class="message-img mat-elevation-z2"
+    [style.backgroundImage]="img | safe:'background-image'">
+    <img  [src]="img">
+  </div>
+</ng-container>
+<ng-template #imgloading>
+  <div class="message-img" fxLayoutAlign="center center">
+    <mat-progress-spinner mode="indeterminate" color="accent" [diameter]="20"></mat-progress-spinner>
+  </div>
+</ng-template>
+```
+
+我們會發現資料並無法正確的顯示，因為當我們的trigger在執行時，我們的檔案實際上是尚未建立完成的，若這時我們去取得`this._storage.ref(path).getDownloadURL()`當然就得到空的了，因此我們這裡還需要下一點功夫，明天再跟大家進一步了解解決辦法。
 
 # 本日小節
-今天我們介紹了firestore 的 trigger，可以說是相當方便，讓我們可以大幅的減少我們在client的邏輯，並且透過他我們就算是直接在firebase的管理中心修改內容也是可以觸發的，大大提升了我們系統的穩定，舉例來說，當我們想刪除room時，我們只需透過刪除主要的room其餘的動作都透trigger來執行，就能做到把資料刪除乾淨的行為，client可以保持邏輯清晰，可說是很不錯，但是就是在開發上還是很多不便利，本機雖然可以透過shell的方式做到基本的測試，但是依舊無法像在雲端一樣的直接操作資料庫，希望未來我們可能可以透過firebase提供的工具來連線到雲端做本地端的操作，不然每次都要deploy實在是相當不方便。
-
-
-對於入門來說，筆者很推薦大家看這個系列的影片，雖然是英文的但是說得很清楚，英文也很好聽(老師也很美XD
-https://www.youtube.com/watch?v=EvV9Vk9iOCQ&list=PLl-K7zZEsYLkPZHe41m4jfAxUi0JjLgSM
+今天使用ngxf-uploader來實做檔案上傳及拖曳上傳，簡單的實作並結合trigger實作縮圖，讓我們在顯示使用這圖片的時候可以使用小縮圖，降低使用者載入的速度，筆者有注意到，目前storage的trigger感覺尚存在許多問題，筆者會發現有時縮圖並不會產生，並且完全沒有觸發，我想是尚有BUG，或是因為我們是免費版本的關係，但由於沒有錯誤訊息，暫時無法了解原因，若將來筆者有所了解再告知大家，明天我們將進一步解決圖片載入的問題。
 
 # 參考文章
-https://firebase.google.com/docs/functions/firestore-events?authuser=0
-https://firebase.google.com/docs/reference/admin/node/admin.firestore.FieldValue?authuser=0
+https://github.com/ZouYouShun/ngxf-uploader
+https://ngxf-uploader.firebaseapp.com/upload

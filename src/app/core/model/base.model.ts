@@ -4,4 +4,6 @@ export class BaseModel {
   metadata?: firebase.firestore.SnapshotMetadata;
   doc?: firebase.firestore.DocumentSnapshot;
   ref?: firebase.firestore.DocumentReference;
+  createdAt?: Date;
+  updatedAt?: Date;
 }

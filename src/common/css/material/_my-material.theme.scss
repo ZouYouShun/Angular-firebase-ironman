@@ -1,11 +1,11 @@
-@import '~common/css/material/_md-icon-align.scss';
+@import '~common/css/material/_mat-icon-align.scss';
 @import '../_my-theme.variable.scss';
 $app-form-primary: mat-palette($mat-green, 800);
 $app-form-accent:mat-palette($mat-grey, 900);
 $app-form-warn:mat-palette($mat-red, 500);
 $app-form-theme:mat-light-theme($app-form-primary, $app-form-accent, $app-form-warn);
 @mixin my-material() {
-  @include md-icon-align(5);
+  @include mat-icon-align(5);
   // font
   @include mat-core($app-typgography);
 

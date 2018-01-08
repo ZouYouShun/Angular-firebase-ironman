@@ -9,6 +9,7 @@ import { HttpClient } from '@angular/common/http';
 import { BlockViewService } from '@core/service/block-view.service';
 import { AlertConfirmService } from '@core/component/alert-confirm';
 import { MyHttpHandler } from './model/myhttp-handler.model';
+import { FileError } from 'ngxf-uploader';
 
 @Injectable()
 export class BaseHttpService {
@@ -41,3 +42,4 @@ export class BaseHttpService {
     return new ObjectHandler<T>(this._db, url);
   }
 }
+

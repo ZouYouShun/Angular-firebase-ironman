@@ -1,6 +1,6 @@
-@mixin md-icon-align($num:3) {
+@mixin mat-icon-align($num:3) {
   @for $i from 1 through $num {
-    .md-size-#{$i} {
+    .mat-size-#{$i} {
       font-size: #{$i}rem;
       width: inherit;
       height: #{$i + .2}rem;

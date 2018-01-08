@@ -1,7 +1,33 @@
-<img *ngIf="'1514711588087_測試圖a.jpg' | img | async as img" [src]="img" />
+<ng-container *ngIf="user$ | async as user">
+  <p>
+    帳號類型： {{user.type}}
+  </p>
+  <p>
+    信箱(帳號)：{{user.email}}
+  </p>
+  <p>
+    名稱：{{user.displayName}}
+  </p>
+  <p>
+    照片：
+    <img [src]="user.photoURL | safe: 'url'" />
+  </p>
+</ng-container>
 
-<input type="file" (change)="uploadFile($event)" />
-<ng-container *ngIf="uploadPercent$ | async as uploadPercent">
+<button mat-raised-button color="primary" (click)="fileSelect.click()">
+  上傳檔案
+</button>
+
+<div class="block"
+     (ngxf-drop)="uploadFile($event)"
+     drop-class="drop"
+     accept="image/*,.svg">
+</div>
+<input type="file" #fileSelect
+  (ngxf-select)="uploadFile($event)"
+  [ngxf-validate]="{ size: { min: 50, max:1000000 } }"
+  accept="image/*,.svg">
+<!-- <ng-container *ngIf="uploadPercent$ | async as uploadPercent">
   <div>{{ uploadPercent }}</div>
   <button mat-raised-button (click)="pause()">暫停</button>
   <button mat-raised-button (click)="resume()">繼續</button>
@@ -12,8 +38,4 @@
 <ng-container *ngIf="fileURL$ | async as imgUrl">
   <a [href]="imgUrl">{{ imgUrl }}</a>
   <img [src]="imgUrl" />
-</ng-container>
-
-<pre><code>{{ meta$ | async | json }}</code></pre>
-
-<img [src]="file$ | async" alt="">
+</ng-container> -->

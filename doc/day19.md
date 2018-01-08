@@ -1,4 +1,4 @@
-# [Angular Firebase 入門與實做] Day-18 Cloud Functions Cloud Storage Triggers 03 顯示檔案與錯誤測試
+# [Angular Firebase 入門與實做] Day-19 Cloud Functions Cloud Storage Triggers 03 修正聊天室顯示功能
 
 每日一句來源：[Daily English](https://play.google.com/store/apps/details?id=net.eocbox.dailysentence)
 
@@ -6,9 +6,7 @@
 
 昨天我們透過ngxf-uploader實作了基本的檔案上傳的功能，但是因為時間的問題我們在顯示檔案上還有問題，今天我們來解決他
 
-關於昨天有時候並不會呼叫倒轉檔的部分，那是因為我們的記憶體滿載
-
-解決上船順序的問題
+解決上傳順序的問題
 
 1. 改用concatMap，當檔案上傳完成後，才寫訊息到資料庫
 ```js
@@ -103,26 +101,70 @@ private getRoomsMessages(roomId): Observable<any> {
   ...
 }
 ```
-最後在把昨天的container修改一下
+最後在把昨天的container修改一下，我們把這整個file的部份抽出去做一個component
+
+建立message-item-file.component
+ts
+```js
+import { Component, Input, OnInit } from '@angular/core';
+import { AngularFireStorage } from 'angularfire2/storage';
+import { Observable } from 'rxjs/Observable';
+
+@Component({
+  selector: 'app-message-item-file',
+  templateUrl: './message-item-file.component.html',
+  styleUrls: ['./message-item-file.component.scss']
+})
+export class MessageItemFileComponent {
+  @Input() set data(value) {
+    if (value) {
+      // 之所以不加上這個判斷是當已經有訂閱了的話就不再訂閱了，避免changeDetection的問題
+      if (!this.url$) {
+        this.url$ = this._storage.ref(value.id).getDownloadURL().do(u => this.path = u);
+      }
+    }
+  }
+
+  url$: Observable<string>;
+  path = '';
+  constructor(private _storage: AngularFireStorage) { }
+
+}
+
+```
 html
 ```html
-<!-- 這裡先判斷有時該物件，若沒有就是還沒加入files的陣列中，顯示loading -->
-<ng-container *ngIf="roomFiles[message.content]; else imgloading">
-  <div class="message-img mat-elevation-z2" *ngIf="message.content | img | async as img"
-    [style.backgroundImage]="img | safe:'background-image'">
-    <img  [src]="img">
+<ng-container *ngIf="url$ | async; else imgloading">
+  <div class="message-img mat-elevation-z2" [style.backgroundImage]="path | safe:'background-image'">
+    <img [src]="path | safe:'url'">
   </div>
-  <ng-template #imgloading>
-    <div class="message-img" fxLayoutAlign="center center">
-      <mat-progress-spinner mode="indeterminate" color="accent" [diameter]="20"></mat-progress-spinner>
-    </div>
-  </ng-template>
+</ng-container>
+<ng-template #imgloading>
+  <div class="message-img" fxLayoutAlign="center center">
+    <mat-progress-spinner mode="indeterminate" color="accent" [diameter]="20"></mat-progress-spinner>
+  </div>
+</ng-template>
+```
+
+最後注入module之後將原本的template替換掉
+```html
+<ng-container [ngSwitch]="message.type">
+  <app-message-item-file *ngSwitchCase="'file'" [data]="roomFiles[message.content]"></app-message-item-file>
+  <span *ngSwitchDefault class="content pad-all-1" [innerHTML]="message.content"></span>
 </ng-container>
 ```
 
-# 本日小節
-今天使用ngxf-uploader來實做檔案上傳及拖曳上傳，簡單的實作並結合trigger實作縮圖，讓我們在顯示使用這圖片的時候可以使用小縮圖，降低使用者載入的速度，筆者有注意到，目前storage的trigger感覺尚存在許多問題，筆者會發現有時縮圖並不會產生，並且完全沒有觸發，我想是尚有BUG，或是因為我們是免費版本的關係，但由於沒有錯誤訊息，暫時無法了解原因，若將來筆者有所了解再告知大家，明天我們將進一步解決圖片載入的問題。
+到這裡我們就修正好了，打開瀏覽器看看吧！
+是不是乾淨很多呢？
 
-# 參考文章
-https://github.com/ZouYouShun/ngxf-uploader
-https://ngxf-uploader.firebaseapp.com/upload
+# 本日小節
+今天我們透過cloud store 修正了問題，關於storage的問題，經過昨天和今天的測試筆者研判是記憶體超載的問題，可能是筆者昨天測試的時候有形成無限迴圈把記憶體吃掉了，所以才會有這個狀況，大家在操作Storage做一些較複雜的處理時要注意記憶體的問題，如果不想冒這個風險，筆者建議大家還是使用傳統的HTTP Trigger較為保險。
+
+透過js的特性將陣列轉為物件可以讓我們在找資料上相當快速且敏捷，可說是非常的好用。
+
+
+# 本日原始碼
+|名稱|網址|
+|---|---|
+|Angular|https://github.com/ZouYouShun/Angular-firebase-ironman/tree/day19_functions_firestorage_3|
+|functions| https://github.com/ZouYouShun/Angular-firebase-ironman-functions/tree/day19_functions_firestore_3|

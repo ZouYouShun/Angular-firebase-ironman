@@ -8,6 +8,7 @@ import { UserRoomModel } from '@core/model/room.model';
 import { UserModel } from '@core/model/user.model';
 import { AuthService } from '@core/service/auth.service';
 import { BaseHttpService } from '@core/service/base-http.service';
+import { arrayToObjectByKey } from '@shared/ts/data/arrayToObjectByKey';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Observable } from 'rxjs/Observable';
 
@@ -39,7 +40,7 @@ export class MessageService {
     this.userFriend$ = this._http.collection<UserModel[]>('users').get()
       .do(users => {
         // console.log(users);
-        this.friendsObj = this.usersToObject(users);
+        this.friendsObj = arrayToObjectByKey(users, 'id');
         this.friends$.next(users);
       });
   }
@@ -49,14 +50,6 @@ export class MessageService {
       this.userFriend$,
       this.userRooms$
     );
-  }
-
-  private usersToObject(array: any[]) {
-    const rv = {};
-    array.forEach(item => {
-      rv[item.id] = item;
-    });
-    return rv;
   }
 
 }

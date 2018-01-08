@@ -11,17 +11,17 @@ export class ImgPipe implements PipeTransform {
 
   transform(path: string): any {
     // console.log(path);
-    // return this._storage.ref(path).getDownloadURL()
-    //   .catch((err) => {
-    //     // console.log('file not exist!');
-    //     return Observable.of(null);
-    //   });
-    return this._http.document(`files/${path}`).get()
-      .do(d => console.log(d))
-      .map((f: any) => f.thumbnail)
+    return this._storage.ref(path).getDownloadURL()
       .catch((err) => {
         // console.log('file not exist!');
         return Observable.of(null);
       });
+    // return this._http.document(`files/${path}`).get()
+    //   .do(d => console.log(d))
+    //   .map((f: any) => f.thumbnail)
+    //   .catch((err) => {
+    //     // console.log('file not exist!');
+    //     return Observable.of(null);
+    //   });
   }
 }

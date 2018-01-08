@@ -9,6 +9,7 @@ import { MessageRoomListComponent } from './message-room-list/message-room-list.
 import { MessageRoutingModule } from './message-routing.module';
 import { MessageComponent } from './message.component';
 import { MessageService } from './message.service';
+import { MessageItemFileComponent } from './message-detial/message-item-file/message-item-file.component';
 
 @NgModule({
   imports: [
@@ -21,7 +22,8 @@ import { MessageService } from './message.service';
     MessageDetialComponent,
     MessageHomeComponent,
     MessageFriendListComponent,
-    MessageRoomListComponent
+    MessageRoomListComponent,
+    MessageItemFileComponent
   ],
   providers: [
     MessageService

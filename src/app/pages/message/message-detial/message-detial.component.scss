@@ -38,6 +38,21 @@
           color: #363636;
         }
       }
+      .message-img {
+        border: 2px solid app-color(accent);
+        border-radius: app-border-radius(square-more);
+        background-size: cover;
+        background-position-x: 50%;
+        background-position-y: 50%;
+        min-width: 200px;
+        min-height: 200px;
+        img {
+          opacity: 0;
+          min-width: 100px;
+          min-height: 100px;
+          width: 100%;
+        }
+      }
     }
   }
   .block {

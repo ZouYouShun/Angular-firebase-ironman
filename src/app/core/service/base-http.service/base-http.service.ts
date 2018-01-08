@@ -41,18 +41,5 @@ export class BaseHttpService {
   object<T>(url: string) {
     return new ObjectHandler<T>(this._db, url);
   }
-
-  fileErrorHandler(errror: FileError) {
-    switch (errror) {
-      case FileError.NumError:
-        this._alc.alert('檔案數量錯誤');
-        break;
-      case FileError.SizeError:
-        this._alc.alert('檔案大小錯誤');
-        break;
-      case FileError.TypeError:
-        this._alc.alert('檔案格式錯誤');
-        break;
-    }
-  }
 }
+

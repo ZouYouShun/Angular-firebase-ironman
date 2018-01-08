@@ -167,17 +167,15 @@ export class MessageDetialComponent extends AutoDestroy {
       this._upload.fileErrorHandler(file);
       return;
     }
-    console.log(file);
 
     const filePath = encodeURIComponent(`${new Date().getTime()}_${file.name}`);
     const fileHandler = this._upload.fileHandler(filePath);
 
     this.uploading = true;
 
-    return Observable.merge(
-      this.getMessageObs(filePath, MESSAGE_TYPE.FILE)),
-      fileHandler.upload({ file: file })
-        .subscribe(RxViewer);
+    return this.getMessageObs(filePath, MESSAGE_TYPE.FILE)
+      .mergeMap(() => fileHandler.upload({ file: file }))
+      .subscribe(RxViewer);
   }
 
 

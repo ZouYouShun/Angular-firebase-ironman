@@ -194,10 +194,9 @@ uploadFile(file: File | FileError) {
   const fileHandler = this._upload.fileHandler(filePath);
 
   // 我們這裡把兩個rx一起送出，並且為我們的訊息加上類型
-  return Observable.merge(
-    this.getMessageObs(filePath, MESSAGE_TYPE.FILE)), 
-    fileHandler.upload({ file: file })
-      .subscribe(RxViewer);
+ return this.getMessageObs(filePath, MESSAGE_TYPE.FILE)
+  .mergeMap(() => fileHandler.upload({ file: file }))
+  .subscribe(RxViewer);
 }
 ```
 

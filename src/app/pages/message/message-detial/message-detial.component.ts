@@ -3,10 +3,10 @@ import 'rxjs/add/operator/combineLatest';
 import 'rxjs/add/operator/do';
 import 'rxjs/add/operator/take';
 
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { MessageModel } from '@core/model/message.model';
+import { MessageModel, MESSAGE_TYPE } from '@core/model/message.model';
 import { RoomModel, UserRoomModel } from '@core/model/room.model';
 import { UserModel } from '@core/model/user.model';
 import { AuthService } from '@core/service/auth.service';
@@ -20,6 +20,8 @@ import { MessageService } from 'app/pages/message/message.service';
 import { Observable } from 'rxjs/Observable';
 
 import { MessageFriendListComponent } from '../message-friend-list/message-friend-list.component';
+import { FileError } from 'ngxf-uploader';
+import { UploadService } from '@core/service/upload.service';
 
 
 @Component({
@@ -33,39 +35,48 @@ export class MessageDetialComponent extends AutoDestroy {
 
   messageLoading = true;
 
-  messages: MessageModel[];
+  messages: MessageModel[] = [];
   messageForm: FormGroup;
 
   sender: UserModel;
-
   addresseeId: string;
 
   private roomsHandler: CollectionHandler<RoomModel>;
   private messageHandler: CollectionHandler<MessageModel>;
-  friends;
+  private roomId: string;
+  private roomPhoto;
+
 
   constructor(
     private _http: BaseHttpService,
     private _fb: FormBuilder,
     private _route: ActivatedRoute,
     private _auth: AuthService,
-    public _message: MessageService) {
+    public _message: MessageService,
+    public _upload: UploadService) {
     super();
     this.messageForm = this._fb.group({
       content: ''
     });
 
     this.roomsHandler = this._http.collection('rooms');
-
+    let message$: Observable<any>;
     if (this._route.parent.component === MessageFriendListComponent) {
-      this.getMessageByUserId();
+      message$ = this.getMessageByUserId();
     } else if (this._route.parent.component === MessageRoomListComponent) {
-      this.getMessageByRoomId();
+      message$ = this.getMessageByRoomId();
     }
+    message$
+      .takeUntil(this._destroy$)
+      .subscribe(messages => {
+        this.messageLoading = false;
+        this.messages = messages;
+        this.scrollButtom();
+      });
   }
 
   private getMessageByUserId() {
-    this._route.params
+    return this._route.params
       .combineLatest(this._auth.currentUser$.filter(u => !!u))
       .switchMap(([params, sender]) => {
         this.init(sender, params.addresseeId);
@@ -77,29 +88,17 @@ export class MessageDetialComponent extends AutoDestroy {
       .switchMap(room => {
         if (room) return this.getRoomsMessages(room.id);
         return Observable.of(null);
-      })
-      .takeUntil(this._destroy$)
-      .subscribe(messages => {
-        this.messageLoading = false;
-        this.messages = messages;
-        this.scrollButtom();
       });
   }
 
   private getMessageByRoomId() {
     // 取得房間資料
     // 取得所有人的資料
-    this._route.params
+    return this._route.params
       .combineLatest(this._auth.currentUser$.filter(u => !!u))
       .switchMap(([params, sender]) => {
         this.init(sender, params.addresseeId);
         return this.getRoomsMessages(params.roomId);
-      })
-      .takeUntil(this._destroy$)
-      .subscribe(messages => {
-        this.messageLoading = false;
-        this.messages = messages;
-        this.scrollButtom();
       });
   }
 
@@ -111,17 +110,22 @@ export class MessageDetialComponent extends AutoDestroy {
   }
 
   private getRoomsMessages(roomId): Observable<any> {
+    this.roomId = roomId;
     this.messageHandler = this.roomsHandler.document(roomId).collection('messages');
     return this.messageHandler.get({
-      isKey: false,
+      isKey: true,
       queryFn: ref => ref.orderBy('createdAt')
     });
   }
 
   @runAfterTimeout()
-  private scrollButtom() {
+  private scrollButtom(behavior: 'auto' | 'smooth' = 'auto') {
     if (this.article)
-      this.article.nativeElement.scroll({ top: this.article.nativeElement.scrollHeight, left: 0 });
+      this.article.nativeElement.scroll({
+        top: this.article.nativeElement.scrollHeight,
+        left: 0,
+        behavior: behavior
+      });
   }
 
   private init(sender, addresseeId = null) {
@@ -134,18 +138,41 @@ export class MessageDetialComponent extends AutoDestroy {
 
   submitMessage(event?) {
     if (event) event.preventDefault();
-    let content = this.messageForm.value.content;
+    const content = this.messageForm.value.content;
     this.messageForm.reset();
-    if (!content.trim()) {
+    if (!content || !content.trim()) {
       return;
     }
+
+    this.getMessageObs(content).subscribe();
+  }
+
+  uploadFile(file: File | FileError) {
+    if (!(file instanceof File)) {
+      this._upload.fileErrorHandler(file);
+      return;
+    }
+    console.log(file);
+
+    const filePath = `${new Date().getTime()}_${file.name}`;
+    const fileHandler = this._upload.fileHandler(filePath);
+
+    return Observable.merge(
+      this.getMessageObs(filePath, MESSAGE_TYPE.FILE)),
+      fileHandler.upload({ file: file })
+        .subscribe(RxViewer);
+  }
+
+
+  private getMessageObs(content, type = MESSAGE_TYPE.MESSAGE) {
     let req: Observable<any>;
     content = replaceToBr(content);
 
     const message: MessageModel = {
       sender: this.sender.uid,
       addressee: this.addresseeId,
-      content: content
+      content: content,
+      type: type
     };
 
     if (this.messageHandler) {
@@ -155,12 +182,7 @@ export class MessageDetialComponent extends AutoDestroy {
         message: message
       });
     }
-
-    req.subscribe();
-  }
-
-  delete(message: any) {
-    this.roomsHandler.delete(message.id).subscribe(RxViewer);
+    return req;
   }
 
   // updateItem(message: any, value?: string) {
@@ -170,4 +192,10 @@ export class MessageDetialComponent extends AutoDestroy {
   //   }
   //   message.update = true;
   // }
+  // delete(message: any) {
+  //   this.roomsHandler.delete(message.id).subscribe(RxViewer);
+  // }
+  trackByFn(index, item) {
+    return item.id; // or item.name
+  }
 }

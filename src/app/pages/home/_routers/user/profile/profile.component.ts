@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { AngularFireStorage, AngularFireUploadTask } from 'angularfire2/storage';
-import { Observable } from 'rxjs/Observable';
-import { UploadService, FileHandler } from '@core/service/upload.service';
+import { AuthService } from '@core/service/auth.service';
+import { FileHandler, UploadService } from '@core/service/upload.service';
 import { RxViewer } from '@shared/ts/rx.viewer';
+import { FileError } from 'ngxf-uploader';
+import { Observable } from 'rxjs/Observable';
 
 @Component({
   selector: 'app-profile',
@@ -17,30 +18,37 @@ export class ProfileComponent implements OnInit {
 
   fileHandler: FileHandler<{}>;
 
-  constructor(private _upload: UploadService) {
+  file$;
+
+  process: number[] = [];
+  fileData: File;
+
+  user$;
+
+  constructor(private _upload: UploadService, private _auth: AuthService) {
+    this.user$ = this._auth.currentUser$;
   }
 
   ngOnInit() {
+    // this.file$ = this._upload.fileHandler('201711081351-rIXwT.jpg').get();
   }
 
-  uploadFile(event) {
-    const file: File = event.target.files[0];
-    const filePath = `${new Date().getTime()}_${file.name}`;
+  uploadFile(file: File | FileError): void {
+    console.log(file);
+    if (!(file instanceof File)) {
+      this.alertError(file);
+      return;
+    }
+    const filePath = `/users/${new Date().getTime()}_${file.name}`;
     this.fileHandler = this._upload.fileHandler(filePath);
 
-    this.fileHandler.upload({ file: file }).subscribe(RxViewer);
+    this.fileHandler.upload({ file: file })
+      .subscribe(RxViewer);
 
     this.uploadPercent$ = this.fileHandler.task.percentageChanges();
     this.fileURL$ = this.fileHandler.task.downloadURL();
     this.meta$ = this.fileHandler.task.snapshotChanges().map(d => d.metadata);
 
-    // setTimeout(() => {
-    //   this.fileHandler.edit({ file: file, data: { cool: 'kkk' } }).subscribe(RxViewer);
-    // }, 1000);
-
-    // setTimeout(() => {
-    //   this.fileHandler.delete().subscribe(RxViewer);
-    // }, 2000);
   }
 
   pause() {
@@ -57,5 +65,19 @@ export class ProfileComponent implements OnInit {
 
   delete() {
     this.fileHandler.delete().subscribe(RxViewer);
+  }
+
+  alertError(msg: FileError) {
+    switch (msg) {
+      case FileError.NumError:
+        alert('Number Error');
+        break;
+      case FileError.SizeError:
+        alert('Size Error');
+        break;
+      case FileError.TypeError:
+        alert('Type Error');
+        break;
+    }
   }
 }

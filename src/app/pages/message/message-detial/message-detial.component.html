@@ -1,4 +1,11 @@
-<section class="message-container" fxLayout="column nowrap">
+<section class="message-container" fxLayout="column nowrap"
+  (ngxf-drop)="uploadFile($event)"
+  drop-class="drop"
+  accept="image/*,.svg">
+  <div class="block">
+    <!-- <h2>上傳檔案</h2> -->
+    <mat-icon class="mat-size-5 c-white">cloud_upload</mat-icon>
+  </div>
 
   <header>
     <mat-toolbar fxLayoutAlign="start center" color="accent" class="mat-elevation-z2">
@@ -20,11 +27,27 @@
     <article fxFlex="1 1 auto" #article fxFlexFill
       *ngIf="messages && messages.length !== 0; else noMessage;">
       <ul>
-        <ng-container *ngFor="let message of messages">
+        <ng-container *ngFor="let message of messages; trackBy:trackByFn ">
           <li class="mar-t-b-1 sender"
             *ngIf="message.sender === sender.uid; else addresseeView">
             <span fxFlexAlign="end" class="mar-r-1 mat-subheading-1 margin-0">{{message.createdAt | date:'hh:mm'}}</span>
-            <span class="content pad-all-1" [innerHTML]="message.content"></span>
+
+            <ng-container [ngSwitch]="message.type">
+              <ng-container *ngSwitchCase="'file'">
+                <ng-container *ngIf="message.content | img | async as img; else imgloading">
+                  <div class="message-img mat-elevation-z2"
+                    [style.backgroundImage]="img | safe:'background-image'">
+                    <img  [src]="img">
+                  </div>
+                </ng-container>
+                <ng-template #imgloading>
+                  <div class="message-img" fxLayoutAlign="center center">
+                    <mat-progress-spinner mode="indeterminate" color="accent" [diameter]="20"></mat-progress-spinner>
+                  </div>
+                </ng-template>
+              </ng-container>
+              <span *ngSwitchDefault class="content pad-all-1" [innerHTML]="message.content"></span>
+            </ng-container>
 
             <i class="isSend material-icons"
               [ngClass]="{complete: message.createdAt}">done</i>
@@ -68,12 +91,21 @@
           ></textarea>
       </mat-form-field>
       <div class="t-al-c pad-l-r-1">
-        <button mat-raised-button color="accent">送出</button>
+        <button mat-icon-button type="button" (click)="fileSelect.click()">
+          <mat-icon color="accent">add_to_photos</mat-icon>
+        </button>
+        <button mat-icon-button>
+          <mat-icon color="accent">send</mat-icon>
+        </button>
       </div>
     </form>
   </footer>
 </section>
 
+<input type="file" #fileSelect
+  (ngxf-select)="uploadFile($event)"
+  [ngxf-validate]="{ size: { min: 50, max:1000000 } }"
+  accept="image/*,.svg">
 
 <!-- matTextareaAutosize
           matAutosizeMaxRows="5" -->

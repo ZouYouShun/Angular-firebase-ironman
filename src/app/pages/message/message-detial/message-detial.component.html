@@ -33,19 +33,7 @@
             <span fxFlexAlign="end" class="mar-r-1 mat-subheading-1 margin-0">{{message.createdAt | date:'hh:mm'}}</span>
 
             <ng-container [ngSwitch]="message.type">
-              <ng-container *ngSwitchCase="'file'">
-                <ng-container *ngIf="message.content | img | async as img; else imgloading">
-                  <div class="message-img mat-elevation-z2"
-                    [style.backgroundImage]="img | safe:'background-image'">
-                    <img  [src]="img">
-                  </div>
-                </ng-container>
-                <ng-template #imgloading>
-                  <div class="message-img" fxLayoutAlign="center center">
-                    <mat-progress-spinner mode="indeterminate" color="accent" [diameter]="20"></mat-progress-spinner>
-                  </div>
-                </ng-template>
-              </ng-container>
+              <app-message-item-file *ngSwitchCase="'file'" [data]="roomFiles[message.content]"></app-message-item-file>
               <span *ngSwitchDefault class="content pad-all-1" [innerHTML]="message.content"></span>
             </ng-container>
 

@@ -10,7 +10,7 @@ import { MessageModel, MESSAGE_TYPE } from '@core/model/message.model';
 import { RoomModel, UserRoomModel } from '@core/model/room.model';
 import { UserModel } from '@core/model/user.model';
 import { AuthService } from '@core/service/auth.service';
-import { BaseHttpService, CollectionHandler } from '@core/service/base-http.service';
+import { BaseHttpService, CollectionHandler, DocumentHandler } from '@core/service/base-http.service';
 import { runAfterTimeout } from '@shared/decorator/timeout.decorator';
 import { AutoDestroy } from '@shared/ts/auto.destroy';
 import { replaceToBr } from '@shared/ts/data/replaceToBr';
@@ -22,6 +22,7 @@ import { Observable } from 'rxjs/Observable';
 import { MessageFriendListComponent } from '../message-friend-list/message-friend-list.component';
 import { FileError } from 'ngxf-uploader';
 import { UploadService } from '@core/service/upload.service';
+import { arrayToObjectByKey } from '@shared/ts/data/arrayToObjectByKey';
 
 
 @Component({
@@ -40,12 +41,14 @@ export class MessageDetialComponent extends AutoDestroy {
 
   sender: UserModel;
   addresseeId: string;
+  uploading = false;
 
-  private roomsHandler: CollectionHandler<RoomModel>;
+  private roomsHandler: CollectionHandler<RoomModel[]>;
   private messageHandler: CollectionHandler<MessageModel>;
-  private roomId: string;
-  private roomPhoto;
 
+  private roomId: string;
+  private roomHandler: DocumentHandler<RoomModel>;
+  private roomFiles = {};
 
   constructor(
     private _http: BaseHttpService,
@@ -66,13 +69,24 @@ export class MessageDetialComponent extends AutoDestroy {
     } else if (this._route.parent.component === MessageRoomListComponent) {
       message$ = this.getMessageByRoomId();
     }
+
     message$
-      .takeUntil(this._destroy$)
-      .subscribe(messages => {
+      .do(messages => {
         this.messageLoading = false;
         this.messages = messages;
         this.scrollButtom();
-      });
+      })
+      .switchMap(() => {
+        if (this.roomHandler) {
+          return this.roomHandler.collection<any>('files').get()
+            .do(files => {
+              this.roomFiles = arrayToObjectByKey(files, 'id');
+            });
+        }
+        return Observable.of(null);
+      })
+      .takeUntil(this._destroy$)
+      .subscribe();
   }
 
   private getMessageByUserId() {
@@ -111,7 +125,8 @@ export class MessageDetialComponent extends AutoDestroy {
 
   private getRoomsMessages(roomId): Observable<any> {
     this.roomId = roomId;
-    this.messageHandler = this.roomsHandler.document(roomId).collection('messages');
+    this.roomHandler = this.roomsHandler.document<RoomModel>(roomId);
+    this.messageHandler = this.roomHandler.collection('messages');
     return this.messageHandler.get({
       isKey: true,
       queryFn: ref => ref.orderBy('createdAt')
@@ -154,8 +169,10 @@ export class MessageDetialComponent extends AutoDestroy {
     }
     console.log(file);
 
-    const filePath = `${new Date().getTime()}_${file.name}`;
+    const filePath = encodeURIComponent(`${new Date().getTime()}_${file.name}`);
     const fileHandler = this._upload.fileHandler(filePath);
+
+    this.uploading = true;
 
     return Observable.merge(
       this.getMessageObs(filePath, MESSAGE_TYPE.FILE)),

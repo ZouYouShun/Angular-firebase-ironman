@@ -12,7 +12,11 @@
             <ng-template #sender>
               <span>{{_message.friendsObj[room.last.sender].displayName}}</span>
             </ng-template>
-            : {{room.last.content}}
+            :
+            <ng-container [ngSwitch]="room.last.type">
+              <span *ngSwitchCase="'file'">送出了一個圖片</span>
+              <span *ngSwitchDefault>{{room.last.content}}</span>
+            </ng-container>
           </p>
         </a>
       </ng-container>

@@ -1,8 +1,10 @@
+import 'rxjs/add/operator/takeUntil';
 import { Component } from '@angular/core';
 import { MenuModel } from '@core/model/menu.model';
 import { CollectionHandler } from '@core/service/base-http.service';
 import { MessageService } from 'app/pages/message/message.service';
 import { AutoDestroy } from '@shared/ts/auto.destroy';
+import { RxViewer } from '@shared/ts/rx.viewer';
 
 @Component({
   selector: 'app-message',

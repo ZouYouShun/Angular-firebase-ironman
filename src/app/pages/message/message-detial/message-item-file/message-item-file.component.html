@@ -1,10 +1,10 @@
 <ng-container *ngIf="url$ | async; else imgloading">
-  <div class="message-img mat-elevation-z2" [style.backgroundImage]="path | safe:'background-image'">
+  <div class="message-img mat-elevation-z2 bg-white" [style.backgroundImage]="path | safe:'background-image'">
     <img [src]="path | safe:'url'">
   </div>
 </ng-container>
 <ng-template #imgloading>
-  <div class="message-img" fxLayoutAlign="center center">
+  <div class="message-img mat-elevation-z2 bg-white" fxLayoutAlign="center center">
     <mat-progress-spinner mode="indeterminate" color="accent" [diameter]="20"></mat-progress-spinner>
   </div>
 </ng-template>

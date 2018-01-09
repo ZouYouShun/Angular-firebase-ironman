@@ -13,7 +13,7 @@ import * as firebase from 'firebase';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Observable } from 'rxjs/Observable';
 
-import { UserModel } from '../model/user.model';
+import { UserModel, USER_TYPE } from '../model/user.model';
 import { BaseHttpService, CollectionHandler } from './base-http.service';
 import { environment } from '@env';
 import { BlockViewService } from '@core/service/block-view.service';
@@ -42,20 +42,20 @@ export class AuthService {
     // 用來保存當前angularfire的使用者狀態
     this.fireUser$ = this._afAuth.authState;
     // 由於這個Service會永遠存活，我們不需對他做unsubscribe
-    this._afAuth.authState
-      // .do(() => this._block.block('登入中'))
-      .switchMap(user => {
-        return this.updateUser(user);
-      })
-      .switchMap(key => this.userHandler.document<UserModel>(key).get())
-      .subscribe(user => {
-        // user.ref.collection('rooms').get().then((x) => console.dir(x));
-        // console.log(user);
-        this._block.unblock();
-        this.returnUrl(user);
-        this.user = user;
-        this.currentUser$.next(user);
-      });
+    // this._afAuth.authState
+    //   // .do(() => this._block.block('登入中'))
+    //   .switchMap(user => {
+    //     return this.updateUser(user);
+    //   })
+    //   .switchMap(key => this.userHandler.document<UserModel>(key).get())
+    //   .subscribe(user => {
+    //     // user.ref.collection('rooms').get().then((x) => console.dir(x));
+    //     // console.log(user);
+    //     this._block.unblock();
+    //     this.returnUrl(user);
+    //     this.user = user;
+    //     this.currentUser$.next(user);
+    //   });
   }
 
 
@@ -65,7 +65,7 @@ export class AuthService {
       return Observable.fromPromise(this._afAuth.auth.createUserWithEmailAndPassword(obj.email, obj.password))
         .switchMap(result => {
           const user = Object.assign({}, result, { displayName: obj.name });
-          return this.addUser(user, 'email');
+          return this.addUser(user, USER_TYPE.EMAIL);
         })
         .do(() => {
           this.signOut();
@@ -97,10 +97,10 @@ export class AuthService {
     this.storeUrl();
 
     return Observable.fromPromise(this._afAuth.auth.signInWithPopup(provider))
-      .switchMap(result => {
-        const user = result.user;
-        return this.addUser(user, type);
-      })
+      // .switchMap(result => {
+      //   const user = result.user;
+      //   return this.addUser(user, type);
+      // })
       .catch(err => this.ErrorHandler(err, isSignUp ? '註冊失敗' : '登入失敗'));
   }
 
@@ -144,7 +144,7 @@ export class AuthService {
     return Observable.of(null);
   }
 
-  private addUser(user: firebase.User, types: 'google' | 'email' | 'facebook') {
+  private addUser(user: firebase.User, types: USER_TYPE) {
     const data: UserModel = {
       uid: user.uid,
       email: user.email,

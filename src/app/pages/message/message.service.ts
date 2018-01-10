@@ -14,8 +14,6 @@ import { Observable } from 'rxjs/Observable';
 @Injectable()
 export class MessageService {
 
-  private userRooms$: Observable<UserRoomModel[]>;
-  private userFriend$: Observable<UserModel[]>;
   // 存使用者
   friends$ = new BehaviorSubject<UserModel[]>(null);
   rooms$ = new BehaviorSubject<UserRoomModel[]>(null);
@@ -24,30 +22,29 @@ export class MessageService {
     private _http: BaseHttpService,
     public _auth: AuthService) {
 
-    this.userRooms$ = this._auth.currentUser$.filter(u => !!u)
-      .switchMap((user: UserModel) => {
-        return this._http.document(`users/${user.id}`).collection<UserRoomModel[]>('rooms').get({
-          queryFn: ref => ref.orderBy('updatedAt', 'desc'),
-          isKey: true
-        });
-      })
-      .do(rooms => {
-        // console.log(rooms);
-        this.rooms$.next(rooms);
-      });
-
-    this.userFriend$ = this._http.collection<UserModel[]>('users').get()
-      .do(users => {
-        // console.log(users);
-        this.friendsObj = arrayToObjectByKey(users, 'id');
-        this.friends$.next(users);
-      });
   }
 
   getNecessaryData() {
     return Observable.merge(
-      this.userFriend$,
-      this.userRooms$
+
+      this._http.collection<UserModel[]>('users').get()
+        .do(users => {
+          // console.log(users);
+          this.friendsObj = arrayToObjectByKey(users, 'id');
+          this.friends$.next(users);
+        }),
+
+      this._auth.currentUser$.filter(u => !!u)
+        .switchMap((user: UserModel) => {
+          return this._http.document(`users/${user.id}`).collection<UserRoomModel[]>('rooms').get({
+            queryFn: ref => ref.orderBy('updatedAt', 'desc'),
+            isKey: true
+          });
+        })
+        .do(rooms => {
+          // console.log(rooms);
+          this.rooms$.next(rooms);
+        })
     );
   }
 

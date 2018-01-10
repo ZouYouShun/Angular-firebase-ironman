@@ -1,0 +1,6 @@
+{
+  "short_name": "onfireChat",
+  "name": "Chat on firebase with Angular",
+  "start_url": "/?utm_source=homescreen",
+  "gcm_sender_id": "103953800507"
+}

@@ -1,17 +1,17 @@
 import 'rxjs/add/operator/takeUntil';
-import { Component } from '@angular/core';
+
+import { Component, OnInit } from '@angular/core';
 import { MenuModel } from '@core/model/menu.model';
-import { CollectionHandler } from '@core/service/base-http.service';
-import { MessageService } from 'app/pages/message/message.service';
+import { BaseHttpService } from '@core/service/base-http.service';
 import { AutoDestroy } from '@shared/ts/auto.destroy';
-import { RxViewer } from '@shared/ts/rx.viewer';
+import { MessageService } from 'app/pages/message/message.service';
 
 @Component({
   selector: 'app-message',
   templateUrl: './message.component.html',
   styleUrls: ['./message.component.scss']
 })
-export class MessageComponent extends AutoDestroy {
+export class MessageComponent extends AutoDestroy implements OnInit {
   menus: MenuModel[] = [
     {
       icon: 'message',
@@ -34,13 +34,15 @@ export class MessageComponent extends AutoDestroy {
     //   title: 'add friend'
     // }
   ];
-  users$;
-  constructor(private _message: MessageService) {
+  constructor(
+    private _http: BaseHttpService, private _message: MessageService) {
     super();
-    this.users$ = this._message.getNecessaryData()
+    this._message.getNecessaryData()
       .takeUntil(this._destroy$)
       .subscribe();
   }
 
+  ngOnInit(): void {
+  }
 
 }

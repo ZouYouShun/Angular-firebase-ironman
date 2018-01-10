@@ -43,3 +43,4 @@ Thumbs.db
 
 functions/node_modules
 functions/lib
+src/firebase-messaging-sw.js

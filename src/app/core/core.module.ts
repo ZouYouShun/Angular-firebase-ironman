@@ -1,5 +1,7 @@
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { NgModule, Optional, SkipSelf } from '@angular/core';
 import { MatIconRegistry } from '@angular/material';
+import { CloudMessagingService } from '@core/service/cloud-messaging.service';
 import { SharedModule } from '@shared/shared.module';
 
 import { AlertConfirmModule } from './component/alert-confirm/alert-confirm.module';
@@ -7,6 +9,7 @@ import { BlockViewComponent } from './component/block-view/block-view.component'
 import { PopUpModule } from './component/pop-up/pop-up.module';
 import { RouteLoadingComponent } from './component/route-loading/route-loading.component';
 import { AuthGuard } from './guard/auth.guard';
+import { ApiInterceptor } from './interceptor/api.interceptor';
 import { throwIfAlreadyLoaded } from './module-import-guard';
 import { AuthService } from './service/auth.service';
 import { BaseHttpService } from './service/base-http.service';
@@ -14,8 +17,6 @@ import { BaseService } from './service/base.service';
 import { BlockViewService } from './service/block-view.service';
 import { RouteLoadingService } from './service/route-loading.service';
 import { UploadService } from './service/upload.service';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { ApiInterceptor } from './interceptor/api.interceptor';
 
 @NgModule({
   imports: [
@@ -39,6 +40,7 @@ import { ApiInterceptor } from './interceptor/api.interceptor';
     RouteLoadingService,
     UploadService,
     AuthGuard,
+    CloudMessagingService,
     { provide: HTTP_INTERCEPTORS, useClass: ApiInterceptor, multi: true },
   ]
 })

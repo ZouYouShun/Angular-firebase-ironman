@@ -1,17 +1,20 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { AuthService } from '@core/service/auth.service';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { RxViewer } from '@shared/ts/rx.viewer';
+import { CloudMessagingService } from '@core/service/cloud-messaging.service';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
 
-  constructor(private _auth: AuthService) {
+  message;
+  constructor(private _auth: AuthService, private msgService: CloudMessagingService) {
     console.log('App working!');
+  }
+  ngOnInit() {
+    this.msgService.getPermission();
   }
 
 }

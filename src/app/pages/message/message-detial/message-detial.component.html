@@ -47,9 +47,15 @@
           <ng-template #addresseeView>
             <li class="mar-all-1 addressee" *ngIf="_message.friendsObj[message.sender] as addressee">
               <img class="avatar-img mar-r-1 "
+                [ngClass]="{'f-end': message.type==='file'}"
                 [src]="addressee?.photoURL | safe: 'url'"
                 alt="addressee photo">
-              <span class="content pad-all-1" [innerHTML]="message.content"></span>
+
+              <ng-container [ngSwitch]="message.type">
+                <app-message-item-file *ngSwitchCase="'file'" [data]="roomFiles[message.content]"></app-message-item-file>
+                <span *ngSwitchDefault class="content pad-all-1" [innerHTML]="message.content"></span>
+              </ng-container>
+
               <span fxFlexAlign="end" class="mar-l-1 mat-subheading-1 margin-0">{{message.createdAt | date:'hh:mm'}}</span>
             </li>
           </ng-template>

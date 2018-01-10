@@ -1,7 +1,6 @@
-import 'rxjs/add/observable/forkJoin';
-import 'rxjs/add/operator/combineLatest';
 import 'rxjs/add/operator/do';
 import 'rxjs/add/operator/merge';
+import 'rxjs/add/operator/switchMap';
 
 import { Injectable } from '@angular/core';
 import { UserRoomModel } from '@core/model/room.model';

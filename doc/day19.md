@@ -1,24 +1,17 @@
 # [Angular Firebase 入門與實做] Day-19 Cloud Functions Cloud Storage Triggers 03 修正聊天室顯示功能
-
 每日一句來源：[Daily English](https://play.google.com/store/apps/details?id=net.eocbox.dailysentence)
 
 > A great secret of success is to go through life as a man who never  gets used up. -- 成功的祕訣是：經歷人生，就像一個永遠不會疲憊的人。
 
 昨天我們透過ngxf-uploader實作了基本的檔案上傳的功能，但是因為時間的問題我們在顯示檔案上還有問題，今天我們來解決他
 
-解決上傳順序的問題
+# 修改trigger
 
-1. 改用concatMap，當檔案上傳完成後，才寫訊息到資料庫
-```js
-return fileHandler.upload({ file: file })
-  .concatMap(() => this.getMessageObs(filePath, MESSAGE_TYPE.FILE))
-  .subscribe(RxViewer);
-```
-當我們改使用concatMap後，我們因為是依序執行的，所以就不會有顯示的問題了，但是這有個缺點，就是當使用者圖片上來的時候，會沒辦法馬上看到上傳中的狀態，當然我們可以使用block來把畫面罩住，這也是個方法。
+我們先修改roomsMessage.firestore.ts
 
-2. 使用store trigger 儲存當前聊天室的檔案，並且將他轉為物件，直接顯示出來
+我們在trigger裡面取得roomId，並且去更新room的files資料，然後一樣加入Promise.all的陣列中一並新增出去
 
-筆者會使用這種方法，不只能解決當前的問題，還能一併將未來會實作的這個聊天室的檔案一併取出來
+此法不只能解決當前的問題，還能一併將未來會實作的這個聊天室的檔案一併取出來
 
 修改trigger
 

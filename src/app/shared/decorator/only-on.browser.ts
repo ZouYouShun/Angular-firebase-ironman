@@ -4,7 +4,7 @@ export function onlyOnBrowser(variableId) {
     const originalMethod = descriptor.value;
     descriptor.value = function (...args) {
       if (isPlatformBrowser(this[variableId])) {
-        originalMethod.apply(this, args);
+        return originalMethod.apply(this, args);
       }
     };
     return descriptor;

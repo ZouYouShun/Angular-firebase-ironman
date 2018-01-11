@@ -1,3 +1,5 @@
+  import 'rxjs/add/operator/do';
+
 import { Component } from '@angular/core';
 import { AlertConfirmModel, AlertConfirmService } from '@core/component/alert-confirm';
 import { AuthService } from '@core/service/auth.service';
@@ -54,9 +56,10 @@ export class SettingMenuComponent {
     this._alc.confirm(new AlertConfirmModel('確認', '確定要登出嗎？', 'success'))
       .ok(() => {
         this._auth.signOut()
-          .subscribe(() => {
+          .do(() => {
             this._alc.alert(new AlertConfirmModel('登出成功', '嗚嗚不要走~~~', 'warning'));
-          });
+          })
+          .subscribe();
       })
       .cancel(() => {
         this._alc.alert(new AlertConfirmModel('不登出', '嘿嘿就知道你還是愛我們的！', 'info'));

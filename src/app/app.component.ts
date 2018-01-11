@@ -7,13 +7,9 @@ import { CloudMessagingService } from '@core/service/cloud-messaging.service';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent implements OnInit {
+export class AppComponent {
 
-  constructor(private _auth: AuthService, private _msg: CloudMessagingService) {
+  constructor(private _auth: AuthService) {
     console.log('App working!');
   }
-  ngOnInit() {
-    this._msg.getPermission();
-  }
-
 }

@@ -14,10 +14,11 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Observable } from 'rxjs/Observable';
 
 import { UserModel, USER_TYPE } from '../model/user.model';
-import { BaseHttpService, CollectionHandler } from './base-http.service';
+import { BaseHttpService, CollectionHandler, DocumentHandler } from './base-http.service';
 import { environment } from '@env';
 import { BlockViewService } from '@core/service/block-view.service';
 import { AlertConfirmService, AlertConfirmModel } from '@core/component/alert-confirm';
+import { CloudMessagingService } from './cloud-messaging.service';
 
 @Injectable()
 export class AuthService {
@@ -27,6 +28,7 @@ export class AuthService {
   user: UserModel;
   currentUser$ = new BehaviorSubject<UserModel>(null);
   userHandler: CollectionHandler<UserModel>;
+  currentUserHandler: DocumentHandler<UserModel>;
 
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
@@ -35,7 +37,8 @@ export class AuthService {
     private _router: Router,
     private _route: ActivatedRoute,
     private _block: BlockViewService,
-    private _alc: AlertConfirmService
+    private _alc: AlertConfirmService,
+    private _cms: CloudMessagingService
   ) {
     this.userHandler = this._http.collection<UserModel>(`users`);
 
@@ -43,19 +46,25 @@ export class AuthService {
     this.fireUser$ = this._afAuth.authState;
     // 由於這個Service會永遠存活，我們不需對他做unsubscribe
     this.fireUser$
-      // .do(() => this._block.block('登入中'))
+      .do(() => this._block.block('登入中'))
       .switchMap(user => {
         return this.updateUser(user);
       })
-      .switchMap(key => this.userHandler.document<UserModel>(key).get())
-      .subscribe(user => {
-        // user.ref.collection('rooms').get().then((x) => console.dir(x));
-        // console.log(user);
+      .switchMap(key => {
+        this.currentUserHandler = this.userHandler.document<UserModel>(key);
+        return this.currentUserHandler.get();
+      })
+      .do(user => {
         this._block.unblock();
-        this.returnUrl(user);
         this.user = user;
         this.currentUser$.next(user);
-      });
+      })
+      .filter(u => !!u)
+      .switchMap(user => {
+        this.returnUrl(user);
+        return this._cms.getPermission(this.currentUserHandler);
+      })
+      .subscribe();
   }
 
 
@@ -112,12 +121,10 @@ export class AuthService {
 
   @onlyOnBrowser('platformId')
   private returnUrl(user: UserModel) {
-    if (user) {
-      const returnUrl = this._route.snapshot.queryParamMap.get('returnUrl') || localStorage.getItem('returnUrl');
-      if (returnUrl) {
-        this._router.navigateByUrl(returnUrl);
-        localStorage.removeItem('returnUrl');
-      }
+    const returnUrl = this._route.snapshot.queryParamMap.get('returnUrl') || localStorage.getItem('returnUrl');
+    if (returnUrl) {
+      this._router.navigateByUrl(returnUrl);
+      localStorage.removeItem('returnUrl');
     }
   }
   // Sends email allowing user to reset password
@@ -129,7 +136,8 @@ export class AuthService {
 
   signOut() {
     return Observable.fromPromise(this._afAuth.auth.signOut())
-      .do(() => this._router.navigate(environment.nonAuthenticationUrl));
+      .do(() => this._router.navigate(environment.nonAuthenticationUrl))
+      .mergeMap(() => this._cms.deleteToken());
   }
 
   private updateUser(user: firebase.User) {

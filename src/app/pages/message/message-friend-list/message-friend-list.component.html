@@ -1,7 +1,14 @@
 <mat-drawer-container fxFlexFill>
-  <mat-drawer mode="side" opened="true" style="width:300px" class="mat-elevation-z2">
+  <mat-drawer #roomList mode="side" opened="true" style="width:300px" class="mat-elevation-z2"
+    [ngStyle.lt-sm]="{ 'width': '100%' }">
+    <mat-toolbar fxHide fxShow.lt-sm color="accent" fxLayoutAlign="end center">
+      <button mat-icon-button (click)="roomList.close()">
+        <mat-icon class="c-white">keyboard_arrow_left</mat-icon>
+      </button>
+    </mat-toolbar>
     <mat-nav-list>
       <a mat-list-item *ngFor="let friend of _message.friends$ | async"
+        (click)="toggleList()"
         [routerLink]="[friend.id]"
         routerLinkActive="nomal-active">
         <img matListAvatar [src]="friend.photoURL | safe: 'url'" />

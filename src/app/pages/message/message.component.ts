@@ -45,4 +45,7 @@ export class MessageComponent extends AutoDestroy implements OnInit {
   ngOnInit(): void {
   }
 
+  toggleList() {
+    this._message.back$.next();
+  }
 }

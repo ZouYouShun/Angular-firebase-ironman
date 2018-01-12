@@ -12,6 +12,7 @@
 
     <mat-nav-list fxFlexOrder="1">
       <a mat-list-item *ngFor="let menu of menus"
+        (click)="toggleList()"
         [routerLink]="menu.url"
         routerLinkActive="bg-white active">
         <mat-icon [attr.aria-label]="menu.title" class="c-white">{{menu.icon}}</mat-icon>

@@ -27,6 +27,7 @@
     "@angular/platform-browser": "^5.2.0",
     "@angular/platform-browser-dynamic": "^5.2.0",
     "@angular/router": "^5.2.0",
+    "@angular/service-worker": "^5.2.0",
     "@types/youtube": "0.0.31",
     "angular2-prettyjson": "^2.0.6",
     "angularfire2": "^5.0.0-rc.5-next",

@@ -4,6 +4,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '@env';
 import { SharedModule } from '@shared/shared.module';
 import { AngularFireModule } from 'angularfire2';
@@ -15,7 +16,7 @@ import { AngularFireStorageModule } from 'angularfire2/storage';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { CoreModule } from './core/core.module';
-import { PagesModule } from 'app/pages/pages.module';
+import { PagesModule } from './pages/pages.module';
 
 @NgModule({
   imports: [
@@ -31,7 +32,9 @@ import { PagesModule } from 'app/pages/pages.module';
     SharedModule.forRoot(),
     AppRoutingModule,
     CoreModule,
-    // PagesModule,
+    // environment.production ? ServiceWorkerModule.register('/ngsw-worker.js') : []
+    ServiceWorkerModule.register('/ngsw-worker.js', { enabled: environment.production }),
+    PagesModule,
   ],
   declarations: [
     AppComponent,

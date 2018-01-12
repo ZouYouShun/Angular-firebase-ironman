@@ -3,7 +3,7 @@ import 'rxjs/add/operator/combineLatest';
 import 'rxjs/add/operator/do';
 import 'rxjs/add/operator/take';
 
-import { Component, ElementRef, ViewChild, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ElementRef, ViewChild, ChangeDetectionStrategy, Output, EventEmitter } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { MessageModel, MESSAGE_TYPE } from '@core/model/message.model';
@@ -23,6 +23,7 @@ import { MessageFriendListComponent } from '../message-friend-list/message-frien
 import { FileError } from 'ngxf-uploader';
 import { UploadService } from '@core/service/upload.service';
 import { arrayToObjectByKey } from '@shared/ts/data/arrayToObjectByKey';
+import { Subject } from 'rxjs/Subject';
 
 
 @Component({
@@ -33,6 +34,7 @@ import { arrayToObjectByKey } from '@shared/ts/data/arrayToObjectByKey';
 export class MessageDetialComponent extends AutoDestroy {
 
   @ViewChild('article', { read: ElementRef }) article: ElementRef;
+
 
   messageLoading = true;
 
@@ -87,6 +89,10 @@ export class MessageDetialComponent extends AutoDestroy {
       })
       .takeUntil(this._destroy$)
       .subscribe();
+  }
+
+  goList() {
+    this._message.goList();
   }
 
   private getMessageByUserId() {

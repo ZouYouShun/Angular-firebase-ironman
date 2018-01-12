@@ -9,6 +9,9 @@
 
   <header>
     <mat-toolbar fxLayoutAlign="start center" color="accent" class="mat-elevation-z2">
+      <button fxHide fxShow.lt-sm mat-icon-button (click)="goList()">
+        <mat-icon class="c-white">keyboard_arrow_left</mat-icon>
+      </button>
       <ng-container *ngIf="_message.friendsObj[addresseeId] as addressee">
         <img class="avatar-img mar-r-1" [src]="addressee?.photoURL | safe: 'url'">
         <h2 class="c-white">

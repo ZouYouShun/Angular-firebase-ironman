@@ -10,10 +10,12 @@ import { BaseHttpService } from '@core/service/base-http.service';
 import { arrayToObjectByKey } from '@shared/ts/data/arrayToObjectByKey';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Observable } from 'rxjs/Observable';
+import { Subject } from 'rxjs/Subject';
 
 @Injectable()
 export class MessageService {
 
+  back$ = new Subject();
   // 存使用者
   friends$ = new BehaviorSubject<UserModel[]>(null);
   rooms$ = new BehaviorSubject<UserRoomModel[]>(null);
@@ -46,6 +48,10 @@ export class MessageService {
           this.rooms$.next(rooms);
         })
     );
+  }
+
+  goList() {
+    this.back$.next();
   }
 
 }

@@ -70,14 +70,6 @@ a {
   margin-top: 0.5em;
 }
 
-.width-full {
-  width: 100%;
-}
-
-.width-half {
-  width: 50%;
-}
-
 .fb-button {
   background: #234ca2;
 }
@@ -99,6 +91,18 @@ a {
   background: rgba(0, 0, 0, 0.04);
 }
 
-.f-end{
+.f-end {
   align-self: flex-end;
+}
+
+.sidenav-container {
+  width: 300px;
+}
+
+.width-full {
+  width: 100%;
+}
+
+.width-half {
+  width: 50%;
 }

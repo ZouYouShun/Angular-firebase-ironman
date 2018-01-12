@@ -7,8 +7,6 @@ $popup-zIndex:1000;
 
 // @import './font/iconfont/material-icons.css';
 $app-menu-height:50px;
-$app-main-background: #fffce4;
-$app-main-color: mat-palette($mat-grey, 800);
 
 
 $app-typgography: mat-typography-config(
@@ -28,10 +26,13 @@ $app-typgography: mat-typography-config(
   // Line-height must be unit-less fraction of the font-size.
   $input:         mat-typography-level(20px, 1.125, 400));
 
-$app-primary: mat-palette($mat-yellow, 200);
+$app-primary: mat-palette($mat-deep-orange, 300);
 $app-accent:mat-palette($mat-deep-orange, 300);
 $app-warn:mat-palette($mat-red, 500);
 $app-theme:mat-light-theme($app-primary, $app-accent, $app-warn);
+
+$app-main-background: mat-color($app-primary,50);
+$app-main-color: mat-palette($mat-grey, 800);
 
 $app-reverse-primary: mat-palette($mat-brown, 300);
 $app-reverse-primary-color: #ffffff;

@@ -152,5 +152,5 @@ signOut() {
 # 本日原始碼
 |名稱|網址|
 |---|---|
-|functions| https://github.com/ZouYouShun/Angular-firebase-ironman-functions/tree/day22_cloud_messaging_2|
+|Angular| https://github.com/ZouYouShun/Angular-firebase-ironman-functions/tree/day22_cloud_messaging_2|
 |functions| https://github.com/ZouYouShun/Angular-firebase-ironman-functions/tree/day22_cloud_messaging_2|

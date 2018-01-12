@@ -8,6 +8,7 @@ import { NgxfUploaderModule } from 'ngxf-uploader';
 
 import { ActionBoxComponent } from './component/action-box/action-box.component';
 import { MyMaterialModuleModule } from './my-material-module.module';
+import { BrToSpacePipe } from './pipe/br-to-space.pipe';
 import { ImgPipe } from './pipe/img.pipe';
 import { SafePipe } from './pipe/safe.pipe';
 import { CdkService } from './service/cdk.service';
@@ -21,6 +22,7 @@ import { CdkService } from './service/cdk.service';
   ],
   declarations: [
     SafePipe,
+    BrToSpacePipe,
     ActionBoxComponent,
     ImgPipe
   ],
@@ -36,7 +38,7 @@ import { CdkService } from './service/cdk.service';
 
     SafePipe,
     ImgPipe,
-
+    BrToSpacePipe,
     ActionBoxComponent,
   ]
 })

@@ -23,7 +23,7 @@
             :
             <ng-container [ngSwitch]="room.last.type">
               <span *ngSwitchCase="'file'">送出了一個圖片</span>
-              <span *ngSwitchDefault>{{room.last.content}}</span>
+              <span *ngSwitchDefault [innerHtml]="room.last.content | brToSpace"></span>
             </ng-container>
           </p>
         </a>

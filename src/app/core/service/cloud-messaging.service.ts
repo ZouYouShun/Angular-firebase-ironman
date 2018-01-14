@@ -30,16 +30,16 @@ export class CloudMessagingService {
     return Observable.fromPromise(
       this.messaging.requestPermission()
         .then(() => {
-          console.log('允許授權推波!');
+          // console.log('允許授權推波!');
           return this.messaging.getToken();
         }))
       .switchMap(token => {
-        console.log(token);
+        // console.log(token);
         this.token = token;
         return this.saveTokenLocal(token, user.collection('fcmTokens'));
       })
       .switchMap(() => {
-        console.log('set');
+        // console.log('set');
         this.fcmTockenHandler = user.collection('fcmTokens').document(this.token);
         return this.fcmTockenHandler.set({
           token: this.token,
@@ -47,7 +47,7 @@ export class CloudMessagingService {
         });
       })
       .catch((err) => {
-        console.log('不給推波', err);
+        // console.log('不給推波', err);
         return Observable.throw(new Error('不給推波'));
       });
   }
@@ -60,7 +60,7 @@ export class CloudMessagingService {
     // if is empty, it maybe first or delete
     if (!localToken) {
       // 取得這個人所有的token，把所有userAgent相同的刪除
-      console.log('!');
+      // console.log('!');
       return tokensRef.get({ isKey: true, queryFn: ref => ref.where('userAgent', '==', userAgent) })
         .take(1)
         .map((tokens: any[]) => tokens.filter(obj => obj.id !== token)
@@ -76,7 +76,7 @@ export class CloudMessagingService {
 
   receiveMessage() {
     this.messaging.onMessage((payload) => {
-      console.log('Message received. ', payload);
+      // console.log('Message received. ', payload);
       this.currentMessage$.next(payload);
     });
   }

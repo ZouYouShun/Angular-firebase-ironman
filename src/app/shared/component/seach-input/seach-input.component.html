@@ -1,0 +1,12 @@
+<!-- <form id="content">
+  <input type="text" name="input" class="input">
+  <button type="reset" class="search"></button>
+</form> -->
+
+<button mat-icon-button (click)="search(!active)">
+  <mat-icon class="c-white">{{active ? 'close' : 'search'}}</mat-icon>
+</button>
+
+<input type="text" class="transition mat-title margin-0 pad-l-r-1"
+  [ngClass]="{'active': active}" #input
+  (keydown.enter)="onSubmit()">

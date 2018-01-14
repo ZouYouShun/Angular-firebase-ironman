@@ -35,6 +35,10 @@ a {
   text-decoration: none;
 }
 
+.display-flex {
+  display: flex;
+}
+
 .fill-remaining-space {
   flex: 1 1 auto;
 }

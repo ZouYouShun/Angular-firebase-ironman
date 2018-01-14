@@ -1,0 +1,5 @@
+@import '~common/css/_my-theme.variable.scss';
+.search-input{
+  border: 1px solid app-color(grey);
+  border-radius: app-border-radius(square);
+}

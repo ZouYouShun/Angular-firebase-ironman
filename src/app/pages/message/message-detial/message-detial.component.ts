@@ -24,6 +24,7 @@ import { FileError } from 'ngxf-uploader';
 import { UploadService } from '@core/service/upload.service';
 import { arrayToObjectByKey } from '@shared/ts/data/arrayToObjectByKey';
 import { Subject } from 'rxjs/Subject';
+import { StringHandler } from '@shared/ts/data/string.handler';
 
 
 @Component({
@@ -161,7 +162,7 @@ export class MessageDetialComponent extends AutoDestroy {
     if (event) event.preventDefault();
     const content = this.messageForm.value.content;
     this.messageForm.reset();
-    if (!content || !content.trim()) {
+    if (new StringHandler(content).isEmpty()) {
       return;
     }
 

@@ -1,0 +1,14 @@
+
+@import '~common/css/_my-theme.variable.scss';
+input {
+  width: 0;
+  border: 0;
+  // display: none;
+  opacity: 0;
+  border-radius: app-border-radius(square);
+  &.active{
+    opacity: 1;
+    // display: inline-block;
+    width: 100%
+  }
+}

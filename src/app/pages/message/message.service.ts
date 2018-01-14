@@ -11,6 +11,7 @@ import { arrayToObjectByKey } from '@shared/ts/data/arrayToObjectByKey';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
+import { QueryFn } from 'angularfire2/firestore';
 
 @Injectable()
 export class MessageService {
@@ -20,6 +21,8 @@ export class MessageService {
   friends$ = new BehaviorSubject<UserModel[]>(null);
   rooms$ = new BehaviorSubject<UserRoomModel[]>(null);
   friendsObj = {}; // Firend To Obj way
+
+  private query = new BehaviorSubject<QueryFn>(ref => ref.orderBy('updatedAt', 'desc'));
   constructor(
     private _http: BaseHttpService,
     public _auth: AuthService) {
@@ -36,10 +39,10 @@ export class MessageService {
           this.friends$.next(users);
         }),
 
-      this._auth.currentUser$.filter(u => !!u)
-        .switchMap((user: UserModel) => {
+      this.query.combineLatest(this._auth.currentUser$.filter(u => !!u))
+        .switchMap(([queryFn, user]) => {
           return this._http.document(`users/${user.id}`).collection<UserRoomModel[]>('rooms').get({
-            queryFn: ref => ref.orderBy('updatedAt', 'desc'),
+            queryFn,
             isKey: true
           });
         })
@@ -52,6 +55,9 @@ export class MessageService {
 
   goList() {
     this.back$.next();
+  }
+
+  search(title: string) {
   }
 
 }

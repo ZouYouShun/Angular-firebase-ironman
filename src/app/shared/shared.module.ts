@@ -12,6 +12,7 @@ import { BrToSpacePipe } from './pipe/br-to-space.pipe';
 import { ImgPipe } from './pipe/img.pipe';
 import { SafePipe } from './pipe/safe.pipe';
 import { CdkService } from './service/cdk.service';
+import { AutofocusDirective } from './directive/autofocus.directive';
 
 @NgModule({
   imports: [
@@ -25,7 +26,8 @@ import { CdkService } from './service/cdk.service';
     BrToSpacePipe,
     ActionBoxComponent,
     ImgPipe,
-    SeachInputComponent
+    SeachInputComponent,
+    AutofocusDirective
   ],
   exports: [
     CommonModule,
@@ -40,7 +42,8 @@ import { CdkService } from './service/cdk.service';
     ImgPipe,
     BrToSpacePipe,
     ActionBoxComponent,
-    SeachInputComponent
+    SeachInputComponent,
+    AutofocusDirective
   ]
 })
 export class SharedModule {

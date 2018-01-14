@@ -1,17 +1,16 @@
 import { CommonModule } from '@angular/common';
 import { ModuleWithProviders, NgModule } from '@angular/core';
-import { MatButtonModule, MatIconModule } from '@angular/material';
 
 import { AlertConfirmComponent } from './alert-confirm.component';
 import { AlertConfirmService } from './alert-confirm.service';
 import { A11yModule } from '@angular/cdk/a11y';
+import { SharedModule } from '@shared/shared.module';
 
 @NgModule({
   imports: [
     CommonModule,
-    MatIconModule,
-    MatButtonModule,
-    A11yModule
+    A11yModule,
+    SharedModule
   ],
   declarations: [
     AlertConfirmComponent

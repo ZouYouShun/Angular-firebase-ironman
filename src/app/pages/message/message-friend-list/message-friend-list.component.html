@@ -21,6 +21,11 @@
         <p matLine>{{ friend.displayName }}</p>
       </a>
     </mat-nav-list>
+    <mat-list *ngIf="!friends || friends.length === 0">
+      <mat-list-item>
+        沒有朋友<mat-icon class="pad-l-1">sentiment_neutral</mat-icon>
+      </mat-list-item>
+    </mat-list>
   </mat-drawer>
   <mat-drawer-content>
     <router-outlet></router-outlet>

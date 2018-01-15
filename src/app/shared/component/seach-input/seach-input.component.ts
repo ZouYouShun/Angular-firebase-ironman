@@ -29,7 +29,6 @@ export class SeachInputComponent extends AutoDestroy implements OnInit, AfterVie
       .debounceTime(500)
       .do((e: KeyboardEvent) => {
         if (e.keyCode !== 13) {
-          console.log(e);
           this.onSubmit();
         }
       })

@@ -1,6 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { AngularFireStorage } from 'angularfire2/storage';
 import { Observable } from 'rxjs/Observable';
+import { BaseHttpService } from '@core/service/base-http.service';
+import { FileModel } from '@core/model/file.model';
 
 @Component({
   selector: 'app-message-item-file',
@@ -11,13 +12,15 @@ export class MessageItemFileComponent {
   @Input() set data(value) {
     if (value) {
       if (!this.url$) {
-        this.url$ = this._storage.ref(value.id).getDownloadURL().do(u => this.path = u);
+        this.url$ = this._http.document<FileModel>(`files/${value.id}`).get()
+          .filter(f => !!f)
+          .do(f => this.path = f.thumbnail);
       }
     }
   }
 
-  url$: Observable<string>;
+  url$: Observable<FileModel>;
   path = '';
-  constructor(private _storage: AngularFireStorage) { }
+  constructor(private _http: BaseHttpService) { }
 
 }

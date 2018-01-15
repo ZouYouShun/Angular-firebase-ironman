@@ -14,7 +14,6 @@ import { BaseHttpService, CollectionHandler, DocumentHandler } from '@core/servi
 import { runAfterTimeout } from '@shared/decorator/timeout.decorator';
 import { AutoDestroy } from '@shared/ts/auto.destroy';
 // import { replaceToBr } from '@shared/ts/data/replaceToBr';
-import { RxViewer } from '@shared/ts/rx.viewer';
 import { MessageRoomListComponent } from 'app/pages/message/message-room-list/message-room-list.component';
 import { MessageService } from 'app/pages/message/message.service';
 import { Observable } from 'rxjs/Observable';
@@ -182,7 +181,7 @@ export class MessageDetialComponent extends AutoDestroy {
 
     return this.getMessageObs(filePath, MESSAGE_TYPE.FILE)
       .mergeMap(() => fileHandler.upload({ file: file }))
-      .subscribe(RxViewer);
+      .subscribe();
   }
 
 

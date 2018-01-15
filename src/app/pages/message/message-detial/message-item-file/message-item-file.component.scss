@@ -6,7 +6,9 @@
   background-position-x: 50%;
   background-position-y: 50%;
   min-width: 200px;
-  min-height: 200px;
+  &.loading {
+    min-height: 200px;
+  }
   img {
     opacity: 0;
     min-width: 100px;

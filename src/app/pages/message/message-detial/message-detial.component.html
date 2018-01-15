@@ -1,5 +1,6 @@
 <section class="message-container" fxLayout="column nowrap"
   (ngxf-drop)="uploadFile($event)"
+  [ngxf-validate]="{ size: { min: 50, max:10000000 } }"
   drop-class="drop"
   accept="image/*,.svg">
   <div class="block">
@@ -18,6 +19,19 @@
           {{addressee?.displayName}}
         </h2>
       </ng-container>
+
+      <div class="fill-remaining-space"></div>
+
+      <button mat-icon-button [matMenuTriggerFor]="menuElm">
+        <mat-icon class="c-white">more_vert</mat-icon>
+      </button>
+
+      <mat-menu #menuElm="matMenu">
+        <button mat-menu-item>
+          <mat-icon>photo</mat-icon>
+          <span>照片</span>
+        </button>
+      </mat-menu>
     </mat-toolbar>
   </header>
 
@@ -101,7 +115,7 @@
 
 <input type="file" #fileSelect
   (ngxf-select)="uploadFile($event)"
-  [ngxf-validate]="{ size: { min: 50, max:1000000 } }"
+  [ngxf-validate]="{ size: { min: 50, max:10000000 } }"
   accept="image/*,.svg">
 
 <!-- matTextareaAutosize

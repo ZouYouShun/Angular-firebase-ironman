@@ -13,7 +13,7 @@ import { AuthService } from '@core/service/auth.service';
 import { BaseHttpService, CollectionHandler, DocumentHandler } from '@core/service/base-http.service';
 import { runAfterTimeout } from '@shared/decorator/timeout.decorator';
 import { AutoDestroy } from '@shared/ts/auto.destroy';
-import { replaceToBr } from '@shared/ts/data/replaceToBr';
+// import { replaceToBr } from '@shared/ts/data/replaceToBr';
 import { RxViewer } from '@shared/ts/rx.viewer';
 import { MessageRoomListComponent } from 'app/pages/message/message-room-list/message-room-list.component';
 import { MessageService } from 'app/pages/message/message.service';
@@ -188,7 +188,8 @@ export class MessageDetialComponent extends AutoDestroy {
 
   private getMessageObs(content, type = MESSAGE_TYPE.MESSAGE) {
     let req: Observable<any>;
-    content = replaceToBr(content);
+    // content = replaceToBr(content);
+    // content = content;
 
     const message: MessageModel = {
       sender: this.sender.uid,

@@ -37,7 +37,7 @@
 
             <ng-container [ngSwitch]="message.type">
               <app-message-item-file *ngSwitchCase="'file'" [data]="roomFiles[message.content]"></app-message-item-file>
-              <span *ngSwitchDefault class="content pad-all-1" [innerHTML]="message.content"></span>
+              <span *ngSwitchDefault class="content pad-all-1" [innerHTML]="message.content | message:'url' "></span>
             </ng-container>
 
             <i class="isSend material-icons"
@@ -56,7 +56,7 @@
 
               <ng-container [ngSwitch]="message.type">
                 <app-message-item-file *ngSwitchCase="'file'" [data]="roomFiles[message.content]"></app-message-item-file>
-                <span *ngSwitchDefault class="content pad-all-1" [innerHTML]="message.content"></span>
+                <span *ngSwitchDefault class="content pad-all-1" [innerHTML]="message.content | message:'url c-black' "></span>
               </ng-container>
 
               <span fxFlexAlign="end" class="mar-l-1 mat-subheading-1 margin-0">{{message.createdAt | date:'hh:mm'}}</span>

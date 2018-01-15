@@ -108,7 +108,7 @@ app.get('*', (req: any, res) => {
   const isBot = detectBot(req.headers['user-agent']);
   if (isBot) {
     const botUrl = generateUrl(req);
-    fetch(`${renderUrl}/${botUrl}`)
+    fetch(`${renderUrl}/render/${botUrl}`)
       .then(response => response.text())
       .then(body => {
         res.set('Cache-Control', 'public, max-age=300, s-maxage=600');
@@ -140,6 +140,10 @@ export const Rendertron = rendertronHttpTrigger;
 最後兩邊都部屬上去，測試看看!
 https://cards-dev.twitter.com/validator
 https://developers.facebook.com/tools/debug/
+
+我想你應該會看到以下畫面：
+![](https://res.cloudinary.com/dw7ecdxlp/image/upload/v1516002316/billing_account_gleips.jpg)
+這是因為在functions要做外部的http request是必須要設定帳單才有辦法執行的QQ，夥伴們如果要測試就設定上去試試看吧
 
 # 建立自己的Rendertron站台
 

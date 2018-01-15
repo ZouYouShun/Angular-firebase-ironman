@@ -2,14 +2,13 @@ import { Pipe, PipeTransform } from '@angular/core';
 import { StringHandler } from '../ts/data/string.handler';
 
 @Pipe({
-  name: 'brToSpace'
+  name: 'message'
 })
-export class BrToSpacePipe implements PipeTransform {
+export class MessagePipe implements PipeTransform {
 
-  transform(value: any, args?: any): any {
+  transform(value: any, cla?: string): any {
     return new StringHandler(value)
-      .brToSpace()
+      .hrefToAnchor(cla)
       .toString();
   }
-
 }

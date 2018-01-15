@@ -6,8 +6,6 @@
 @import '~common/css/_my-theme.variable.scss';
 @import '~common/css/material/_my-material.theme.scss';
 @include my-material();
-@import '~common/css/component/index.scss';
-@import '~common/css/general/index.scss';
 // set global typgography, and box-sizing
 * {
   outline: none;
@@ -110,3 +108,11 @@ a {
 .width-half {
   width: 50%;
 }
+
+.url {
+  color: white;
+  text-decoration: underline;
+}
+
+@import '~common/css/component/index.scss';
+@import '~common/css/general/index.scss';

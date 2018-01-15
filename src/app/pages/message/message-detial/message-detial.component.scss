@@ -36,9 +36,10 @@
           color: #363636;
         }
       }
-      .content{
+      .content {
         border-radius: app-border-radius(square);
         word-break: break-all;
+        white-space: pre-wrap;
       }
     }
   }

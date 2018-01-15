@@ -12,7 +12,7 @@
     ],
     "rewrites": [{
       "source": "**",
-      "function": "Rendertron"
+      "destination": "/index.html"
     }]
   },
   "storage": {

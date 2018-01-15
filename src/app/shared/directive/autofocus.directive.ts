@@ -10,7 +10,7 @@ export class AutofocusDirective implements FocusableOption, AfterViewInit {
   constructor(private element: ElementRef) { }
 
   focus(): void {
-    console.log('!focus');
+    // console.log('!focus');
     this.element.nativeElement.focus();
   }
 

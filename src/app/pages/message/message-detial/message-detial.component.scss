@@ -13,7 +13,6 @@
       &.sender {
         justify-content: flex-end;
         .content {
-          border-radius: app-border-radius(square);
           background-color: #2095FE;
           color: #fff;
         }
@@ -33,10 +32,13 @@
       }
       &.addressee {
         .content {
-          border-radius: app-border-radius(square);
           background-color: #E5E4E9;
           color: #363636;
         }
+      }
+      .content{
+        border-radius: app-border-radius(square);
+        word-break: break-all;
       }
     }
   }

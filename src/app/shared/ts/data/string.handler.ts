@@ -15,33 +15,24 @@ export class StringHandler {
   }
 
   hrefToAnchor(cla?: string) {
+    // get all url
     let urls = this._content.match(/https?:\/\/[^ \r\n]+/g);
 
+    // if has url
     if (urls && urls.length > 0) {
-      console.log(urls);
-      urls = urls.map(url => `<a target="_blank" class="${cla}" href="${url}">${url}</a>`);
+      // decoratate to a href
+      urls = urls.map(url => `<a target="_blank" class="${cla || ''}" href="${url}">${url}</a>`);
 
+      // content split by url and add new urls into original index
       const tmp = this._content.split(/https?:\/\/[^ \r\n]+/g);
-      console.log(tmp);
-
       for (let i = urls.length; i > 0; i--) {
         tmp.splice(i, 0, urls[i - 1]);
       }
-      console.log(tmp);
+      // join with ''
       this._content = tmp.join('');
     }
-    // tmp.forEach((elm, i) => {
-    // });
     return this;
   }
-
-
-  // .map(item => {
-  //   if (item.indexOf(`http://`) > -1 || item.indexOf(`https://`) > -1) {
-  //     return `<a target="_blank" href="${item}">${item}</a>`;
-  //   }
-  //   return item;
-  // })
 
   limit(num: number) {
     if (this._content.length > num) {

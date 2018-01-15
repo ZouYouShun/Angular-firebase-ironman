@@ -35,6 +35,11 @@
         </a>
       </ng-container>
     </mat-nav-list>
+    <mat-list *ngIf="!rooms || rooms.length === 0">
+      <mat-list-item>
+        尚未有對話<mat-icon class="pad-l-1">sentiment_neutral</mat-icon>
+      </mat-list-item>
+    </mat-list>
   </mat-drawer>
   <mat-drawer-content>
     <router-outlet></router-outlet>

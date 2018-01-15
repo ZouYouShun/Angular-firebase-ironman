@@ -208,6 +208,11 @@ Rendertron真的是救星!雖然或許效能上比較慢了一些，但是針對
 https://www.youtube.com/watch?v=ANyOZIcGvB8
 講者的英文相當清楚，且分享的內容也都很給力!是非常優質的頻道！
 
+# 本日原始碼
+|名稱|網址|
+|---|---|
+|Angular| https://github.com/ZouYouShun/Angular-firebase-ironman-functions/tree/day25_seo_rendertron|
+|functions| https://github.com/ZouYouShun/Angular-firebase-ironman-functions/tree/day25_seo_rendertron|
 
 # 參考資料
 https://www.youtube.com/watch?v=ANyOZIcGvB8

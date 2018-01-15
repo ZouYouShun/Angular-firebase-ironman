@@ -114,13 +114,19 @@ app.get('*', (req: any, res) => {
         res.set('Cache-Control', 'public, max-age=300, s-maxage=600');
         res.set('Vary', 'User-Agent');
         res.send(body.toString());
-      });
+      })
+      .catch(err => res.status(401).json({
+        err: err
+      }));
   } else {
     fetch(`https://${appUrl}`)
       .then(response => response.text())
       .then(body => {
         res.send(body.toString());
-      });
+      })
+      .catch(err => res.status(401).json({
+        err: err
+      }));
   }
 });
 

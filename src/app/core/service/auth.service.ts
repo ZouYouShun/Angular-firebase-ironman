@@ -102,8 +102,10 @@ export class AuthService {
   private signInUpBySocialMedia(provider, type, isSignUp = false) {
     this.storeUrl();
 
-    return fromPromise(this._afAuth.auth.signInWithPopup(provider))
-      .catch(err => this.ErrorHandler(err, isSignUp ? '註冊失敗' : '登入失敗'));
+    return fromPromise(
+      this._afAuth.auth.signInWithPopup(provider)
+        .catch(err => this.ErrorHandler(err, isSignUp ? '註冊失敗' : '登入失敗'))
+    );
   }
 
   @onlyOnBrowser('platformId')

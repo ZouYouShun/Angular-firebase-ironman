@@ -18,6 +18,7 @@
         <h2 class="c-white">
           {{addressee?.displayName}}
         </h2>
+        <i class="online-cycle mar-l-1" [ngClass]="{active: addressee?.loginStatus}"></i>
       </ng-container>
 
       <div class="fill-remaining-space"></div>

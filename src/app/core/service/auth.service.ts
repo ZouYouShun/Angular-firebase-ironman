@@ -46,12 +46,15 @@ export class AuthService {
     // 由於這個Service會永遠存活，我們不需對他做unsubscribe
     this.fireUser$.pipe(
       tap(() => this._block.block('登入中')),
+      // switchMap(user => {
+      //   return this.updateUser(user);
+      // }),
       switchMap(user => {
-        return this.updateUser(user);
-      }),
-      switchMap(key => {
-        this.currentUserHandler = this.userHandler.document<UserModel>(key);
-        return this.currentUserHandler.get();
+        if (user) {
+          this.currentUserHandler = this.userHandler.document<UserModel>(user.uid);
+          return this.currentUserHandler.get();
+        }
+        return of(null);
       }),
       tap(user => {
         this._block.unblock();
@@ -134,26 +137,29 @@ export class AuthService {
   }
 
   signOut() {
-    return this._http.document(`status/${this.user.uid}`).set({ state: false }, false).pipe(
+    return this.currentUserHandler.update(<any>{
+      loginStatus: false,
+      lastSignInTime: firebase.firestore.FieldValue.serverTimestamp()
+    }, false).pipe(
       mergeMap(() => this._cms.deleteToken()),
       tap(() => {
         this._router.navigate(environment.nonAuthenticationUrl);
         this._afAuth.auth.signOut();
       })
-    );
+      );
   }
 
-  private updateUser(user: firebase.User) {
-    if (user) {
-      const data: UserModel = {
-        email: user.email,
-        photoURL: user.photoURL,
-        lastSignInTime: user.metadata.lastSignInTime
-      };
-      return this.userHandler.update(user.uid, data);
-    }
-    return of(null);
-  }
+  // private updateUser(user: firebase.User) {
+  //   if (user) {
+  //     const data: UserModel = {
+  //       email: user.email,
+  //       photoURL: user.photoURL,
+  //       lastSignInTime: user.metadata.lastSignInTime
+  //     };
+  //     return this.userHandler.update(user.uid, data);
+  //   }
+  //   return of(null);
+  // }
 
   private addUser(user: firebase.User, types: USER_TYPE) {
     const data: UserModel = {
@@ -161,7 +167,6 @@ export class AuthService {
       email: user.email,
       displayName: user.displayName,
       photoURL: user.photoURL,
-      lastSignInTime: user.metadata.lastSignInTime,
       type: types
     };
     return this.userHandler.set(data.uid, data);

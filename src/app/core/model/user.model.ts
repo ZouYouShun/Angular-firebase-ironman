@@ -15,6 +15,7 @@ export interface UserModel extends BaseModel {
   type?: USER_TYPE;
   catchPhrase?: string;
   photoURL?: string;
+  loginStatus?: boolean;
   lastSignInTime?: string;
   firend?: any;
   rooms?: { [s: string]: RoomModel };

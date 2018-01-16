@@ -20,7 +20,10 @@
           [routerLink]="[room.roomId, room.id]"
           routerLinkActive="nomal-active">
           <img matListAvatar [src]="user.photoURL | safe: 'url'" />
-          <h2 mat-line>{{user.displayName}}</h2>
+          <h2 mat-line>
+            {{user.displayName}}
+            <i class="online-cycle f-r" [ngClass]="{active: user.loginStatus}"></i>
+          </h2>
           <p mat-line class="c-grey">
             <span *ngIf="_auth.user.id === room.last.sender; else sender">you</span>
             <ng-template #sender>

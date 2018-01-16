@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BaseHttpService } from '@core/service/base-http.service';
-import { map, tap, filter, combineLatest } from 'rxjs/operators';
+import { map, tap, filter, combineLatest, skipWhile } from 'rxjs/operators';
 import * as firebase from 'firebase';
 import { AuthService } from './auth.service';
 import { isOnlineForDatabase, isOfflineForDatabase } from '../model/login.model';
@@ -17,28 +17,27 @@ export class LoginStatusService {
 
     // this state never stop
     this._auth.currentUser$.pipe(
+      skipWhile(u => !!u),
       combineLatest(this._http.object('.info/connected').get()),
       tap(([user, connected]) => {
-        console.log(user);
-        if (user) {
+        // console.log('get user', user);
+        if (user && !this._disconnection) {
+          // console.log('登入!');
           const userStatusDatabaseRef = firebase.database().ref('/status/' + user.uid);
-          userStatusDatabaseRef.set(dbTimeObject({ state: true }, false));
+          userStatusDatabaseRef.set(dbTimeObject({ state: true }, false))
+            .then(() => {
+              // console.log('update login');
+              this._disconnection = userStatusDatabaseRef.onDisconnect();
+              return this._disconnection.set(dbTimeObject({ state: false }, false));
+            })
+            .catch(e => console.log(e));
 
-          this._disconnection = userStatusDatabaseRef.onDisconnect();
-          this._disconnection.set(dbTimeObject({ state: false }, false));
-        } else {
-          if (this._disconnection) {
-            console.log('取消');
-            this._disconnection.cancel();
-          }
+        } else if (!user && this._disconnection) {
+          // console.log('取消');
+          this._disconnection.cancel();
+          this._disconnection = undefined;
         }
       })
     ).subscribe();
   }
 }
-
-
-    // this._http.collection(`status`).get().pipe(
-    //   // tap(d => console.log(d))
-    // ).subscribe();
-

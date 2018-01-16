@@ -18,7 +18,10 @@
         [routerLink]="[friend.id]"
         routerLinkActive="nomal-active">
         <img matListAvatar [src]="friend.photoURL | safe: 'url'" />
-        <p matLine>{{ friend.displayName }}</p>
+        <h2 mat-line>
+          {{friend.displayName}}
+          <i class="online-cycle f-r" [ngClass]="{active: friend.loginStatus}"></i>
+        </h2>
       </a>
     </mat-nav-list>
     <mat-list *ngIf="!friends || friends.length === 0">

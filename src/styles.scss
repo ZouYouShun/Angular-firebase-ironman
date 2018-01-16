@@ -114,5 +114,25 @@ a {
   text-decoration: underline;
 }
 
+.online-cycle {
+  display: none;
+  border-radius: app-border-radius(cycle);
+  width: 10px;
+  height: 10px;
+  background: app-color(green);
+  border: 1px solid app-color(gray);
+  &.active {
+    display: block;
+  }
+}
+
+.f-r {
+  float: right;
+}
+
+.f-l {
+  float: left;
+}
+
 @import '~common/css/component/index.scss';
 @import '~common/css/general/index.scss';

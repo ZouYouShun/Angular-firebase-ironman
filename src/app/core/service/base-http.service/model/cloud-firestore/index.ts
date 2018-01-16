@@ -155,9 +155,10 @@ export class DocumentHandler<T> {
     );
   }
   // 修改
-  update(data: T) {
+  update(data: T, updateDate = true) {
     if (!this.url) return of(null);
-    return fromPromise(this._fireAction.update(storeTimeObject(data, false))).pipe(
+    const obj = updateDate ? storeTimeObject(data, false) : data;
+    return fromPromise(this._fireAction.update(obj)).pipe(
       catchError(error => handleError(error))
     );
   }

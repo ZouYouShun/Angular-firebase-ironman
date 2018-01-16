@@ -83,8 +83,8 @@ export class CloudMessagingService {
   @onlyOnBrowser('platformId')
   deleteToken() {
     return this.fcmTockenHandler.delete().pipe(
+      mergeMap(() => fromPromise(this.messaging.deleteToken(this.token))),
       tap(() => localStorage.removeItem(tokenName)),
-      mergeMap(() => fromPromise(this.messaging.deleteToken(this.token)))
     );
   }
 }

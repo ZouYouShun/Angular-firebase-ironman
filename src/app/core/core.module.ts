@@ -17,6 +17,7 @@ import { BaseService } from './service/base.service';
 import { BlockViewService } from './service/block-view.service';
 import { RouteLoadingService } from './service/route-loading.service';
 import { UploadService } from './service/upload.service';
+import { LoginStatusService } from './service/login-status.service';
 
 @NgModule({
   imports: [
@@ -41,6 +42,7 @@ import { UploadService } from './service/upload.service';
     UploadService,
     AuthGuard,
     CloudMessagingService,
+    LoginStatusService,
     { provide: HTTP_INTERCEPTORS, useClass: ApiInterceptor, multi: true },
   ]
 })

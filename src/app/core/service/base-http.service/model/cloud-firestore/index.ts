@@ -162,9 +162,9 @@ export class DocumentHandler<T> {
     );
   }
   // 設定
-  set(data: T) {
+  set(data: T, isCreated = true) {
     if (!this.url) return of(null);
-    return fromPromise(this._fireAction.set(storeTimeObject(data))).pipe(
+    return fromPromise(this._fireAction.set(storeTimeObject(data, isCreated))).pipe(
       catchError(error => handleError(error))
     );
   }

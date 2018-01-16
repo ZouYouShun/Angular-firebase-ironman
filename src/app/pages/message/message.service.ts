@@ -6,7 +6,7 @@ import { BaseHttpService } from '@core/service/base-http.service';
 import { arrayToObjectByKey } from '@shared/ts/data/arrayToObjectByKey';
 import { QueryFn } from 'angularfire2/firestore';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { combineLatest, switchMap, tap } from 'rxjs/operators';
+import { combineLatest, switchMap, tap, filter } from 'rxjs/operators';
 import { Subject } from 'rxjs/Subject';
 import { Observable } from 'rxjs/Observable';
 import { merge } from 'rxjs/observable/merge';
@@ -37,7 +37,7 @@ export class MessageService {
         })
       ),
       this.query.pipe(
-        combineLatest(this._auth.currentUser$.filter(u => !!u)),
+        combineLatest(this._auth.currentUser$.pipe(filter(u => !!u))),
         switchMap(([queryFn, user]) => {
           return this._http.document(`users/${user.id}`).collection<UserRoomModel[]>('rooms').get({
             queryFn,

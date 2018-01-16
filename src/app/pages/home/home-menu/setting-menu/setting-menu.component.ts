@@ -56,6 +56,7 @@ export class SettingMenuComponent {
       .ok(() => {
         this._auth.signOut().pipe(
           tap(() => {
+            console.log('登出了');
             this._alc.alert(new AlertConfirmModel('登出成功', '嗚嗚不要走~~~', 'warning'));
           })
         ).subscribe();

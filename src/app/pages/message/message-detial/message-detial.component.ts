@@ -19,7 +19,7 @@ import { UploadService } from '@core/service/upload.service';
 import { arrayToObjectByKey } from '@shared/ts/data/arrayToObjectByKey';
 import { Subject } from 'rxjs/Subject';
 import { StringHandler } from '@shared/ts/data/string.handler';
-import { takeUntil, switchMap, tap, combineLatest, mergeMap } from 'rxjs/operators';
+import { takeUntil, switchMap, tap, combineLatest, mergeMap, filter } from 'rxjs/operators';
 import { of } from 'rxjs/observable/of';
 
 
@@ -95,7 +95,7 @@ export class MessageDetialComponent extends AutoDestroy {
 
   private getMessageByUserId() {
     return this._route.params.pipe(
-      combineLatest(this._auth.currentUser$.filter(u => !!u)),
+      combineLatest(this._auth.currentUser$.pipe(filter(u => !!u))),
       switchMap(([params, sender]) => {
         this.init(sender, params.addresseeId);
         return this._http.document(`users/${this.sender.uid}`)
@@ -114,7 +114,7 @@ export class MessageDetialComponent extends AutoDestroy {
     // 取得房間資料
     // 取得所有人的資料
     return this._route.params.pipe(
-      combineLatest(this._auth.currentUser$.filter(u => !!u)),
+      combineLatest(this._auth.currentUser$.pipe(filter(u => !!u))),
       switchMap(([params, sender]) => {
         this.init(sender, params.addresseeId);
         return this.getRoomsMessages(params.roomId);

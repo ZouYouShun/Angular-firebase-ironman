@@ -17,6 +17,7 @@ import { RouteLoadingComponent } from '../component/route-loading/route-loading.
 import { CdkService } from '@shared/service/cdk.service';
 import { onlyOnBrowser } from '@shared/decorator/only-on.browser';
 import { runAfterTimeout } from '@shared/decorator/timeout.decorator';
+import { filter } from 'rxjs/operators';
 
 @Injectable()
 export class RouteLoadingService {
@@ -35,14 +36,14 @@ export class RouteLoadingService {
     this.portalHost = _cdk.createBodyPortalHost();
     this.insertPortal = new ComponentPortal(RouteLoadingComponent);
     // never cancel when app is alive
-    this._router.events
+    this._router.events.pipe(
       // becouse ssr so first time skip show router blockView
       // .skipWhile((event: RouterEvent) => event.id < 2)
-      .filter((event: RouterEvent) => event.id !== undefined && event['state'] === undefined)
-      .subscribe((event: RouterEvent) => {
-        // console.log(event);
-        this.navigationInterceptor(event);
-      });
+      filter((event: RouterEvent) => event.id !== undefined && event['state'] === undefined)
+    ).subscribe((event: RouterEvent) => {
+      // console.log(event);
+      this.navigationInterceptor(event);
+    });
   }
 
   private navigationInterceptor(event: RouterEvent): void {

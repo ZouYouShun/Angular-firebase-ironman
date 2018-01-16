@@ -13,8 +13,9 @@ import { BlockViewService } from '@core/service/block-view.service';
 import { AlertConfirmService, AlertConfirmModel } from '@core/component/alert-confirm';
 import { CloudMessagingService } from './cloud-messaging.service';
 import { fromPromise } from 'rxjs/observable/fromPromise';
-import { tap, mergeMap, catchError, switchMap, filter } from 'rxjs/operators';
+import { tap, mergeMap, catchError, switchMap, filter, map } from 'rxjs/operators';
 import { of } from 'rxjs/observable/of';
+import { isOfflineForDatabase } from '@core/model/login.model';
 
 @Injectable()
 export class AuthService {
@@ -25,6 +26,8 @@ export class AuthService {
   currentUser$ = new BehaviorSubject<UserModel>(null);
   userHandler: CollectionHandler<UserModel>;
   currentUserHandler: DocumentHandler<UserModel>;
+
+  private disconnect: firebase.database.OnDisconnect;
 
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
@@ -131,9 +134,12 @@ export class AuthService {
   }
 
   signOut() {
-    return fromPromise(this._afAuth.auth.signOut()).pipe(
-      tap(() => this._router.navigate(environment.nonAuthenticationUrl)),
-      mergeMap(() => this._cms.deleteToken())
+    return this._http.document(`status/${this.user.uid}`).set({ state: false }, false).pipe(
+      mergeMap(() => this._cms.deleteToken()),
+      tap(() => {
+        this._router.navigate(environment.nonAuthenticationUrl);
+        this._afAuth.auth.signOut();
+      })
     );
   }
 

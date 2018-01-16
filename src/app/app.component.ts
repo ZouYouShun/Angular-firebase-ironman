@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { SwUpdate } from '@angular/service-worker';
 import { AlertConfirmService } from '@core/component/alert-confirm';
 import { AuthService } from '@core/service/auth.service';
+import { LoginStatusService } from '@core/service/login-status.service';
 
 @Component({
   selector: 'app-root',
@@ -12,6 +13,7 @@ export class AppComponent {
 
   constructor(
     private _auth: AuthService,
+    private _loginState: LoginStatusService,
     private updates: SwUpdate,
     private _alc: AlertConfirmService) {
     console.log('App working! 1.2.1');

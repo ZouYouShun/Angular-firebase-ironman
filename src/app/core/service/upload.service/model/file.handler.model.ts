@@ -1,5 +1,3 @@
-import 'rxjs/add/observable/fromPromise';
-
 import { AngularFireStorage, AngularFireStorageReference, AngularFireUploadTask } from 'angularfire2/storage';
 import * as firebase from 'firebase';
 import { Observable } from 'rxjs/Observable';

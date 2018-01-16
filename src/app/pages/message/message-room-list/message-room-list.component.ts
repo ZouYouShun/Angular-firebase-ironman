@@ -1,5 +1,3 @@
-import 'rxjs/add/operator/takeUntil';
-
 import { Component, ViewChild } from '@angular/core';
 import { ObservableMedia } from '@angular/flex-layout';
 import { MatDrawer } from '@angular/material';
@@ -11,6 +9,8 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { StringHandler } from '@shared/ts/data/string.handler';
 import { UserModel } from '@core/model/user.model';
 import { Observable } from 'rxjs/Observable';
+import { tap, takeUntil } from 'rxjs/operators';
+import { merge } from 'rxjs/observable/merge';
 
 @Component({
   selector: 'app-message-room-list',
@@ -32,16 +32,18 @@ export class MessageRoomListComponent extends AutoDestroy {
     private _media: ObservableMedia) {
     super();
 
-    Observable
-      .merge(
-      this._message.rooms$
-        .do(rooms => {
+    merge(
+      this._message.rooms$.pipe(
+        tap(rooms => {
           this.originRooms = this.rooms = rooms;
-        }),
-      this._message.back$.do(() => {
-        this.roomList.open();
-      }))
-      .takeUntil(this._destroy$)
+        })
+      ),
+      this._message.back$.pipe(
+        tap(() => {
+          this.roomList.open();
+        }))
+    )
+      .pipe(takeUntil(this._destroy$))
       .subscribe();
   }
 

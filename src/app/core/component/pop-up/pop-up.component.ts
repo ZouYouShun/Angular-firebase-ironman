@@ -1,7 +1,3 @@
-import 'rxjs/add/observable/fromEvent';
-import 'rxjs/add/operator/filter';
-import 'rxjs/add/operator/takeUntil';
-
 import { DomPortalOutlet } from '@angular/cdk/portal';
 import {
     AfterContentInit,

@@ -1,14 +1,12 @@
-import 'rxjs/add/observable/throw';
-import 'rxjs/add/operator/catch';
-import 'rxjs/add/operator/mergeMap';
-import 'rxjs/add/operator/do';
-
 import { AngularFireDatabase, AngularFireList, QueryFn } from 'angularfire2/database';
 import { Observable } from 'rxjs/Observable';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { isPlatformServer } from '@angular/common';
 import { BlockViewService } from '@core/service/block-view.service';
 import { AlertConfirmService } from '@core/component/alert-confirm';
+import { of } from 'rxjs/observable/of';
+import { mergeMap, tap, catchError } from 'rxjs/operators';
+import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 
 export interface MyHttpConfig {
   headers?: HttpHeaders | {
@@ -66,14 +64,17 @@ export class MyHttpHandler<T> {
 
 
   next(methood: Observable<any>): Observable<T> {
-    return Observable.of(1).map(() => this._block.block())
-      .mergeMap(() => methood)
-      .do(() => this._block.unblock())
-      .catch(error => this.handleError(error));
+    return of(1).map(() => this._block.block()).pipe(
+      mergeMap(() => methood),
+      tap(() => this._block.unblock()),
+      catchError(error => this.handleError(error))
+    );
   }
 
-  noBlockNext(methood: any): Observable<T> {
-    return methood.catch((error: Response) => this.handleError(error));
+  noBlockNext(methood: Observable<any>): Observable<T> {
+    return methood.pipe(
+      catchError((error: Response) => this.handleError(error))
+    );
   }
 
   private handleError(error: Response) {
@@ -94,6 +95,6 @@ export class MyHttpHandler<T> {
       message: `伺服器發生${error.status}錯誤，請聯絡管理者`,
       type: 'error'
     });
-    return Observable.throw(reqObj);
+    return ErrorObservable.create(reqObj);
   }
 }

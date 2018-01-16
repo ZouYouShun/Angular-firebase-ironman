@@ -6,6 +6,7 @@ import { onlyOnBrowser } from '@shared/decorator/only-on.browser';
 import { AutoDestroy } from '@shared/ts/auto.destroy';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
+import { tap, map, takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-home-menu',
@@ -39,13 +40,14 @@ export class HomeMenuComponent extends AutoDestroy implements AfterViewInit, OnD
 
   @onlyOnBrowser('platformId')
   private setScroll() {
-    this.scrollObs$ = this._base.mainScrollTopEvent
-      .takeUntil(this._destroy$)
-      .map(top => top > 50)
-      .do(result => {
+    this.scrollObs$ = this._base.mainScrollTopEvent.pipe(
+      takeUntil(this._destroy$),
+      map(top => top > 50),
+      tap(result => {
         if (this.isSmall !== result)
           this.isSmall = result;
-      });
+      })
+    );
     if (!this._media.isActive('lt-md')) {
       this.scrollWatcher = this.scrollObs$.subscribe();
     }
@@ -79,7 +81,7 @@ export class HomeMenuComponent extends AutoDestroy implements AfterViewInit, OnD
 
   @onlyOnBrowser('platformId')
   ngOnDestroy() {
-    if (this.hammer)this.hammer.destroy();
+    if (this.hammer) this.hammer.destroy();
     if (this.watcher) this.watcher.unsubscribe();
   }
 

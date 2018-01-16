@@ -1,8 +1,3 @@
-import 'rxjs/add/observable/forkJoin';
-import 'rxjs/add/operator/combineLatest';
-import 'rxjs/add/operator/do';
-import 'rxjs/add/operator/take';
-
 import { Component, ElementRef, ViewChild, ChangeDetectionStrategy, Output, EventEmitter } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
@@ -24,6 +19,7 @@ import { UploadService } from '@core/service/upload.service';
 import { arrayToObjectByKey } from '@shared/ts/data/arrayToObjectByKey';
 import { Subject } from 'rxjs/Subject';
 import { StringHandler } from '@shared/ts/data/string.handler';
+import { takeUntil, switchMap, tap, combineLatest, mergeMap } from 'rxjs/operators';
 
 
 @Component({
@@ -72,23 +68,24 @@ export class MessageDetialComponent extends AutoDestroy {
       message$ = this.getMessageByRoomId();
     }
 
-    message$
-      .do(messages => {
+    message$.pipe(
+      tap(messages => {
         this.messageLoading = false;
         this.messages = messages;
         this.scrollButtom();
-      })
-      .switchMap(() => {
+      }),
+      switchMap(() => {
         if (this.roomHandler) {
-          return this.roomHandler.collection<any>('files').get()
-            .do(files => {
+          return this.roomHandler.collection<any>('files').get().pipe(
+            tap(files => {
               this.roomFiles = arrayToObjectByKey(files, 'id');
-            });
+            })
+          );
         }
         return Observable.of(null);
-      })
-      .takeUntil(this._destroy$)
-      .subscribe();
+      }),
+      takeUntil(this._destroy$)
+    ).subscribe();
   }
 
   goList() {
@@ -96,30 +93,32 @@ export class MessageDetialComponent extends AutoDestroy {
   }
 
   private getMessageByUserId() {
-    return this._route.params
-      .combineLatest(this._auth.currentUser$.filter(u => !!u))
-      .switchMap(([params, sender]) => {
+    return this._route.params.pipe(
+      combineLatest(this._auth.currentUser$.filter(u => !!u)),
+      switchMap(([params, sender]) => {
         this.init(sender, params.addresseeId);
         return this._http.document(`users/${this.sender.uid}`)
           .collection('rooms')
           .document<UserRoomModel>(this.addresseeId).get();
-      })
-      .switchMap(usersRoom => this.getUsersRoom(usersRoom))
-      .switchMap(room => {
+      }),
+      switchMap(usersRoom => this.getUsersRoom(usersRoom)),
+      switchMap(room => {
         if (room) return this.getRoomsMessages(room.id);
         return Observable.of(null);
-      });
+      })
+    );
   }
 
   private getMessageByRoomId() {
     // 取得房間資料
     // 取得所有人的資料
-    return this._route.params
-      .combineLatest(this._auth.currentUser$.filter(u => !!u))
-      .switchMap(([params, sender]) => {
+    return this._route.params.pipe(
+      combineLatest(this._auth.currentUser$.filter(u => !!u)),
+      switchMap(([params, sender]) => {
         this.init(sender, params.addresseeId);
         return this.getRoomsMessages(params.roomId);
-      });
+      })
+    );
   }
 
   private getUsersRoom(usersRoom): Observable<MessageModel> {
@@ -179,9 +178,9 @@ export class MessageDetialComponent extends AutoDestroy {
 
     this.uploading = true;
 
-    return this.getMessageObs(filePath, MESSAGE_TYPE.FILE)
-      .mergeMap(() => fileHandler.upload({ file: file }))
-      .subscribe();
+    return this.getMessageObs(filePath, MESSAGE_TYPE.FILE).pipe(
+      mergeMap(() => fileHandler.upload({ file: file }))
+    ).subscribe();
   }
 
 

@@ -1,6 +1,3 @@
-import 'rxjs/add/operator/take';
-import 'rxjs/add/operator/do';
-
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { BaseHttpService, CollectionHandler } from '@core/service/base-http.service';
@@ -9,6 +6,7 @@ import { QueryFn, DocumentChangeAction } from 'angularfire2/firestore';
 import * as firebase from 'firebase';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Observable } from 'rxjs/Observable';
+import { switchMap } from 'rxjs/operators';
 
 
 @Component({
@@ -31,12 +29,14 @@ export class MessageListComponent {
 
     this.messagesHandler = this._http.collection('messages');
 
-    this.messages$ = this.query.switchMap(queryFn => {
-      return this.messagesHandler.get({
-        queryFn: queryFn,
-        isKey: true
-      });
-    });
+    this.messages$ = this.query.pipe(
+      switchMap(queryFn => {
+        return this.messagesHandler.get({
+          queryFn: queryFn,
+          isKey: true
+        });
+      })
+    );
   }
 
   getAll(number?) {

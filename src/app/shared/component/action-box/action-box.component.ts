@@ -1,14 +1,10 @@
-import 'rxjs/add/observable/of';
-import 'rxjs/add/operator/filter';
-import 'rxjs/add/operator/takeUntil';
-
 import { Component, Inject, Input, OnInit, PLATFORM_ID } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 
 import { animateFactory } from '../../animation';
+import { CUBIC_BEZIER, DURATIONS } from '../../animation/animate.constant';
 import { onlyOnBrowser } from '../../decorator/only-on.browser';
 import { AutoDestroy } from '../../ts/auto.destroy';
-import { CUBIC_BEZIER, DURATIONS } from '../../animation/animate.constant';
 
 @Component({
   selector: 'action-box',

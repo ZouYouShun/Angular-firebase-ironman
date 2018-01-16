@@ -1,10 +1,9 @@
-import 'rxjs/add/operator/takeUntil';
-
 import { Component, OnInit } from '@angular/core';
 import { MenuModel } from '@core/model/menu.model';
 import { BaseHttpService } from '@core/service/base-http.service';
 import { AutoDestroy } from '@shared/ts/auto.destroy';
 import { MessageService } from 'app/pages/message/message.service';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-message',
@@ -37,9 +36,9 @@ export class MessageComponent extends AutoDestroy implements OnInit {
   constructor(
     private _http: BaseHttpService, private _message: MessageService) {
     super();
-    this._message.getNecessaryData()
-      .takeUntil(this._destroy$)
-      .subscribe();
+    this._message.getNecessaryData().pipe(
+      takeUntil(this._destroy$)
+    ).subscribe();
   }
 
   ngOnInit(): void {

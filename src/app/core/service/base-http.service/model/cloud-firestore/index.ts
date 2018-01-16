@@ -2,6 +2,10 @@ import { AngularFirestore, AngularFirestoreCollection, AngularFirestoreDocument,
 import { Observable } from 'rxjs/Observable';
 
 import { storeTimeObject } from './store.time.function';
+import { map, catchError } from 'rxjs/operators';
+import { of } from 'rxjs/observable/of';
+import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
+import { fromPromise } from 'rxjs/observable/fromPromise';
 
 export interface CloudFirestoreConfig {
   isKey: boolean;
@@ -10,7 +14,7 @@ export interface CloudFirestoreConfig {
 
 function handleError(error) {
   console.log(error);
-  return Observable.throw(new Error(error));
+  return ErrorObservable.create(new Error(error));
 }
 
 export class CollectionHandler<T> {
@@ -33,57 +37,64 @@ export class CollectionHandler<T> {
   }
 
   get(config: CloudFirestoreConfig = { isKey: true }): Observable<T> {
-    if (!this.url) return Observable.of(null);
+    if (!this.url) return of(null);
     const req = config.queryFn ?
       this._afs.collection(this.url, config.queryFn) : this._fireAction;
-    return config.isKey ? req.snapshotChanges()
-      .map(actions => {
-        return actions.map(a => {
-          if (a.payload.doc.exists) {
-            const metadata = a.payload.doc.metadata;
-            const ref = a.payload.doc.ref;
-            const data = a.payload.doc.data();
-            const doc = a.payload.doc;
-            const id = a.payload.doc.id;
-            return { id, doc, ref, metadata, ...data };
-          }
-          return null;
-        }) as any;
-      })
-      .catch(error => handleError(error)) :
+    return config.isKey ?
+      req.snapshotChanges().pipe(
+        map(actions => {
+          return actions.map(a => {
+            if (a.payload.doc.exists) {
+              const metadata = a.payload.doc.metadata;
+              const ref = a.payload.doc.ref;
+              const data = a.payload.doc.data();
+              const doc = a.payload.doc;
+              const id = a.payload.doc.id;
+              return { id, doc, ref, metadata, ...data };
+            }
+            return null;
+          }) as any;
+        }),
+        catchError(error => handleError(error))
+      ) :
       req.valueChanges();
   }
 
   add(data: T): Observable<DocumentHandler<T>> {
     if (!this.url) return Observable.of(null);
-    return Observable.fromPromise(this._fireAction.add(storeTimeObject(data)))
-      .map(d => this.document<T>(d.id))
-      .catch(error => handleError(error));
+    return fromPromise(this._fireAction.add(storeTimeObject(data))).pipe(
+      map(d => this.document<T>(d.id)),
+      catchError(error => handleError(error))
+    );
   }
 
   delete(key: string): Observable<any> {
-    if (!this.url) return Observable.of(null);
+    if (!this.url) return of(null);
     return key ?
-      Observable.fromPromise(this._fireAction.doc(key).delete())
-        .map(() => key)
-        .catch(error => handleError(error)) :
-      Observable.throw(new Error('no key!'));
+      fromPromise(this._fireAction.doc(key).delete()).pipe(
+        map(() => key),
+        catchError(error => handleError(error))
+      ) :
+      ErrorObservable.create(new Error('no key!'));
   }
 
   update(key, data: T): Observable<string> {
-    if (!this.url) return Observable.of(null);
-    return Observable.fromPromise(
+    if (!this.url) return of(null);
+    return fromPromise(
       this._fireAction
         .doc(key)
-        .update(storeTimeObject(data, false))).map(() => key)
-      .catch(error => handleError(error));
+        .update(storeTimeObject(data, false))).pipe(
+      map(() => key),
+      catchError(error => handleError(error))
+      );
   }
 
   set(key, data: T) {
-    if (!this.url) return Observable.of(null);
-    return Observable.fromPromise(this._fireAction.doc(key).set(storeTimeObject(data)))
-      .map(() => this.document(key))
-      .catch(error => handleError(error));
+    if (!this.url) return of(null);
+    return fromPromise(this._fireAction.doc(key).set(storeTimeObject(data))).pipe(
+      map(() => this.document(key)),
+      catchError(error => handleError(error))
+    );
   }
 
   document<K>(path: string) {
@@ -121,8 +132,8 @@ export class DocumentHandler<T> {
     if (!this.url) return Observable.of(null);
 
     return isKey ?
-      this._fireAction.snapshotChanges()
-        .map(a => {
+      this._fireAction.snapshotChanges().pipe(
+        map(a => {
           if (a.payload.exists) {
             const ref = a.payload.ref;
             const metadata = a.payload.metadata;
@@ -131,27 +142,31 @@ export class DocumentHandler<T> {
             return ({ id, metadata, ref, ...data }) as any;
           }
           return null;
-        })
-        .catch(error => handleError(error)) :
+        }),
+        catchError(error => handleError(error))
+      ) :
       this._fireAction.valueChanges();
   }
   // 刪除
   delete(): Observable<any> {
-    if (!this.url) return Observable.of(null);
-    return Observable.fromPromise(this._fireAction.delete())
-      .catch(error => handleError(error));
+    if (!this.url) return of(null);
+    return fromPromise(this._fireAction.delete()).pipe(
+      catchError(error => handleError(error))
+    );
   }
   // 修改
   update(data: T) {
-    if (!this.url) return Observable.of(null);
-    return Observable.fromPromise(this._fireAction.update(storeTimeObject(data, false)))
-      .catch(error => handleError(error));
+    if (!this.url) return of(null);
+    return fromPromise(this._fireAction.update(storeTimeObject(data, false))).pipe(
+      catchError(error => handleError(error))
+    );
   }
   // 設定
   set(data: T) {
-    if (!this.url) return Observable.of(null);
-    return Observable.fromPromise(this._fireAction.set(storeTimeObject(data)))
-      .catch(error => handleError(error));
+    if (!this.url) return of(null);
+    return fromPromise(this._fireAction.set(storeTimeObject(data))).pipe(
+      catchError(error => handleError(error))
+    );
   }
 
   collection<K>(path: string) {

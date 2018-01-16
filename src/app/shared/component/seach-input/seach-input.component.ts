@@ -1,10 +1,8 @@
-import 'rxjs/add/observable/fromEvent';
-import 'rxjs/add/operator/debounceTime';
-
-import { Component, OnInit, Output, EventEmitter, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
-import { StringHandler } from '@shared/ts/data/string.handler';
-import { Observable } from 'rxjs/Observable';
+import { AfterViewInit, Component, ElementRef, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
 import { AutoDestroy } from '@shared/ts/auto.destroy';
+import { StringHandler } from '@shared/ts/data/string.handler';
+import { fromEvent } from 'rxjs/observable/fromEvent';
+import { debounceTime, takeUntil, tap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-seach-input',
@@ -25,15 +23,15 @@ export class SeachInputComponent extends AutoDestroy implements OnInit, AfterVie
   }
 
   ngAfterViewInit(): void {
-    Observable.fromEvent(this.input.nativeElement, 'keyup')
-      .debounceTime(500)
-      .do((e: KeyboardEvent) => {
+    fromEvent(this.input.nativeElement, 'keyup').pipe(
+      debounceTime(500),
+      tap((e: KeyboardEvent) => {
         if (e.keyCode !== 13) {
           this.onSubmit();
         }
-      })
-      .takeUntil(this._destroy$)
-      .subscribe();
+      }),
+      takeUntil(this._destroy$)
+    ).subscribe();
   }
 
   search(state = true) {

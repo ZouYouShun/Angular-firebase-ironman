@@ -8,6 +8,8 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Observable } from 'rxjs/Observable';
 import { StringHandler } from '@shared/ts/data/string.handler';
 import { UserModel } from '@core/model/user.model';
+import { tap, takeUntil } from 'rxjs/operators';
+import { merge } from 'rxjs/observable/merge';
 
 @Component({
   selector: 'app-message-friend-list',
@@ -27,16 +29,18 @@ export class MessageFriendListComponent extends AutoDestroy {
     private _media: ObservableMedia) {
     super();
 
-    Observable
-      .merge(
-      this._message.friends$
-        .do(friends => {
+    merge(
+      this._message.friends$.pipe(
+        tap(friends => {
           this.originFriends = this.friends = friends;
-        }),
-      this._message.back$.do(() => {
-        this.roomList.open();
-      }))
-      .takeUntil(this._destroy$)
+        })
+      ),
+      this._message.back$.pipe(
+        tap(() => {
+          this.roomList.open();
+        }))
+    )
+      .pipe(takeUntil(this._destroy$))
       .subscribe();
   }
 

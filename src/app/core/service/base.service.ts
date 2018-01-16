@@ -1,7 +1,3 @@
-import 'rxjs/add/observable/fromEvent';
-import 'rxjs/add/operator/filter';
-import 'rxjs/add/operator/takeUntil';
-
 import { Inject, Injectable, PLATFORM_ID } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { onlyOnBrowser } from '@shared/decorator/only-on.browser';
@@ -9,6 +5,7 @@ import { runAfterTimeout } from '@shared/decorator/timeout.decorator';
 import { Observable } from 'rxjs/Observable';
 
 import { RouteLoadingService } from './route-loading.service';
+import { fromEvent } from 'rxjs/observable/fromEvent';
 
 @Injectable()
 export class BaseService {
@@ -19,7 +16,7 @@ export class BaseService {
   private page: { url: string, scroll: number }[] = [];
 
   private set mainViewElm(elm) {
-    this.mainScrollTopEvent = Observable.fromEvent(elm, 'scroll', (e: any) => e.target.scrollTop);
+    this.mainScrollTopEvent = fromEvent(elm, 'scroll', (e: any) => e.target.scrollTop);
     // if the elm is exist unsubscribe prev, and do the next elm observable
     this._mainViewElm = elm;
     this.doRememberPage();

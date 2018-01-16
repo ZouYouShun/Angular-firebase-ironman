@@ -1,5 +1,3 @@
-import 'rxjs/add/operator/take';
-
 import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivate, Route, Router, RouterStateSnapshot } from '@angular/router';
 import { CanLoad } from '@angular/router/src/interfaces';
@@ -7,6 +5,7 @@ import { Observable } from 'rxjs/Observable';
 
 import { AuthService } from '../service/auth.service';
 import { environment } from '@env';
+import { map, take } from 'rxjs/operators';
 
 @Injectable()
 export class AuthGuard implements CanActivate, CanLoad {
@@ -30,13 +29,14 @@ export class AuthGuard implements CanActivate, CanLoad {
 
   private isLogin(url: string): Observable<boolean> | Promise<boolean> | boolean {
     // https://github.com/angular/angular/issues/18991
-    return this._auth.fireUser$
-      .take(1)
-      .map((user) => {
+    return this._auth.fireUser$.pipe(
+      take(1),
+      map((user) => {
         if (user) return true;
 
         this._router.navigate(environment.nonAuthenticationUrl, { queryParams: { returnUrl: url } });
         return false;
-      });
+      })
+    );
   }
 }

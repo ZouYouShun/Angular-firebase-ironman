@@ -1,5 +1,3 @@
-import 'rxjs/add/operator/filter';
-
 import { ComponentPortal, DomPortalHost } from '@angular/cdk/portal';
 import { Inject, Injectable, PLATFORM_ID } from '@angular/core';
 import { Title } from '@angular/platform-browser';

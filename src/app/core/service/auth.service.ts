@@ -1,10 +1,3 @@
-import 'rxjs/add/operator/catch';
-import 'rxjs/add/operator/do';
-import 'rxjs/add/operator/concatMap';
-import 'rxjs/add/operator/switchMap';
-import 'rxjs/add/observable/fromPromise';
-import 'rxjs/add/observable/throw';
-
 import { Inject, Injectable, PLATFORM_ID } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { onlyOnBrowser } from '@shared/decorator/only-on.browser';
@@ -19,6 +12,9 @@ import { environment } from '@env';
 import { BlockViewService } from '@core/service/block-view.service';
 import { AlertConfirmService, AlertConfirmModel } from '@core/component/alert-confirm';
 import { CloudMessagingService } from './cloud-messaging.service';
+import { fromPromise } from 'rxjs/observable/fromPromise';
+import { tap, mergeMap, catchError, switchMap, filter } from 'rxjs/operators';
+import { of } from 'rxjs/observable/of';
 
 @Injectable()
 export class AuthService {
@@ -45,42 +41,43 @@ export class AuthService {
     // 用來保存當前angularfire的使用者狀態
     this.fireUser$ = this._afAuth.authState;
     // 由於這個Service會永遠存活，我們不需對他做unsubscribe
-    this.fireUser$
-      .do(() => this._block.block('登入中'))
-      .switchMap(user => {
+    this.fireUser$.pipe(
+      tap(() => this._block.block('登入中')),
+      switchMap(user => {
         return this.updateUser(user);
-      })
-      .switchMap(key => {
+      }),
+      switchMap(key => {
         this.currentUserHandler = this.userHandler.document<UserModel>(key);
         return this.currentUserHandler.get();
-      })
-      .do(user => {
+      }),
+      tap(user => {
         this._block.unblock();
         this.user = user;
         this.currentUser$.next(user);
-      })
-      .filter(u => !!u)
-      .switchMap(user => {
+      }),
+      filter(u => !!u),
+      switchMap(user => {
         this.returnUrl(user);
         return this._cms.getPermission(this.currentUserHandler);
       })
-      .subscribe();
+    ).subscribe();
   }
 
 
   // 注意！當註冊後也會更改當前authState，也會接到user，視同於登入
   signUpByEmail(obj: { email: string, password: string, name: string }) {
     if (obj.name) {
-      return Observable.fromPromise(this._afAuth.auth.createUserWithEmailAndPassword(obj.email, obj.password))
+      return fromPromise(this._afAuth.auth.createUserWithEmailAndPassword(obj.email, obj.password))
         .switchMap(result => {
           const user = Object.assign({}, result, { displayName: obj.name });
           return this.addUser(user, USER_TYPE.EMAIL);
-        })
-        .do(() => {
+        }).pipe(
+        tap(() => {
           this.signOut();
           this._router.navigateByUrl('/auth/signin');
-        })
-        .catch(err => this.ErrorHandler(err));
+        }),
+        catchError(err => this.ErrorHandler(err))
+        );
     }
     this._alc.alert(new AlertConfirmModel('註冊失敗', '未輸入名子', 'warning'));
     return Observable.of(null);
@@ -96,7 +93,7 @@ export class AuthService {
 
   signInByEmail(email: string, password: string) {
     this.storeUrl();
-    return Observable.fromPromise(
+    return fromPromise(
       this._afAuth.auth.signInWithEmailAndPassword(email, password)
         .catch(err => this.ErrorHandler(err))
     );
@@ -105,11 +102,7 @@ export class AuthService {
   private signInUpBySocialMedia(provider, type, isSignUp = false) {
     this.storeUrl();
 
-    return Observable.fromPromise(this._afAuth.auth.signInWithPopup(provider))
-      // .switchMap(result => {
-      //   const user = result.user;
-      //   return this.addUser(user, type);
-      // })
+    return fromPromise(this._afAuth.auth.signInWithPopup(provider))
       .catch(err => this.ErrorHandler(err, isSignUp ? '註冊失敗' : '登入失敗'));
   }
 
@@ -130,14 +123,16 @@ export class AuthService {
   // Sends email allowing user to reset password
   resetPassword(oldPassword: string, newPassword: string) {
     // 修改前要再次登入一次
-    this.signInByEmail(this._afAuth.auth.currentUser.email, oldPassword)
-      .switchMap(() => Observable.fromPromise(this._afAuth.auth.currentUser.updatePassword(newPassword)));
+    this.signInByEmail(this._afAuth.auth.currentUser.email, oldPassword).pipe(
+      switchMap(() => fromPromise(this._afAuth.auth.currentUser.updatePassword(newPassword)))
+    );
   }
 
   signOut() {
-    return Observable.fromPromise(this._afAuth.auth.signOut())
-      .do(() => this._router.navigate(environment.nonAuthenticationUrl))
-      .mergeMap(() => this._cms.deleteToken());
+    return fromPromise(this._afAuth.auth.signOut()).pipe(
+      tap(() => this._router.navigate(environment.nonAuthenticationUrl)),
+      mergeMap(() => this._cms.deleteToken())
+    );
   }
 
   private updateUser(user: firebase.User) {
@@ -149,7 +144,7 @@ export class AuthService {
       };
       return this.userHandler.update(user.uid, data);
     }
-    return Observable.of(null);
+    return of(null);
   }
 
   private addUser(user: firebase.User, types: USER_TYPE) {
@@ -191,6 +186,6 @@ export class AuthService {
     if (message) {
       this._alc.alert(new AlertConfirmModel(title, message, 'warning'));
     }
-    return Observable.of(`Error: ${err}`);
+    return of(`Error: ${err}`);
   }
 }

@@ -80,7 +80,7 @@ export class AuthService {
         );
     }
     this._alc.alert(new AlertConfirmModel('註冊失敗', '未輸入名子', 'warning'));
-    return Observable.of(null);
+    return of(null);
   }
 
   signInUpByGoogle(isSignUp = false) {

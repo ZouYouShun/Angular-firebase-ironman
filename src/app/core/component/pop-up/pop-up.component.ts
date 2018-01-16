@@ -1,15 +1,15 @@
 import { DomPortalOutlet } from '@angular/cdk/portal';
 import {
-    AfterContentInit,
-    Component,
-    ComponentFactory,
-    ComponentFactoryResolver,
-    EventEmitter,
-    HostBinding,
-    HostListener,
-    ReflectiveInjector,
-    TemplateRef,
-    ViewChild,
+  AfterContentInit,
+  Component,
+  ComponentFactory,
+  ComponentFactoryResolver,
+  EventEmitter,
+  HostBinding,
+  HostListener,
+  ReflectiveInjector,
+  TemplateRef,
+  ViewChild,
 } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { animateFactory } from '@shared/animation';
@@ -18,6 +18,7 @@ import { AutoDestroy } from '@shared/ts/auto.destroy';
 
 import { PopUpCallback, PopUpConfig, PopUpRef } from './pop-up.model';
 import { ViewContainerDirective } from './view-container.directive';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'pop-up-container',
@@ -64,12 +65,12 @@ export class PopUpComponent extends AutoDestroy implements AfterContentInit {
     } else {
       this.completeEmitter = new EventEmitter<string>();
 
-      this.completeEmitter
-        .takeUntil(this._destroy$)
-        .subscribe(data => {
-          this.sendData = data;
-          this.close();
-        });
+      this.completeEmitter.pipe(
+        takeUntil(this._destroy$)
+      ).subscribe(data => {
+        this.sendData = data;
+        this.close();
+      });
     }
     this.handelConfig(this.config);
   }
@@ -98,12 +99,12 @@ export class PopUpComponent extends AutoDestroy implements AfterContentInit {
 
     // when data send back, close this dialog
     if (componentRef.instance.popupOutputSender) {
-      componentRef.instance.popupOutputSender
-        .takeUntil(this._destroy$)
-        .subscribe((data: any) => {
-          this.sendData = data;
-          this.close();
-        });
+      componentRef.instance.popupOutputSender.pipe(
+        takeUntil(this._destroy$)
+      ).subscribe((data: any) => {
+        this.sendData = data;
+        this.close();
+      });
     }
   }
 

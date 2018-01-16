@@ -9,6 +9,8 @@ import { BaseHttpService, DocumentHandler, CollectionHandler } from './base-http
 import { RxViewer } from '@shared/ts/rx.viewer';
 import { map, take, tap, mergeMap, catchError, switchMap } from 'rxjs/operators';
 import { fromPromise } from 'rxjs/observable/fromPromise';
+import { of } from 'rxjs/observable/of';
+import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 
 const tokenName = 'fcmToken';
 @Injectable()
@@ -44,7 +46,7 @@ export class CloudMessagingService {
       }),
       catchError((err) => {
         // console.log('不給推波', err);
-        return Observable.throw(new Error('不給推波'));
+        return ErrorObservable.create(new Error('不給推波'));
       }));
   }
 
@@ -68,7 +70,7 @@ export class CloudMessagingService {
       // if the old is not same of now token, delete the old token
       return tokensRef.delete(localToken);
     }
-    return Observable.of(null);
+    return of(null);
   }
 
   receiveMessage() {

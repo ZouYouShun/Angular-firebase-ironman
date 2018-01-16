@@ -2,6 +2,8 @@ import { AngularFireDatabase, AngularFireList, QueryFn } from 'angularfire2/data
 import { Observable } from 'rxjs/Observable';
 
 import { dbTimeObject } from './db.time.function';
+import { fromPromise } from 'rxjs/observable/fromPromise';
+import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 
 export interface RealTimeDbConfig {
   isKey: boolean;
@@ -31,24 +33,24 @@ export class ListHandler<T> {
 
   // 新增
   add(data: T) {
-    return Observable.fromPromise(this._fireList.push(dbTimeObject(data)));
+    return fromPromise(this._fireList.push(dbTimeObject(data)));
   }
   // 刪除
   delete(key: string): Observable<any> {
     return key ?
-      Observable.fromPromise(this._fireList.remove(key)) :
-      Observable.throw(new Error('no key!'));
+      fromPromise(this._fireList.remove(key)) :
+      ErrorObservable.create(new Error('no key!'));
   }
   // 修改
   update(key, data: T) {
-    return Observable.fromPromise(this._fireList.update(key, dbTimeObject(data, false)));
+    return fromPromise(this._fireList.update(key, dbTimeObject(data, false)));
   }
   // 設定
   set(key, data: T) {
-    return Observable.fromPromise(this._fireList.set(key, dbTimeObject(data, false)));
+    return fromPromise(this._fireList.set(key, dbTimeObject(data, false)));
   }
   // 抹除
   drop() {
-    return Observable.fromPromise(this._fireList.remove());
+    return fromPromise(this._fireList.remove());
   }
 }

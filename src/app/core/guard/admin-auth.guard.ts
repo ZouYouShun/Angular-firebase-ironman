@@ -4,6 +4,7 @@ import { Observable } from 'rxjs/Observable';
 
 import { UserModel } from '../model/user.model';
 import { AuthService } from '../service/auth.service';
+import { map } from 'rxjs/operators';
 
 @Injectable()
 export class AdminAuthGuard implements CanActivate, CanLoad {
@@ -24,13 +25,14 @@ export class AdminAuthGuard implements CanActivate, CanLoad {
 
 
   isAdmin(url: string): Observable<boolean> | Promise<boolean> | boolean {
-    return this._auth.currentUser$
-      .map((user: UserModel) => {
+    return this._auth.currentUser$.pipe(
+      map((user: UserModel) => {
         if (!user) {
           this._router.navigate(['/no-permissions']);
           return false;
         }
         return true;
-      });
+      })
+    );
   }
 }

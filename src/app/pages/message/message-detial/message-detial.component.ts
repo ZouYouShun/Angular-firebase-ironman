@@ -20,6 +20,7 @@ import { arrayToObjectByKey } from '@shared/ts/data/arrayToObjectByKey';
 import { Subject } from 'rxjs/Subject';
 import { StringHandler } from '@shared/ts/data/string.handler';
 import { takeUntil, switchMap, tap, combineLatest, mergeMap } from 'rxjs/operators';
+import { of } from 'rxjs/observable/of';
 
 
 @Component({
@@ -82,7 +83,7 @@ export class MessageDetialComponent extends AutoDestroy {
             })
           );
         }
-        return Observable.of(null);
+        return of(null);
       }),
       takeUntil(this._destroy$)
     ).subscribe();
@@ -104,7 +105,7 @@ export class MessageDetialComponent extends AutoDestroy {
       switchMap(usersRoom => this.getUsersRoom(usersRoom)),
       switchMap(room => {
         if (room) return this.getRoomsMessages(room.id);
-        return Observable.of(null);
+        return of(null);
       })
     );
   }
@@ -125,7 +126,7 @@ export class MessageDetialComponent extends AutoDestroy {
     if (usersRoom) {
       return this.roomsHandler.document<MessageModel>(usersRoom.roomId).get();
     }
-    return Observable.of(null);
+    return of(null);
   }
 
   private getRoomsMessages(roomId): Observable<any> {

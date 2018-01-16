@@ -61,7 +61,7 @@ export class CollectionHandler<T> {
   }
 
   add(data: T): Observable<DocumentHandler<T>> {
-    if (!this.url) return Observable.of(null);
+    if (!this.url) return of(null);
     return fromPromise(this._fireAction.add(storeTimeObject(data))).pipe(
       map(d => this.document<T>(d.id)),
       catchError(error => handleError(error))
@@ -129,7 +129,7 @@ export class DocumentHandler<T> {
   }
   // 取得資料
   get(isKey = true): Observable<T> {
-    if (!this.url) return Observable.of(null);
+    if (!this.url) return of(null);
 
     return isKey ?
       this._fireAction.snapshotChanges().pipe(

@@ -5,6 +5,8 @@ import { animateFactory } from '../../animation';
 import { CUBIC_BEZIER, DURATIONS } from '../../animation/animate.constant';
 import { onlyOnBrowser } from '../../decorator/only-on.browser';
 import { AutoDestroy } from '../../ts/auto.destroy';
+import { takeUntil } from 'rxjs/operators';
+import { of } from 'rxjs/observable/of';
 
 @Component({
   selector: 'action-box',
@@ -16,7 +18,7 @@ import { AutoDestroy } from '../../ts/auto.destroy';
 })
 export class ActionBoxComponent extends AutoDestroy implements OnInit {
 
-  @Input('showObs') showObs$: Observable<boolean> = Observable.of(true);
+  @Input('showObs') showObs$: Observable<boolean> = of(true);
   @Input('elm') targetElm: HTMLAnchorElement;
   isShow = false;
 
@@ -24,11 +26,11 @@ export class ActionBoxComponent extends AutoDestroy implements OnInit {
 
   @onlyOnBrowser('platformId')
   ngOnInit(): void {
-    this.showObs$
-      .takeUntil(this._destroy$)
-      .subscribe((state) => {
-        this.isShow = state;
-      });
+    this.showObs$.pipe(
+      takeUntil(this._destroy$)
+    ).subscribe((state) => {
+      this.isShow = state;
+    });
   }
 
   goTop() {

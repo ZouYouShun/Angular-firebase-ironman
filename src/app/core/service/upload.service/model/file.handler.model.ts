@@ -1,6 +1,7 @@
 import { AngularFireStorage, AngularFireStorageReference, AngularFireUploadTask } from 'angularfire2/storage';
 import * as firebase from 'firebase';
 import { Observable } from 'rxjs/Observable';
+import { fromPromise } from 'rxjs/observable/fromPromise';
 
 export class FileHandler<T> {
   path: string;
@@ -20,7 +21,7 @@ export class FileHandler<T> {
     this.task = obj.data ?
       this.ref.put(obj.file, { customMetadata: <any>obj.data }) :
       this.ref.put(obj.file);
-    return Observable.fromPromise(this.task.then());
+    return fromPromise(this.task.then());
   }
 
   edit(obj: { file?: File, data: T }) {

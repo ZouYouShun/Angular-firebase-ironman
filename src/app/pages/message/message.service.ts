@@ -6,9 +6,10 @@ import { BaseHttpService } from '@core/service/base-http.service';
 import { arrayToObjectByKey } from '@shared/ts/data/arrayToObjectByKey';
 import { QueryFn } from 'angularfire2/firestore';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { combineLatest, merge, switchMap, tap } from 'rxjs/operators';
+import { combineLatest, switchMap, tap } from 'rxjs/operators';
 import { Subject } from 'rxjs/Subject';
 import { Observable } from 'rxjs/Observable';
+import { merge } from 'rxjs/observable/merge';
 
 @Injectable()
 export class MessageService {
@@ -27,7 +28,7 @@ export class MessageService {
   }
 
   getNecessaryData() {
-    return Observable.merge(
+    return merge(
       this._http.collection<UserModel[]>('users').get().pipe(
         tap(users => {
           // console.log(users);

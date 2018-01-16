@@ -2,6 +2,7 @@ import { AngularFireDatabase, AngularFireObject } from 'angularfire2/database';
 import { Observable } from 'rxjs/Observable';
 
 import { dbTimeObject } from './db.time.function';
+import { fromPromise } from 'rxjs/observable/fromPromise';
 
 export class ObjectHandler<T> {
   url: string;
@@ -18,14 +19,14 @@ export class ObjectHandler<T> {
   }
   // 刪除
   delete(): Observable<any> {
-    return Observable.fromPromise(this._fireObject.remove());
+    return fromPromise(this._fireObject.remove());
   }
   // 修改
   update(data: T) {
-    return Observable.fromPromise(this._fireObject.update(dbTimeObject(data, false)));
+    return fromPromise(this._fireObject.update(dbTimeObject(data, false)));
   }
   // 設定
   set(data: T) {
-    return Observable.fromPromise(this._fireObject.set(dbTimeObject(data, false)));
+    return fromPromise(this._fireObject.set(dbTimeObject(data, false)));
   }
 }

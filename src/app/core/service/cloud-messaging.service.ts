@@ -61,8 +61,8 @@ export class CloudMessagingService {
       // console.log('!');
       return tokensRef.get({ isKey: true, queryFn: ref => ref.where('userAgent', '==', userAgent) }).pipe(
         take(1),
-        map((tokens: any[]) => tokens.filter(obj => obj.id !== token)
-          .map((i: any) => tokensRef.delete(i.id))
+        map((tokens: any[]) =>
+          tokens.filter(obj => obj.id !== token).map((i: any) => tokensRef.delete(i.id))
         )
       );
 

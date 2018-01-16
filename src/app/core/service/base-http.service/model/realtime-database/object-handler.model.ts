@@ -3,6 +3,7 @@ import { Observable } from 'rxjs/Observable';
 
 import { dbTimeObject } from './db.time.function';
 import { fromPromise } from 'rxjs/observable/fromPromise';
+import { map } from 'rxjs/operators';
 
 export class ObjectHandler<T> {
   url: string;
@@ -14,7 +15,9 @@ export class ObjectHandler<T> {
   // get data
   get(isKey = true) {
     return isKey ?
-      this._fireObject.snapshotChanges().map(action => ({ id: action.key, ...action.payload.val() })) :
+      this._fireObject.snapshotChanges().pipe(
+        map(action => ({ id: action.key, ...action.payload.val() }))
+      ) :
       this._fireObject.valueChanges();
   }
   // 刪除

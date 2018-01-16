@@ -16,21 +16,24 @@ export class StringHandler {
 
   hrefToAnchor(cla?: string) {
     // get all url
-    let urls = this._content.match(/https?:\/\/[^ \r\n]+/g);
+    // let urls = this._content.match(/https?:\/\/[^ \r\n]+/g);
 
-    // if has url
-    if (urls && urls.length > 0) {
-      // decoratate to a href
-      urls = urls.map(url => `<a target="_blank" class="${cla || ''}" href="${url}">${url}</a>`);
+    // // if has url
+    // if (urls && urls.length > 0) {
+    //   // decoratate to a href
+    //   urls = urls.map(url => `<a target="_blank" class="${cla || ''}" href="${url}">${url}</a>`);
 
-      // content split by url and add new urls into original index
-      const tmp = this._content.split(/https?:\/\/[^ \r\n]+/g);
-      for (let i = urls.length; i > 0; i--) {
-        tmp.splice(i, 0, urls[i - 1]);
-      }
-      // join with ''
-      this._content = tmp.join('');
-    }
+    //   // content split by url and add new urls into original index
+    //   const tmp = this._content.split(/https?:\/\/[^ \r\n]+/g);
+    //   for (let i = urls.length; i > 0; i--) {
+    //     tmp.splice(i, 0, urls[i - 1]);
+    //   }
+    //   // join with ''
+    //   this._content = tmp.join('');
+    // }
+    const exp = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
+    this._content = this._content.replace(exp, `<a target="_blank" class="${cla || ''}" href="$1">$1</a>`);
+    // var exp2 =/(^|[^\/])(www\.[\S]+(\b|$))/gim;
     return this;
   }
 

@@ -64,7 +64,7 @@ export class MyHttpHandler<T> {
 
 
   next(methood: Observable<any>): Observable<T> {
-    return of(1).map(() => this._block.block()).pipe(
+    return of(1).pipe(tap(() => this._block.block())).pipe(
       mergeMap(() => methood),
       tap(() => this._block.unblock()),
       catchError(error => this.handleError(error))

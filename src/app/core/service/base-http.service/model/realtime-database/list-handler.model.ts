@@ -4,6 +4,7 @@ import { Observable } from 'rxjs/Observable';
 import { dbTimeObject } from './db.time.function';
 import { fromPromise } from 'rxjs/observable/fromPromise';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
+import { map } from 'rxjs/operators';
 
 export interface RealTimeDbConfig {
   isKey: boolean;
@@ -22,8 +23,9 @@ export class ListHandler<T> {
     const req = config.queryFn ?
       this._db.list(this.url, config.queryFn) : this._fireList;
     return config.isKey ?
-      req.snapshotChanges().map(
-        actions => actions.map(action => ({ id: action.key, ...action.payload.val() }))) :
+      req.snapshotChanges().pipe(
+        map(actions => actions.map(action => ({ id: action.key, ...action.payload.val() })))
+      ) :
       req.valueChanges();
   }
 

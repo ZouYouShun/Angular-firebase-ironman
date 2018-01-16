@@ -4,6 +4,7 @@ import { FileHandler, UploadService } from '@core/service/upload.service';
 import { RxViewer } from '@shared/ts/rx.viewer';
 import { FileError } from 'ngxf-uploader';
 import { Observable } from 'rxjs/Observable';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-profile',
@@ -47,7 +48,9 @@ export class ProfileComponent implements OnInit {
 
     this.uploadPercent$ = this.fileHandler.task.percentageChanges();
     this.fileURL$ = this.fileHandler.task.downloadURL();
-    this.meta$ = this.fileHandler.task.snapshotChanges().map(d => d.metadata);
+    this.meta$ = this.fileHandler.task.snapshotChanges().pipe(
+      map(d => d.metadata)
+    );
 
   }
 

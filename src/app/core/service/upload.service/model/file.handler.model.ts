@@ -2,6 +2,7 @@ import { AngularFireStorage, AngularFireStorageReference, AngularFireUploadTask 
 import * as firebase from 'firebase';
 import { Observable } from 'rxjs/Observable';
 import { fromPromise } from 'rxjs/observable/fromPromise';
+import { map } from 'rxjs/operators';
 
 export class FileHandler<T> {
   path: string;
@@ -32,6 +33,8 @@ export class FileHandler<T> {
   }
 
   delete() {
-    return this.ref.delete().map(() => this.path);
+    return this.ref.delete().pipe(
+      map(() => this.path)
+    );
   }
 }

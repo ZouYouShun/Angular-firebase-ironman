@@ -6,6 +6,7 @@ import { Observable } from 'rxjs/Observable';
 
 import { RouteLoadingService } from './route-loading.service';
 import { fromEvent } from 'rxjs/observable/fromEvent';
+import { tap } from 'rxjs/operators';
 
 @Injectable()
 export class BaseService {
@@ -44,8 +45,8 @@ export class BaseService {
 
   @onlyOnBrowser('platformId')
   private doRememberPage() {
-    this.pageChangeScroll$ = this._pageChange.pageChangeEvent
-      .map(url => {
+    this.pageChangeScroll$ = this._pageChange.pageChangeEvent.pipe(
+      tap(url => {
         const top = this.mainViewElm.scrollTop;
         if (this.page[0] && url === this.page[0].url) {
           this.goScroll();
@@ -53,7 +54,8 @@ export class BaseService {
           this.mainViewElm.scroll({ top: 0 });
         }
         this.pushPage(url, top);
-      });
+      })
+    );
   }
 
   private pushPage(url: string, top: number) {

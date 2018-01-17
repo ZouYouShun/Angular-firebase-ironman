@@ -7,6 +7,9 @@ import { DatePipe } from '@angular/common';
 export class ShortDatePipe extends DatePipe implements PipeTransform {
 
   transform(date: string, zero: string, type?: string): any {
+    if (!date) {
+      return '';
+    }
     let format = 'HH:mm';
     if (date <= zero) {
       if (type === 'full') {

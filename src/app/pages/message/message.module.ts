@@ -10,7 +10,6 @@ import { MessageRoutingModule } from './message-routing.module';
 import { MessageComponent } from './message.component';
 import { MessageService } from './message.service';
 import { MessageItemFileComponent } from './message-detial/message-item-file/message-item-file.component';
-import { ShowDateComponent } from './show-date/show-date.component';
 
 @NgModule({
   imports: [
@@ -24,8 +23,7 @@ import { ShowDateComponent } from './show-date/show-date.component';
     MessageHomeComponent,
     MessageFriendListComponent,
     MessageRoomListComponent,
-    MessageItemFileComponent,
-    ShowDateComponent
+    MessageItemFileComponent
 ],
   providers: [
     MessageService

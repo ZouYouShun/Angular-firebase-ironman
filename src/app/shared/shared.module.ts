@@ -13,7 +13,7 @@ import { SafePipe } from './pipe/safe.pipe';
 import { CdkService } from './service/cdk.service';
 import { AutofocusDirective } from './directive/autofocus.directive';
 import { MessagePipe } from './pipe/message.pipe';
-import { ShortDatePipe } from '@shared/pipe/short-date.pipe';
+import { ShortDatePipe } from '@shared/pipe/shortDate.pipe';
 
 @NgModule({
   imports: [

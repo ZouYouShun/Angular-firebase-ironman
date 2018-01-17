@@ -49,11 +49,7 @@
           <li class="mar-t-b-1 sender"
             *ngIf="message.sender === sender.uid; else addresseeView">
             <span fxFlexAlign="end" class="mar-r-1 mat-subheading-1 mar-0">
-              <app-show-date
-                type="full"
-                [date]="message.updatedAt"
-                [zero]="_message.todayZero">
-              </app-show-date>
+              {{message.updatedAt | shortDate: _message.todayZero: 'full'}}
             </span>
 
             <ng-container [ngSwitch]="message.type">
@@ -81,11 +77,7 @@
               </ng-container>
 
               <span fxFlexAlign="end" class="mar-l-1 mat-subheading-1 mar-0">
-                <app-show-date
-                  type="full"
-                  [date]="message.updatedAt"
-                  [zero]="_message.todayZero">
-                </app-show-date>
+                {{message.updatedAt | shortDate: _message.todayZero: 'full'}}
               </span>
             </li>
           </ng-template>

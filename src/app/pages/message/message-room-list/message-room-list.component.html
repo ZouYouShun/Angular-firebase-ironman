@@ -24,7 +24,7 @@
             <i class="online-cycle" [ngClass]="{active: user.loginStatus}"></i>
             {{user.displayName}}
             <span class="f-r c-grey mat-subheading-1 mar-0">
-              <app-show-date [date]="room.last.updatedAt" [zero]="_message.todayZero"></app-show-date>
+              {{room.last.updatedAt | shortDate: _message.todayZero}}
             </span>
           </h2>
           <p mat-line class="c-grey">

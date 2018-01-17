@@ -20,6 +20,8 @@ export class MessageService {
   rooms$ = new BehaviorSubject<UserRoomModel[]>(null);
   friendsObj = {}; // Firend To Obj way
 
+  todayZero = new Date().setHours(0, 0, 0, 0);
+
   private query = new BehaviorSubject<QueryFn>(ref => ref.orderBy('updatedAt', 'desc'));
   constructor(
     private _http: BaseHttpService,

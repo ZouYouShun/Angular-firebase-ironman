@@ -111,13 +111,9 @@ app-font-size({種類})
   border-radius: app-border-radius(cycle);
   overflow: hidden;
 }
-.margin-0 {
+.mar-0 {
   margin-top: 0;
   margin-bottom: 0;
-}
-
-.margin-top {
-  margin-top: 0.5em;
 }
 
 .width-full {

@@ -15,7 +15,6 @@ import { CloudMessagingService } from './cloud-messaging.service';
 import { fromPromise } from 'rxjs/observable/fromPromise';
 import { tap, mergeMap, catchError, switchMap, filter, map } from 'rxjs/operators';
 import { of } from 'rxjs/observable/of';
-import { isOfflineForDatabase } from '@core/model/login.model';
 
 @Injectable()
 export class AuthService {

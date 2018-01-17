@@ -63,13 +63,11 @@ a {
   overflow: hidden;
 }
 
-.margin-0 {
+.mar-0 {
   margin-top: 0;
   margin-bottom: 0;
-}
-
-.margin-top {
-  margin-top: 0.5em;
+  margin-left: 0;
+  margin-right: 0;
 }
 
 .fb-button {
@@ -122,7 +120,7 @@ a {
   background: app-color(green);
   border: 1px solid app-color(gray);
   &.active {
-    display: block;
+    display: inline-block;
   }
 }
 

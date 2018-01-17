@@ -3,7 +3,6 @@ import { BaseHttpService } from '@core/service/base-http.service';
 import { map, tap, filter, combineLatest, skipWhile } from 'rxjs/operators';
 import * as firebase from 'firebase';
 import { AuthService } from './auth.service';
-import { isOnlineForDatabase, isOfflineForDatabase } from '../model/login.model';
 import { dbTimeObject } from '@core/service/base-http.service/model/realtime-database/db.time.function';
 import { Observable } from 'rxjs/Observable';
 

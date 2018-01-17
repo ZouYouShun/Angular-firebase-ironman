@@ -135,7 +135,7 @@ export class MessageDetialComponent extends AutoDestroy {
     this.messageHandler = this.roomHandler.collection('messages');
     return this.messageHandler.get({
       isKey: true,
-      queryFn: ref => ref.orderBy('createdAt')
+      queryFn: ref => ref.orderBy('updatedAt')
     });
   }
 

@@ -13,6 +13,7 @@ import { SafePipe } from './pipe/safe.pipe';
 import { CdkService } from './service/cdk.service';
 import { AutofocusDirective } from './directive/autofocus.directive';
 import { MessagePipe } from './pipe/message.pipe';
+import { ShortDatePipe } from '@shared/pipe/short-date.pipe';
 
 @NgModule({
   imports: [
@@ -27,7 +28,8 @@ import { MessagePipe } from './pipe/message.pipe';
     ImgPipe,
     SeachInputComponent,
     AutofocusDirective,
-    MessagePipe
+    MessagePipe,
+    ShortDatePipe
   ],
   exports: [
     CommonModule,
@@ -41,6 +43,8 @@ import { MessagePipe } from './pipe/message.pipe';
     SafePipe,
     ImgPipe,
     MessagePipe,
+    ShortDatePipe,
+
     ActionBoxComponent,
     SeachInputComponent,
     AutofocusDirective

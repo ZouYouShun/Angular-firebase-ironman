@@ -1,0 +1,11 @@
+<ng-container *ngIf="date > zero; else dateFormat">
+  {{date | date:'HH:mm'}}
+</ng-container>
+<ng-template #dateFormat>
+  <ng-container *ngIf="type!=='full';else full">
+    {{date | date:'yyyy/MM/dd'}}
+  </ng-container>
+  <ng-template #full>
+    {{date | date:'yyyy/MM/dd HH:mm'}}
+  </ng-template>
+</ng-template>

@@ -48,7 +48,13 @@
         <ng-container *ngFor="let message of messages; trackBy:trackByFn ">
           <li class="mar-t-b-1 sender"
             *ngIf="message.sender === sender.uid; else addresseeView">
-            <span fxFlexAlign="end" class="mar-r-1 mat-subheading-1 mar-0">{{message.updatedAt | date:'HH:mm'}}</span>
+            <span fxFlexAlign="end" class="mar-r-1 mat-subheading-1 mar-0">
+              <app-show-date
+                type="full"
+                [date]="message.updatedAt"
+                [zero]="_message.todayZero">
+              </app-show-date>
+            </span>
 
             <ng-container [ngSwitch]="message.type">
               <app-message-item-file *ngSwitchCase="'file'" [data]="roomFiles[message.content]"></app-message-item-file>
@@ -74,7 +80,13 @@
                 <span *ngSwitchDefault class="content pad-all-1" [innerHTML]="message.content | message:'url c-black' "></span>
               </ng-container>
 
-              <span fxFlexAlign="end" class="mar-l-1 mat-subheading-1 mar-0">{{message.updatedAt | date:'HH:mm'}}</span>
+              <span fxFlexAlign="end" class="mar-l-1 mat-subheading-1 mar-0">
+                <app-show-date
+                  type="full"
+                  [date]="message.updatedAt"
+                  [zero]="_message.todayZero">
+                </app-show-date>
+              </span>
             </li>
           </ng-template>
         </ng-container>

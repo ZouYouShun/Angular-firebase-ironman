@@ -24,12 +24,7 @@
             <i class="online-cycle" [ngClass]="{active: user.loginStatus}"></i>
             {{user.displayName}}
             <span class="f-r c-grey mat-subheading-1 mar-0">
-              <ng-container *ngIf="room.last.updatedAt > _message.todayZero; else dateFormat">
-                {{room.last.updatedAt | date:'HH:mm'}}
-              </ng-container>
-              <ng-template #dateFormat>
-                {{room.last.updatedAt | date:'yyyy/MM/dd'}}
-              </ng-template>
+              <app-show-date [date]="room.last.updatedAt" [zero]="_message.todayZero"></app-show-date>
             </span>
           </h2>
           <p mat-line class="c-grey">

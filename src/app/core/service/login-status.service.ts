@@ -23,11 +23,12 @@ export class LoginStatusService {
         if (user && !this._disconnection) {
           // console.log('登入!');
           const userStatusDatabaseRef = firebase.database().ref('/status/' + user.uid);
-          userStatusDatabaseRef.set(dbTimeObject({ state: true }, false))
+          this._disconnection = userStatusDatabaseRef.onDisconnect();
+
+          this._disconnection.set(dbTimeObject({ state: false }, false))
             .then(() => {
               // console.log('update login');
-              this._disconnection = userStatusDatabaseRef.onDisconnect();
-              return this._disconnection.set(dbTimeObject({ state: false }, false));
+              return userStatusDatabaseRef.set(dbTimeObject({ state: true }, false));
             })
             .catch(e => console.log(e));
 

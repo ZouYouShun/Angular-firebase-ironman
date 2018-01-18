@@ -19,10 +19,13 @@ import { UploadService } from '@core/service/upload.service';
 import { arrayToObjectByKey } from '@shared/ts/data/arrayToObjectByKey';
 import { Subject } from 'rxjs/Subject';
 import { StringHandler } from '@shared/ts/data/string.handler';
-import { takeUntil, switchMap, tap, combineLatest, mergeMap, filter, take } from 'rxjs/operators';
+import { takeUntil, switchMap, tap, combineLatest, filter, take, map } from 'rxjs/operators';
 import { of } from 'rxjs/observable/of';
-import { merge } from 'rxjs/observable/merge';
 import { dbTimeObject } from '@core/service/base-http.service/model/realtime-database/db.time.function';
+import * as firebase from 'firebase';
+import { LoginStatusService } from '@core/service/login-status.service';
+import { merge } from 'rxjs/observable/merge';
+import { BaseModel } from '@core/model/base.model';
 
 
 @Component({
@@ -43,22 +46,24 @@ export class MessageDetialComponent extends AutoDestroy {
   addresseeId: string;
 
   private roomsHandler: CollectionHandler<RoomModel[]>;
-  private messageHandler: CollectionHandler<MessageModel>;
+  private roomMessageHandler: CollectionHandler<MessageModel>;
 
   private roomHandler: DocumentHandler<RoomModel>;
-  private roomUsersHandler: CollectionHandler<RoomUsersModel[]>;
+  private roomUsersHandler: CollectionHandler<RoomUsersModel>;
+
 
   private roomId: string;
   private roomFiles = {};
   private roomUsers: RoomUsersModel[] = [];
 
   constructor(
+    public _message: MessageService,
     private _http: BaseHttpService,
     private _fb: FormBuilder,
     private _route: ActivatedRoute,
     private _auth: AuthService,
-    public _message: MessageService,
-    public _upload: UploadService) {
+    private _upload: UploadService,
+    private _loginStatus: LoginStatusService) {
     super();
     this.messageForm = this._fb.group({
       content: ''
@@ -72,19 +77,22 @@ export class MessageDetialComponent extends AutoDestroy {
       message$ = this.getMessageByRoomId();
     }
 
-    message$.pipe(
-      tap(messages => {
-        this.messageLoading = false;
-        this.messages = messages;
-        this.scrollButtom();
-      }),
-      takeUntil(this._destroy$)
-    ).subscribe();
+    merge(
+      // 取得訊息相關
+      message$,
+      // 取得使用者狀態
+      this._loginStatus.userFocusStatus$.pipe(
+        switchMap(status => {
+          if (!status) {
+            return this._message.setLeave();
+          }
+          return this._message.setReading();
+        })
+      ))
+      .pipe(takeUntil(this._destroy$))
+      .subscribe();
   }
 
-  goList() {
-    this._message.goList();
-  }
 
   private getMessageByUserId() {
     return this._route.params.pipe(
@@ -115,37 +123,54 @@ export class MessageDetialComponent extends AutoDestroy {
     );
   }
 
-  private getUsersRoom(usersRoom): Observable<MessageModel> {
+  private getUsersRoom(usersRoom): Observable<BaseModel> {
     if (usersRoom) {
-      return this.roomsHandler.document<MessageModel>(usersRoom.roomId).get();
+      return this.roomsHandler.document<BaseModel>(usersRoom.roomId).get();
     }
     return of(null);
   }
 
   private getRoomsMessages(roomId): Observable<any> {
+    // 檢查房間ID是否改變
+    if (this.roomId && this.roomId !== roomId) {
+      console.log('room changed');
+      this._message.setLeave();
+    }
     this.roomId = roomId;
     this.roomHandler = this.roomsHandler.document<RoomModel>(roomId);
-    this.roomUsersHandler = this.roomHandler.collection<any>('users');
-    this.messageHandler = this.roomHandler.collection('messages');
+
+    this.roomUsersHandler = this.roomHandler.collection('users');
+    this.roomMessageHandler = this.roomHandler.collection('messages');
+
+    this._message.myReadStatusHandler =
+      this.roomUsersHandler.document<RoomUsersModel>(this.sender.uid);
 
     // 先寫完當下的讀取狀態
-    return this.roomUsersHandler.document<RoomUsersModel>(this.sender.uid).update({ isReading: true }).pipe(
-      // 取得相關房間內容
-      switchMap(() => {
-        return this.roomHandler.collection<any>('files').get().pipe(
-          combineLatest(this.roomUsersHandler.get()),
-          tap(([files, users]) => {
-            this.roomFiles = arrayToObjectByKey(files, 'id');
-            this.roomUsers = users.filter(u => u.id !== this.sender.uid);
-            console.log(this.roomUsers);
-          }),
-        );
-      }),
-      // 最後取得房間訊息
-      switchMap(() => this.messageHandler.get({
+    return merge(
+      // 取得檔案
+      this.roomHandler.collection<any>('files').get().pipe(
+        tap((files) => {
+          this.roomFiles = arrayToObjectByKey(files, 'id');
+        })
+      ),
+      // 取得人員
+      this.roomUsersHandler.get().pipe(
+        tap((users) => {
+          this.roomUsers = users.filter(u => u.id !== this.sender.uid);
+        })
+      ),
+      // 取得訊息
+      this.roomMessageHandler.get({
         isKey: true,
         queryFn: ref => ref.orderBy('updatedAt')
-      }))
+      }).pipe(
+        tap(messages => {
+          this.messageLoading = false;
+          this.messages = messages;
+          this.scrollButtom();
+          console.log('get message');
+        })
+        )
     );
   }
 
@@ -165,7 +190,7 @@ export class MessageDetialComponent extends AutoDestroy {
     this.sender = sender;
     this.addresseeId = addresseeId;
 
-    this.messageHandler = null;
+    this.roomMessageHandler = null;
     this.roomUsersHandler = null;
   }
 
@@ -190,10 +215,9 @@ export class MessageDetialComponent extends AutoDestroy {
     const fileHandler = this._upload.fileHandler(filePath);
 
     return this.getMessageObs(filePath, MESSAGE_TYPE.FILE).pipe(
-      mergeMap(() => fileHandler.upload({ file: file }))
+      switchMap(() => fileHandler.upload({ file: file }))
     ).subscribe();
   }
-
 
   private getMessageObs(content, type = MESSAGE_TYPE.MESSAGE) {
     let req: Observable<any>;
@@ -205,18 +229,19 @@ export class MessageDetialComponent extends AutoDestroy {
       type: type
     };
 
-    if (this.messageHandler) {
-      req = this.messageHandler.add(message).pipe(
+    if (this.roomMessageHandler) {
+      req = this.roomMessageHandler.add(message).pipe(
         switchMap(msg => {
-          const adds = this.roomUsers
+          const batchHandler = this._http.batch();
+
+          // 取出所有正在讀取的人，一次寫進去讀取人的列表
+          this.roomUsers
             .filter(u => u.isReading)
-            // .map(user => {
-            //   return dbTimeObject({ uid: user.id }, false);
-            // });
-          // .map(user => this._http.list(`rooms/${this.roomId}/message/${msg.id}`).add({ uid: user.id }));
-          .map(user => msg.collection(`readed`).set(user.id, {}));
-          // return this._http.list(`rooms/${this.roomId}/message`).set(msg.id, adds);
-          return merge(...adds);
+            .forEach(user => {
+              const readHandler = msg.collection(`readed`).document(user.id);
+              batchHandler.set(readHandler, {});
+            });
+          return batchHandler.commit();
         })
       );
     } else {
@@ -227,17 +252,11 @@ export class MessageDetialComponent extends AutoDestroy {
     return req;
   }
 
-  // updateItem(message: any, value?: string) {
-  //   if (message.update) {
-  //     // this.messagesHandler.update(message.id, { content: value }).subscribe(RxViewer);
-  //     message.update = false;
-  //   }
-  //   message.update = true;
-  // }
-  // delete(message: any) {
-  //   this.roomsHandler.delete(message.id).subscribe(RxViewer);
-  // }
   trackByFn(index, item) {
     return item.id; // or item.name
+  }
+
+  goList() {
+    this._message.goList();
   }
 }

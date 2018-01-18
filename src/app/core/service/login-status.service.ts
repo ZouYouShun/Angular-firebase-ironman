@@ -5,12 +5,15 @@ import * as firebase from 'firebase';
 import { AuthService } from './auth.service';
 import { dbTimeObject } from '@core/service/base-http.service/model/realtime-database/db.time.function';
 import { Observable } from 'rxjs/Observable';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 
 @Injectable()
 export class LoginStatusService {
 
   private _disconnection: firebase.database.OnDisconnect;
+
+  userFocusStatus$ = new BehaviorSubject<boolean>(false);
 
   constructor(private _http: BaseHttpService, private _auth: AuthService) {
 
@@ -27,6 +30,7 @@ export class LoginStatusService {
 
           this._disconnection.set(dbTimeObject({ state: false }, false))
             .then(() => {
+              // console.log('寫入狀態');
               // console.log('update login');
               return userStatusDatabaseRef.set(dbTimeObject({ state: true }, false));
             })
@@ -39,5 +43,9 @@ export class LoginStatusService {
         }
       })
     ).subscribe();
+  }
+
+  changeFocus(status: boolean) {
+    this.userFocusStatus$.next(status);
   }
 }

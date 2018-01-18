@@ -19,7 +19,7 @@ function handleError(error) {
 
 export class CollectionHandler<T> {
   url: string;
-  _fireAction: AngularFirestoreCollection<T>;
+  private _fireAction: AngularFirestoreCollection<T>;
   constructor(
     private _afs: AngularFirestore,
     private _url: string | AngularFirestoreCollection<T>) {
@@ -36,7 +36,7 @@ export class CollectionHandler<T> {
     }
   }
 
-  get(config: CloudFirestoreConfig = { isKey: true }): Observable<T> {
+  get(config: CloudFirestoreConfig = { isKey: true }): Observable<T[]> {
     if (!this.url) return of(null);
     const req = config.queryFn ?
       this._afs.collection(this.url, config.queryFn) : this._fireAction;
@@ -109,6 +109,7 @@ export class DocumentHandler<T> {
   url: string;
   id: string;
   _fireAction: AngularFirestoreDocument<T>;
+
   constructor(
     private _afs: AngularFirestore,
     private _url: string | AngularFirestoreDocument<T>) {
@@ -126,6 +127,9 @@ export class DocumentHandler<T> {
         this.id = this._fireAction.ref.id;
       }
     }
+  }
+  get ref() {
+    return this._fireAction.ref;
   }
   // 取得資料
   get(isKey = true): Observable<T> {

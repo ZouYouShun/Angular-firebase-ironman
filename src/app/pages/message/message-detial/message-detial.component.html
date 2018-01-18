@@ -48,7 +48,8 @@
         <ng-container *ngFor="let message of messages; trackBy:trackByFn ">
           <li class="mar-t-b-1 sender"
             *ngIf="message.sender === sender.uid; else addresseeView">
-            <span fxFlexAlign="end" class="mar-r-1 mat-subheading-1 mar-0">
+            <span fxFlexAlign="end" class="mar-r-1 mat-subheading-1 mar-0 c-grey t-al-r">
+              {{message.readed?.length > 0? '已讀': '沒人看'}}<br>
               {{message.updatedAt | shortDate: _message.todayZero: 'full'}}
             </span>
 
@@ -57,12 +58,7 @@
               <span *ngSwitchDefault class="content pad-all-1" [innerHTML]="message.content | message:'url' "></span>
             </ng-container>
 
-            <i class="isSend material-icons"
-              [ngClass]="{complete: message.updatedAt}">done</i>
-            <!-- <img class="mar-l-1 avatar-img"
-              [src]="sender.photoURL || 'assets/img/avatar.jpg'"
-              [matTooltip]="sender.displayName" matTooltipPosition="left"
-              alt="sender photo"> -->
+            <i class="isSend material-icons" [ngClass]="{complete: message.updatedAt}">done</i>
           </li>
           <ng-template #addresseeView>
             <li class="mar-all-1 addressee" *ngIf="_message.friendsObj[message.sender] as addressee">
@@ -76,7 +72,7 @@
                 <span *ngSwitchDefault class="content pad-all-1" [innerHTML]="message.content | message:'url c-black' "></span>
               </ng-container>
 
-              <span fxFlexAlign="end" class="mar-l-1 mat-subheading-1 mar-0">
+              <span fxFlexAlign="end" class="mar-l-1 mat-subheading-1 mar-0 c-grey">
                 {{message.updatedAt | shortDate: _message.todayZero: 'full'}}
               </span>
             </li>

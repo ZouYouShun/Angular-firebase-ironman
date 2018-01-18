@@ -163,7 +163,7 @@ export const loginCheck = (req: Request, res: Response, next: NextFunction) => {
 import { loginCheck } from '../libs/login-check';
 
 export const messageApi = Router()
-  .use(loginCheck)
+  .use('/', loginCheck)
   .post('/roomWithMessage', roomWithMessageHandler)
   .post('/checkMessageReaded', checkMessageReadedHandler);
 ```
@@ -187,43 +187,73 @@ export const checkMessageReadedHandler = async (req, res, next) => {
   try {
     const firestore = admin.firestore();
     const user: admin.auth.DecodedIdToken = req.user;
-    console.log(user);
+    // console.log(user);
     const roomId = req.body.roomId;
 
     const roomRef = firestore.doc(`/rooms/${roomId}`);
     const roomMessagesRef = roomRef.collection(`messages`);
-    const myReadStatus: BaseModel = await roomRef.collection(`users`).doc(user.uid).get();
+    const myReadStatus = await roomRef.collection(`users`).doc(user.uid).get();
 
-    // 這裡一樣用batch做批次寫入
+    let query = roomMessagesRef.orderBy('updatedAt');
+
+    if (myReadStatus) {
+      const lastDate = myReadStatus.data();
+      query = query.startAt(lastDate.updatedAt)
+    }
+
     const batch = firestore.batch();
     let firstNotReadedMessageId;
 
-    // 我們根據使用者最後讀取的時間，把往後的資料全部都寫讀已讀
-    return roomMessagesRef.orderBy('updatedAt').startAt(myReadStatus.updatedAt).get()
+    return query.get()
       .then((result) => {
-        const data = result.docChanges;
-        firstNotReadedMessageId = data[0].doc.id;
-        data.forEach(message => {
-          const messageReadedDoc = message.doc.ref.collection(`readed`).doc(user.uid);
-          batch.set(messageReadedDoc, storeTimeObject({}));
-        });
-        return batch.commit();
+        const data = result.docs;
+        if (data && data.length > 0) {
+          firstNotReadedMessageId = data[0].id;
+          data.forEach(message => {
+            // 過濾掉自己的訊息
+            if (message.data().sender !== user.uid) {
+              const messageReadedDoc = message.ref.collection(`readed`).doc(user.uid);
+              batch.set(messageReadedDoc, storeTimeObject({}));
+            }
+          });
+          return batch.commit();
+        }
+        return null;
       }).then((result) => {
         return res.success({
-          message: 'add message success',
+          message: 'mark readed success',
           obj: firstNotReadedMessageId
         });
       });
   } catch (error) {
+    console.log(error);
     return res.status(500).json({
       message: 'fail',
       obj: error
     });
   }
-}
+};
 ```
 
-在使用者focus的時候，一併送出這個要求去把訊息標示已讀。
+另外在server.ts的部分要記得加上OPTIONS的判斷，因為跨域會先發送一個OPTIONS請求看可否跨域，之後才會傳真正的物件
+```js
+this.app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, GET, PATCH, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+
+  // 加上這段
+  if (req.method === 'OPTIONS') {
+    res.sendStatus(200);
+    res.end();
+  } else {
+    next();
+  }
+});
+```
+
+最後回到Angular中，在使用者focus的時候，一併送出這個要求去把訊息標示已讀。
 
 ```js
 merge(
@@ -235,36 +265,39 @@ merge(
       if (!status) {
         return this._message.setLeave();
       }
-      // 我們在寫入已讀後，去呼叫我們的方法
-      return this._message.setReading().pipe(
-        switchMap(() => {
+      return this._auth.token.pipe(
+        switchMap(token => {
           if (this.roomId) {
             return this._http.request('/api/message/checkMessageReaded').post({
               roomId: this.roomId
-            });
+            }, { token: token }, false);
           }
           return of(null);
-        }));
+        }),
+        switchMap(result => this._message.setReading())
+      );
     })
   ))
   .pipe(takeUntil(this._destroy$))
   .subscribe();
 ```
 
-不要忘記也要傳入token!
+不要忘記也要傳入token! Token的傳送方法就不多做解釋，大家可以自行實做，基本上就是擺在header而已。
 
 完成!
 
 
-
 # 本日小節
 今天我們把已讀功能實作完畢了，也了解在HTTP要如何做authentication，雖然目前沒有query subcollections的方法，但是透過時間，也是足夠的！方法是人想出來的！特別在還在起步的時候，真的特別需要花點心思啊，經過這次已讀的實做，相信大家對整個firebase的生命週期有了更多的了解了。
+
+另外筆者測試了之後，windows的 focus屬性在手機是無效的，這個部份我們可能還要想想其他方法來解決，只能在思考了。
 
 
 # 本日原始碼
 |名稱|網址|
 |---|---|
 |Angular| https://github.com/ZouYouShun/Angular-firebase-ironman/tree/day29_read_status_2|
+|functions| https://github.com/ZouYouShun/Angular-firebase-ironman-functions/tree/day29_read_status_2|
 
 
 # 參考資料

@@ -2,7 +2,7 @@ import { Component, ElementRef, ViewChild, ChangeDetectionStrategy, Output, Even
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { MessageModel, MESSAGE_TYPE } from '@core/model/message.model';
-import { RoomModel, UserRoomModel } from '@core/model/room.model';
+import { RoomModel, UserRoomModel, RoomUsersModel } from '@core/model/room.model';
 import { UserModel } from '@core/model/user.model';
 import { AuthService } from '@core/service/auth.service';
 import { BaseHttpService, CollectionHandler, DocumentHandler } from '@core/service/base-http.service';
@@ -19,8 +19,10 @@ import { UploadService } from '@core/service/upload.service';
 import { arrayToObjectByKey } from '@shared/ts/data/arrayToObjectByKey';
 import { Subject } from 'rxjs/Subject';
 import { StringHandler } from '@shared/ts/data/string.handler';
-import { takeUntil, switchMap, tap, combineLatest, mergeMap, filter } from 'rxjs/operators';
+import { takeUntil, switchMap, tap, combineLatest, mergeMap, filter, take } from 'rxjs/operators';
 import { of } from 'rxjs/observable/of';
+import { merge } from 'rxjs/observable/merge';
+import { dbTimeObject } from '@core/service/base-http.service/model/realtime-database/db.time.function';
 
 
 @Component({
@@ -32,7 +34,6 @@ export class MessageDetialComponent extends AutoDestroy {
 
   @ViewChild('article', { read: ElementRef }) article: ElementRef;
 
-
   messageLoading = true;
 
   messages: MessageModel[] = [];
@@ -40,14 +41,16 @@ export class MessageDetialComponent extends AutoDestroy {
 
   sender: UserModel;
   addresseeId: string;
-  uploading = false;
 
   private roomsHandler: CollectionHandler<RoomModel[]>;
   private messageHandler: CollectionHandler<MessageModel>;
 
-  private roomId: string;
   private roomHandler: DocumentHandler<RoomModel>;
+  private roomUsersHandler: CollectionHandler<RoomUsersModel[]>;
+
+  private roomId: string;
   private roomFiles = {};
+  private roomUsers: RoomUsersModel[] = [];
 
   constructor(
     private _http: BaseHttpService,
@@ -75,16 +78,6 @@ export class MessageDetialComponent extends AutoDestroy {
         this.messages = messages;
         this.scrollButtom();
       }),
-      switchMap(() => {
-        if (this.roomHandler) {
-          return this.roomHandler.collection<any>('files').get().pipe(
-            tap(files => {
-              this.roomFiles = arrayToObjectByKey(files, 'id');
-            })
-          );
-        }
-        return of(null);
-      }),
       takeUntil(this._destroy$)
     ).subscribe();
   }
@@ -95,7 +88,7 @@ export class MessageDetialComponent extends AutoDestroy {
 
   private getMessageByUserId() {
     return this._route.params.pipe(
-      combineLatest(this._auth.currentUser$.pipe(filter(u => !!u))),
+      combineLatest(this._auth.currentUser$.pipe(filter(u => !!u), take(1))),
       switchMap(([params, sender]) => {
         this.init(sender, params.addresseeId);
         return this._http.document(`users/${this.sender.uid}`)
@@ -114,7 +107,7 @@ export class MessageDetialComponent extends AutoDestroy {
     // 取得房間資料
     // 取得所有人的資料
     return this._route.params.pipe(
-      combineLatest(this._auth.currentUser$.pipe(filter(u => !!u))),
+      combineLatest(this._auth.currentUser$.pipe(filter(u => !!u), take(1))),
       switchMap(([params, sender]) => {
         this.init(sender, params.addresseeId);
         return this.getRoomsMessages(params.roomId);
@@ -132,11 +125,28 @@ export class MessageDetialComponent extends AutoDestroy {
   private getRoomsMessages(roomId): Observable<any> {
     this.roomId = roomId;
     this.roomHandler = this.roomsHandler.document<RoomModel>(roomId);
+    this.roomUsersHandler = this.roomHandler.collection<any>('users');
     this.messageHandler = this.roomHandler.collection('messages');
-    return this.messageHandler.get({
-      isKey: true,
-      queryFn: ref => ref.orderBy('updatedAt')
-    });
+
+    // 先寫完當下的讀取狀態
+    return this.roomUsersHandler.document<RoomUsersModel>(this.sender.uid).update({ isReading: true }).pipe(
+      // 取得相關房間內容
+      switchMap(() => {
+        return this.roomHandler.collection<any>('files').get().pipe(
+          combineLatest(this.roomUsersHandler.get()),
+          tap(([files, users]) => {
+            this.roomFiles = arrayToObjectByKey(files, 'id');
+            this.roomUsers = users.filter(u => u.id !== this.sender.uid);
+            console.log(this.roomUsers);
+          }),
+        );
+      }),
+      // 最後取得房間訊息
+      switchMap(() => this.messageHandler.get({
+        isKey: true,
+        queryFn: ref => ref.orderBy('updatedAt')
+      }))
+    );
   }
 
   @runAfterTimeout()
@@ -152,9 +162,11 @@ export class MessageDetialComponent extends AutoDestroy {
   private init(sender, addresseeId = null) {
     this.messages = [];
     this.messageLoading = true;
-    this.messageHandler = null;
     this.sender = sender;
     this.addresseeId = addresseeId;
+
+    this.messageHandler = null;
+    this.roomUsersHandler = null;
   }
 
   submitMessage(event?) {
@@ -177,8 +189,6 @@ export class MessageDetialComponent extends AutoDestroy {
     const filePath = encodeURIComponent(`${new Date().getTime()}_${file.name}`);
     const fileHandler = this._upload.fileHandler(filePath);
 
-    this.uploading = true;
-
     return this.getMessageObs(filePath, MESSAGE_TYPE.FILE).pipe(
       mergeMap(() => fileHandler.upload({ file: file }))
     ).subscribe();
@@ -187,8 +197,6 @@ export class MessageDetialComponent extends AutoDestroy {
 
   private getMessageObs(content, type = MESSAGE_TYPE.MESSAGE) {
     let req: Observable<any>;
-    // content = replaceToBr(content);
-    // content = content;
 
     const message: MessageModel = {
       sender: this.sender.uid,
@@ -198,7 +206,19 @@ export class MessageDetialComponent extends AutoDestroy {
     };
 
     if (this.messageHandler) {
-      req = this.messageHandler.add(message);
+      req = this.messageHandler.add(message).pipe(
+        switchMap(msg => {
+          const adds = this.roomUsers
+            .filter(u => u.isReading)
+            // .map(user => {
+            //   return dbTimeObject({ uid: user.id }, false);
+            // });
+          // .map(user => this._http.list(`rooms/${this.roomId}/message/${msg.id}`).add({ uid: user.id }));
+          .map(user => msg.collection(`readed`).set(user.id, {}));
+          // return this._http.list(`rooms/${this.roomId}/message`).set(msg.id, adds);
+          return merge(...adds);
+        })
+      );
     } else {
       req = this._http.request('/api/message/roomWithMessage').post({
         message: message

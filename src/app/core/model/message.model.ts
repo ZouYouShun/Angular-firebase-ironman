@@ -10,4 +10,5 @@ export interface MessageModel extends BaseModel {
   addressee: string;
   content: string;
   type: MESSAGE_TYPE;
+  readedNum?: number;
 }

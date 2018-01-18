@@ -49,7 +49,7 @@
           <li class="mar-t-b-1 sender"
             *ngIf="message.sender === sender.uid; else addresseeView">
             <span fxFlexAlign="end" class="mar-r-1 mat-subheading-1 mar-0 c-grey t-al-r">
-              {{message.readed?.length > 0? '已讀': '沒人看'}}<br>
+              {{message.readedNum > 0? ('已讀' + message.readedNum) : '沒人看'}}<br>
               {{message.updatedAt | shortDate: _message.todayZero: 'full'}}
             </span>
 

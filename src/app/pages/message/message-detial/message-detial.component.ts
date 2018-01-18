@@ -86,7 +86,17 @@ export class MessageDetialComponent extends AutoDestroy {
           if (!status) {
             return this._message.setLeave();
           }
-          return this._message.setReading();
+          return this._message.setReading().pipe(
+            switchMap( () => {
+              if (this.roomId) {
+                return this._http.request('api/message/checkMessageReaded').post({
+                  roomId: this.roomId
+                // tslint:disable-next-line:max-line-length
+                }, false, ``);
+              }
+              return of(null);
+            })
+          );
         })
       ))
       .pipe(takeUntil(this._destroy$))
@@ -236,7 +246,7 @@ export class MessageDetialComponent extends AutoDestroy {
 
           // 取出所有正在讀取的人，一次寫進去讀取人的列表
           this.roomUsers
-            .filter(u => u.isReading)
+            .filter(u => u.isReading && this._message.friendsObj[u.id].loginStatus)
             .forEach(user => {
               const readHandler = msg.collection(`readed`).document(user.id);
               batchHandler.set(readHandler, {});

@@ -19,7 +19,7 @@ export class MessageService {
   // 存使用者
   friends$ = new BehaviorSubject<UserModel[]>(null);
   rooms$ = new BehaviorSubject<UserRoomModel[]>(null);
-  friendsObj = {}; // Firend To Obj way
+  friendsObj: { [Key: string]: UserModel } = {}; // Firend To Obj way
 
   todayZero = new Date().setHours(0, 0, 0, 0);
 
@@ -62,14 +62,14 @@ export class MessageService {
   }
 
   setReading() {
-    console.log('reading');
+    // console.log('reading');
     if (this.myReadStatusHandler)
       return this.myReadStatusHandler.update({ isReading: true });
     return of(null);
   }
 
   setLeave() {
-    console.log('leave');
+    // console.log('leave');
     if (this.myReadStatusHandler)
       return this.myReadStatusHandler.update({ isReading: false });
     return of(null);

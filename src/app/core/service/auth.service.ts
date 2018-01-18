@@ -68,6 +68,9 @@ export class AuthService {
     ).subscribe();
   }
 
+  get token() {
+    return this._afAuth.auth.currentUser.getToken();
+  }
 
   // 注意！當註冊後也會更改當前authState，也會接到user，視同於登入
   signUpByEmail(obj: { email: string, password: string, name: string }) {

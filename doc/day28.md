@@ -228,7 +228,8 @@ private getMessageObs(content, type = MESSAGE_TYPE.MESSAGE) {
 
         // 取出所有正在讀取的人，設定他們進入已讀清單，直接用他們的id當作document id
         this.roomUsers
-          .filter(u => u.isReading)
+          // 這裡記得要塞選，只有當下是讀取的人，並且登入狀態是登入中的我們才要寫入已讀
+          .filter(u => u.isReading && this._message.friendsObj[u.id].loginStatus) 
           .forEach(user => {
             const readHandler = msg.collection(`readed`).document(user.id);
             batchHandler.set(readHandler, {});

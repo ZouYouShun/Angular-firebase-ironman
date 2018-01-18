@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild, ChangeDetectionStrategy, Output, EventEmitter } from '@angular/core';
+import { Component, ElementRef, ViewChild, ChangeDetectionStrategy, Output, EventEmitter, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { MessageModel, MESSAGE_TYPE } from '@core/model/message.model';
@@ -33,7 +33,7 @@ import { BaseModel } from '@core/model/base.model';
   templateUrl: './message-detial.component.html',
   styleUrls: ['./message-detial.component.scss']
 })
-export class MessageDetialComponent extends AutoDestroy {
+export class MessageDetialComponent extends AutoDestroy implements OnInit {
 
   @ViewChild('article', { read: ElementRef }) article: ElementRef;
 
@@ -70,6 +70,10 @@ export class MessageDetialComponent extends AutoDestroy {
     });
 
     this.roomsHandler = this._http.collection('rooms');
+  }
+
+  async ngOnInit() {
+
     let message$: Observable<any>;
     if (this._route.parent.component === MessageFriendListComponent) {
       message$ = this.getMessageByUserId();
@@ -79,30 +83,33 @@ export class MessageDetialComponent extends AutoDestroy {
 
     merge(
       // 取得訊息相關
-      message$,
+      message$.pipe(
+        tap(() => {
+          this.messageLoading = false;
+        })
+      ),
       // 取得使用者狀態
       this._loginStatus.userFocusStatus$.pipe(
         switchMap(status => {
           if (!status) {
             return this._message.setLeave();
           }
-          return this._message.setReading().pipe(
-            switchMap( () => {
+          return this._auth.token.pipe(
+            switchMap(token => {
               if (this.roomId) {
-                return this._http.request('api/message/checkMessageReaded').post({
+                return this._http.request('/api/message/checkMessageReaded').post({
                   roomId: this.roomId
-                // tslint:disable-next-line:max-line-length
-                }, false, ``);
+                }, { token: token }, false);
               }
               return of(null);
-            })
+            }),
+            switchMap(result => this._message.setReading())
           );
         })
       ))
       .pipe(takeUntil(this._destroy$))
       .subscribe();
   }
-
 
   private getMessageByUserId() {
     return this._route.params.pipe(
@@ -175,7 +182,6 @@ export class MessageDetialComponent extends AutoDestroy {
         queryFn: ref => ref.orderBy('updatedAt')
       }).pipe(
         tap(messages => {
-          this.messageLoading = false;
           this.messages = messages;
           this.scrollButtom();
           console.log('get message');
@@ -243,7 +249,6 @@ export class MessageDetialComponent extends AutoDestroy {
       req = this.roomMessageHandler.add(message).pipe(
         switchMap(msg => {
           const batchHandler = this._http.batch();
-
           // 取出所有正在讀取的人，一次寫進去讀取人的列表
           this.roomUsers
             .filter(u => u.isReading && this._message.friendsObj[u.id].loginStatus)
@@ -255,9 +260,11 @@ export class MessageDetialComponent extends AutoDestroy {
         })
       );
     } else {
-      req = this._http.request('/api/message/roomWithMessage').post({
-        message: message
-      });
+      req = this._auth.token.pipe(
+        switchMap(token => this._http.request('/api/message/roomWithMessage').post({ message: message }, {
+          token: token
+        }))
+      );
     }
     return req;
   }

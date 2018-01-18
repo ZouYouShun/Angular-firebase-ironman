@@ -9,16 +9,17 @@ import { mergeMap, tap, catchError } from 'rxjs/operators';
 import { ErrorObservable } from 'rxjs/observable/ErrorObservable';
 
 export interface MyHttpConfig {
-  headers?: HttpHeaders | {
+  headers?: {
     [header: string]: string | string[];
   };
   observe?: 'body';
-  params?: HttpParams | {
+  params?: {
     [param: string]: string | string[];
   };
   reportProgress?: boolean;
   responseType?: 'json';
   withCredentials?: boolean;
+  token?: string;
 }
 
 export class MyHttpHandler<T> {
@@ -37,15 +38,22 @@ export class MyHttpHandler<T> {
     return isBlockView ? this.next(getMethod) : this.noBlockNext(getMethod);
   }
 
-  post(obj: any, blockView = true, contentType?: string): Observable<T> {
-    const postMethod = this._http.post<T>(this.url, obj, { headers: this.getHeaders(contentType) });
+  post(obj: any, options: MyHttpConfig = {}, blockView = true): Observable<T> {
+    const postMethod = this._http.post<T>(this.url, obj, {
+      headers: this.getHeaders(options),
+      params: options.params
+    });
     return blockView ? this.next(postMethod) : this.noBlockNext(postMethod);
   }
 
-  getHeaders(contentType: string = 'application/json'): HttpHeaders {
-    const headers = new HttpHeaders()
-      // .set('authorization', `Bearer ${sessionStorage.getItem('token') ? sessionStorage.getItem('token') : ''}`)
-      .set('Content-Type', contentType);
+  getHeaders(options: MyHttpConfig = {}): { [header: string]: string } {
+    const headers = {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    };
+    if (options.token) {
+      headers['Authorization'] = `IronMan ${options.token}`;
+    }
 
     return headers;
   }

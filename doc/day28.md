@@ -258,7 +258,6 @@ private getMessageObs(content, type = MESSAGE_TYPE.MESSAGE) {
 |名稱|網址|
 |---|---|
 |Angular| https://github.com/ZouYouShun/Angular-firebase-ironman/tree/day28_read_status_1|
-|functions| https://github.com/ZouYouShun/Angular-firebase-ironman-functions/tree/day28_read_status_1|
 
 
 # 參考資料
